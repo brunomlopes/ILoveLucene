@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Primitives;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Caliburn.Micro;
@@ -15,9 +16,11 @@ namespace ILoveLucene
 
         protected override void Configure()
         {
+            var assemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             container =
                 CompositionHost.Initialize(
-                    new AggregateCatalog(AssemblySource.Instance.Select(x => new AssemblyCatalog(x)).OfType<ComposablePartCatalog>()));
+                    new AggregateCatalog(AssemblySource.Instance.Select(x => new AssemblyCatalog(x)).OfType<ComposablePartCatalog>()), 
+                    new DirectoryCatalog(assemblyDirectory));
 
             var batch = new CompositionBatch();
 
@@ -51,14 +54,7 @@ namespace ILoveLucene
             container.SatisfyImportsOnce(instance);
         }
 
-        protected override IEnumerable<System.Reflection.Assembly> SelectAssemblies()
-        {
-            // TODO: load more assemblies?
-            return new[]
-                       {
-                           Assembly.GetExecutingAssembly()
-                       };
-        }
+        
 
     }
 }
