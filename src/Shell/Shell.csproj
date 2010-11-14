@@ -39,7 +39,11 @@
     <Reference Include="Caliburn.Micro">
       <HintPath>..\..\lib\caliburn_micro\Caliburn.Micro.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ComponentModel.Composition.Initialization.Desktop">
+      <HintPath>..\..\lib\composition.initialization.desktop\Microsoft.ComponentModel.Composition.Initialization.Desktop.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Interactivity">
       <HintPath>..\..\lib\caliburn_micro\System.Windows.Interactivity.dll</HintPath>
@@ -66,7 +70,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindowBootstrapper.cs" />
+    <Compile Include="IShell.cs" />
+    <Compile Include="MefBootstrapper.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="WindowsInterop\FocusHandler.cs" />
     <Compile Include="WindowsInterop\KeyboardHandler.cs" />

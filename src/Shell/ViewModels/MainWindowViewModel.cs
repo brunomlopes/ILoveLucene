@@ -1,9 +1,11 @@
-﻿using System.Windows;
+﻿using System.ComponentModel.Composition;
+using System.Windows;
 using Caliburn.Micro;
 
 namespace ILoveLucene.ViewModels
 {
-    public class MainWindowViewModel : PropertyChangedBase
+    [Export(typeof(IShell))]
+    public class MainWindowViewModel : PropertyChangedBase, IShell
     {
         private string input;
 
