@@ -1,0 +1,12 @@
+﻿<Window x:Class="ILoveLucene.Views.MainWindowView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" Height="172" Width="525">
+    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="503">
+        <TextBlock Name="ItemName" Text="Text here" FontWeight="Bold" FontSize="24" Margin="5" />
+        <TextBlock Name="ItemDescription" Text="TextBlock" Margin="5" />
+        <TextBox Name="Input" Text="Sample text here" FontSize="22" />
+        <Button Name="Execute" Content="Execute me!"/>
+    </StackPanel>
+</Window>
