@@ -1,4 +1,8 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
 using Core.Abstractions;
@@ -10,13 +14,16 @@ namespace ILoveLucene.ViewModels
     {
         private readonly IExecuteCommand _executeCommand;
         private readonly IAutoCompleteText _autoCompleteText;
-        private string _input;
+        private readonly ILog _log;
+        private CancellationTokenSource _cancelationTokenSource;
 
         [ImportingConstructor]
-        public MainWindowViewModel(IExecuteCommand executeCommand, IAutoCompleteText autoCompleteText)
+        public MainWindowViewModel(IExecuteCommand executeCommand, IAutoCompleteText autoCompleteText, ILog log)
         {
             _executeCommand = executeCommand;
             _autoCompleteText = autoCompleteText;
+            _log = log;
+            _cancelationTokenSource = new CancellationTokenSource();
         }
 
         private string _description;
@@ -41,19 +48,13 @@ namespace ILoveLucene.ViewModels
             }
         }
 
+        private string _input;
         public string Input
         {
             get { return _input; }
             set
             {
                 _input = value;
-                
-                var autoCompletionResult = _autoCompleteText.Autocomplete(_input);
-                if (autoCompletionResult.HasAutoCompletion)
-                {
-                    Command = autoCompletionResult.AutoCompletedText;
-                }
-
                 NotifyOfPropertyChange(() => Input);
                 NotifyOfPropertyChange(() => CanExecute);
             }
@@ -68,5 +69,33 @@ namespace ILoveLucene.ViewModels
         {
             _executeCommand.Execute(_input);
         }
+
+        public void AutoComplete()
+        {
+            _cancelationTokenSource.Cancel();
+            _cancelationTokenSource = new CancellationTokenSource();
+
+            var token = _cancelationTokenSource.Token;
+            Task.Factory.StartNew(() =>
+                                      {
+                                          var result = _autoCompleteText.Autocomplete(Input);
+
+                                          token.ThrowIfCancellationRequested();
+
+                                          _log.Info("Got autocompletion '{0}' for '{1}' with {2} alternatives",
+                                                    result.AutoCompletedText, result.OriginalText,
+                                                    result.OtherOptions.Count());
+
+                                          if (result.HasAutoCompletion)
+                                          {
+                                              Command = result.AutoCompletedText;
+                                          }
+                                      }, token);
+        }
+    }
+
+    public class HasCompletion
+    {
+        public AutoCompletionResult Completion { get; set; }
     }
 }
