@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Core.Abstractions
@@ -32,6 +33,11 @@ namespace Core.Abstractions
                 return new AutoCompletionResult() {OriginalText = originalText, AutoCompletedCommand = null};
             }
             return new AutoCompletionResult(){OriginalText = originalText, AutoCompletedCommand = result.First(), OtherOptions = result.Skip(1)};
+        }
+
+        public static AutoCompletionResult SingleResult(string text, ICommand textCommand)
+        {
+            return OrderedResult(text, new[] {textCommand});
         }
     }
 }

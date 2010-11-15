@@ -10,6 +10,7 @@ namespace Core
 {
     public class ShortcutFinder
     {
+        private readonly Action<IEnumerable<FileInfo>> _foundFilesCallback;
         private HashSet<FileInfo> _shortcutPaths;
         public HashSet<FileInfo> ShortcutPaths
         {
@@ -24,9 +25,15 @@ namespace Core
             }
         }
         private static object _shortcutPathsLock = new object();
+        public static string[] _extensions = new[] { ".exe", ".bat", ".ps1", ".ipy", ".lnk", ".appref-ms" };
 
         public ShortcutFinder()
+            :this(files => {})
         {
+        }
+        public ShortcutFinder(Action<IEnumerable<FileInfo>> foundFilesCallback)
+        {
+            _foundFilesCallback = foundFilesCallback;
             _shortcutPaths = new HashSet<FileInfo>();
             var dirs = new[]
                            {
@@ -38,14 +45,12 @@ namespace Core
                                @"%USERPROFILE%\Favorites",
                                @"%HOME%\utils"
                            }.Select(Environment.ExpandEnvironmentVariables).ToList();
-            var extensions = new[] {"exe", "bat", "ps1", "ipy", "lnk", "appref-ms"}.Select(x => "."+x).ToList();
-
             Task.Factory.StartNew(() => dirs.AsParallel()
-                                            .ForAll(d => ScanDirectoryForShortcuts(d, extensions)))
+                                            .ForAll(d => ScanDirectoryForShortcuts(d)))
                 .GuardForException(e => Debug.WriteLine("Exception on task:" + e));
         }
-
-        private void ScanDirectoryForShortcuts(string s, List<string> extensions)
+        
+        private void ScanDirectoryForShortcuts(string s)
         {
             var currentDir = new DirectoryInfo(s);
 
@@ -54,8 +59,9 @@ namespace Core
                                           try
                                           {
                                               var fileInfos = currentDir.GetFiles("*.*", SearchOption.TopDirectoryOnly)
-                                                  .Where(f => extensions.Contains(f.Extension)).ToList();
+                                                  .Where(f => _extensions.Contains(f.Extension)).ToList();
                                               Debug.WriteLine("Found {0} files in {1}", fileInfos.Count(), currentDir);
+                                              _foundFilesCallback(fileInfos);
                                               lock (_shortcutPathsLock)
                                               {
                                                   _shortcutPaths.UnionWith(fileInfos);
@@ -81,7 +87,7 @@ namespace Core
                                           }
                                           directoryInfos
                                               .AsParallel()
-                                              .ForAll(d => ScanDirectoryForShortcuts(d.FullName, extensions));
+                                              .ForAll(d => ScanDirectoryForShortcuts(d.FullName));
                                       })
                 .GuardForException(e => Debug.WriteLine("Exception on task:" + e));
         }

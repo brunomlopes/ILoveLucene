@@ -20,16 +20,19 @@ namespace Core.Abstractions
     public class TextCommand : ICommand
     {
         public TextCommand(string input)
+            :this(input, string.Empty)
+        {
+        }
+
+        public TextCommand(string input, string description)
         {
             Text = input;
+            Description = description;
         }
 
         public string Text { get; set; }
 
-        public string Description
-        {
-            get { return String.Empty; }
-        }
+        public string Description { get; set; }
 
         public void Execute()
         {

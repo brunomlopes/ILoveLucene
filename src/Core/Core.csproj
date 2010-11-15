@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Lucene.Net">
+      <HintPath>..\..\lib\lucene\Lucene.Net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -45,7 +48,9 @@
     <Compile Include="Abstractions\IAutoCompleteText.cs" />
     <Compile Include="Abstractions\ICommand.cs" />
     <Compile Include="AutoCompletes\AutoCompleteBasedOnFiles.cs" />
+    <Compile Include="AutoCompletes\AutoCompleteBasedOnLucene.cs" />
     <Compile Include="AutoCompletes\AutoCompleteText.cs" />
+    <Compile Include="AutoCompletes\FileInfoCommand.cs" />
     <Compile Include="AutoCompletes\SlowAutoCompleteText.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
