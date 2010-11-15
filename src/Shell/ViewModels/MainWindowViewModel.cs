@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Input;
 using Caliburn.Micro;
 using Core.Abstractions;
+using ILoveLucene.Views;
 using ICommand = Core.Abstractions.ICommand;
 
 namespace ILoveLucene.ViewModels
@@ -26,7 +27,7 @@ namespace ILoveLucene.ViewModels
             _cancelationTokenSource = new CancellationTokenSource();
         }
 
-        public void Execute()
+        public void Execute(FrameworkElement source)
         {
             if (CommandWithArguments != null)
             {
@@ -36,6 +37,9 @@ namespace ILoveLucene.ViewModels
             {
                 Command.Execute();
             }
+
+            // HACK
+            ((MainWindowView)Window.GetWindow(source)).Toggle();
         }
 
         private IList<ICommand> _allOptions;
