@@ -45,8 +45,7 @@ namespace Core
                                @"%USERPROFILE%\Favorites",
                                @"%HOME%\utils"
                            }.Select(Environment.ExpandEnvironmentVariables).ToList();
-            Task.Factory.StartNew(() => dirs.AsParallel()
-                                            .ForAll(d => ScanDirectoryForShortcuts(d)))
+            Task.Factory.StartNew(() => dirs.ForEach(ScanDirectoryForShortcuts))
                 .GuardForException(e => Debug.WriteLine("Exception on task:" + e));
         }
         
@@ -54,42 +53,33 @@ namespace Core
         {
             var currentDir = new DirectoryInfo(s);
 
-            Task.Factory.StartNew(() =>
-                                      {
-                                          try
-                                          {
-                                              var fileInfos = currentDir.GetFiles("*.*", SearchOption.TopDirectoryOnly)
-                                                  .Where(f => _extensions.Contains(f.Extension)).ToList();
-                                              Debug.WriteLine("Found {0} files in {1}", fileInfos.Count(), currentDir);
-                                              _foundFilesCallback(fileInfos);
-                                              lock (_shortcutPathsLock)
-                                              {
-                                                  _shortcutPaths.UnionWith(fileInfos);
-                                              }
-                                          }
-                                          catch (UnauthorizedAccessException e)
-                                          {
-                                              // Oh well, no biggie I guess
-                                          }
-                                      })
-                .GuardForException(e => Debug.WriteLine("Exception on task:" + e));
-           
-            Task.Factory.StartNew(() =>
-                                      {
-                                          DirectoryInfo[] directoryInfos;
-                                          try
-                                          {
-                                              directoryInfos = currentDir.GetDirectories();
-                                          }
-                                          catch(UnauthorizedAccessException e)
-                                          {
-                                              return;
-                                          }
-                                          directoryInfos
-                                              .AsParallel()
-                                              .ForAll(d => ScanDirectoryForShortcuts(d.FullName));
-                                      })
-                .GuardForException(e => Debug.WriteLine("Exception on task:" + e));
+            try
+            {
+                var fileInfos = currentDir
+                    .GetFiles("*.*", SearchOption.TopDirectoryOnly)
+                    .Where(f => _extensions.Contains(f.Extension)).ToList();
+                Debug.WriteLine("Found {0} files in {1}", fileInfos.Count(), currentDir);
+                _foundFilesCallback(fileInfos);
+                lock (_shortcutPathsLock)
+                {
+                    _shortcutPaths.UnionWith(fileInfos);
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                // Oh well, no biggie I guess
+            }
+
+            List<DirectoryInfo> directoryInfos;
+            try
+            {
+                directoryInfos = currentDir.GetDirectories().ToList();
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                return;
+            }
+            directoryInfos.ForEach(d => ScanDirectoryForShortcuts(d.FullName));
         }
     }
 }

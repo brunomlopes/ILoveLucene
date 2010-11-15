@@ -29,13 +29,14 @@ namespace Core.AutoCompletes
             _stopwords = new Hashtable(ShortcutFinder._extensions.ToDictionary(s => s, s => s));
             
             var indexDirectory = new DirectoryInfo(Path.Combine(new FileInfo(Assembly.GetExecutingAssembly().FullName).DirectoryName, "index"));
-            //_directory = new SimpleFSDirectory(indexDirectory);
-            _directory = new RAMDirectory();
+            _directory = new SimpleFSDirectory(indexDirectory);
+            //_directory = new RAMDirectory();
             new IndexWriter(_directory, new StandardAnalyzer(Version.LUCENE_29), true, IndexWriter.MaxFieldLength.UNLIMITED).Close();
 
             IndexWriter.WRITE_LOCK_TIMEOUT = 30000; // 30 seconds should be enough?
             _finder = new ShortcutFinder(files =>
                                              {
+                                                 if(files.Count() == 0) return;
                                                  var indexWriter = new IndexWriter(_directory, new StopAnalyzer(Version.LUCENE_29, _stopwords), mfl: IndexWriter.MaxFieldLength.UNLIMITED);
                                                  try
                                                  {
