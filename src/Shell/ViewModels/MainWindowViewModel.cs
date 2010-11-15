@@ -53,8 +53,14 @@ namespace ILoveLucene.ViewModels
             }
         }
 
-        public void ProcessShortcut(KeyEventArgs eventArgs)
+        public void ProcessShortcut(FrameworkElement source, KeyEventArgs eventArgs)
         {
+            if (eventArgs.Key == Key.Escape)
+            {
+                ((MainWindowView)Window.GetWindow(source)).Toggle();
+                return;
+            }
+
             if (eventArgs.KeyboardDevice.Modifiers != ModifierKeys.Control)
             {
                 return;

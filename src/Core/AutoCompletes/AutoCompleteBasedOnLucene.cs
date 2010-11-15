@@ -29,21 +29,23 @@ namespace Core.AutoCompletes
             _stopwords = new Hashtable(ShortcutFinder._extensions.ToDictionary(s => s, s => s));
             
             var indexDirectory = new DirectoryInfo(Path.Combine(new FileInfo(Assembly.GetExecutingAssembly().FullName).DirectoryName, "index"));
+            var createIndex = !indexDirectory.Exists;
             _directory = new SimpleFSDirectory(indexDirectory);
-            //_directory = new RAMDirectory();
-            new IndexWriter(_directory, new StandardAnalyzer(Version.LUCENE_29), true, IndexWriter.MaxFieldLength.UNLIMITED).Close();
+            new IndexWriter(_directory, new StandardAnalyzer(Version.LUCENE_29), createIndex, IndexWriter.MaxFieldLength.UNLIMITED).Close();
 
-            IndexWriter.WRITE_LOCK_TIMEOUT = 30000; // 30 seconds should be enough?
             _finder = new ShortcutFinder(files =>
                                              {
                                                  if(files.Count() == 0) return;
-                                                 var indexWriter = new IndexWriter(_directory, new StopAnalyzer(Version.LUCENE_29, _stopwords), mfl: IndexWriter.MaxFieldLength.UNLIMITED);
+
+                                                 var indexWriter = new IndexWriter(_directory, new StandardAnalyzer(Version.LUCENE_29, _stopwords), mfl: IndexWriter.MaxFieldLength.UNLIMITED);
                                                  try
                                                  {
                                                      foreach (var fileInfo in files)
                                                      {
+                                                         indexWriter.DeleteDocuments(new Term("filepath", fileInfo.FullName));
+
                                                          var name = new Field("filename", Path.GetFileNameWithoutExtension(fileInfo.Name), Field.Store.YES,
-                                                                              Field.Index.ANALYZED);
+                                                                              Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
                                                          var path = new Field("filepath", fileInfo.FullName, Field.Store.YES,
                                                                               Field.Index.NOT_ANALYZED_NO_NORMS);
                                                          var document = new Document();
@@ -68,7 +70,7 @@ namespace Core.AutoCompletes
             try
             {
                 QueryParser queryParser = new QueryParser(Version.LUCENE_29, "filename",
-                                                          new StopAnalyzer(Version.LUCENE_29, _stopwords));
+                                                          new StandardAnalyzer(Version.LUCENE_29, _stopwords));
                 queryParser.SetDefaultOperator(QueryParser.Operator.AND);
                 var results = searcher.Search(queryParser.Parse(text), 10);
                 var commands = results.scoreDocs

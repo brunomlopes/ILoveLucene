@@ -15,6 +15,7 @@
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="KeyDown">
                             <cal:ActionMessage MethodName="ProcessShortcut" >
+                                <cal:Parameter Value="$source"/>
                                 <cal:Parameter Value="$eventArgs"/>
                             </cal:ActionMessage>
                         </i:EventTrigger>
