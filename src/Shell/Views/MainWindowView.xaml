@@ -5,23 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
         xmlns:cal="clr-namespace:Caliburn.Micro;assembly=Caliburn.Micro" 
-        xmlns:t="clr-namespace:ILoveLucene.ValueConverters" Height="172" Width="525">
+        xmlns:t="clr-namespace:ILoveLucene.ValueConverters" Height="202" Width="525">
 	<StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="503">
         <TextBlock Name="Command" Text="{Binding Command, Converter={t:ICommandToStringConverter}}" FontWeight="Bold" FontSize="24" Margin="5" />
         <TextBlock Name="Description" Text="TextBlock" Margin="5" />
-        <StackPanel Orientation="Horizontal">
-            <TextBox Name="Input" Text="Sample text here" FontSize="22" >
+        <StackPanel Orientation="Vertical" Height="Auto">
+            <TextBox Name="Input" Text="Sample text here" FontSize="22" Width="Auto">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="KeyUp">
                         <cal:ActionMessage MethodName="AutoComplete" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </TextBox>
-            <TextBox Name="Arguments" Text="" FontSize="22" Visibility="{Binding ArgumentsVisible}">
+            <TextBox Name="Arguments" Text="" FontSize="22" Visibility="{Binding ArgumentsVisible}" Width="Auto" >
                
             </TextBox>
         </StackPanel>
         
-        <Button Name="Execute" Content="Execute me!" IsDefault="True" />
+        <Button Name="Execute" Content="Execute me!" IsDefault="True" Visibility="Visible" />
     </StackPanel>
 </Window>
