@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using Caliburn.Micro;
 using Core.Abstractions;
+using ICommand = Core.Abstractions.ICommand;
 
 namespace ILoveLucene.ViewModels
 {
@@ -22,6 +26,81 @@ namespace ILoveLucene.ViewModels
             _autoCompleteText = autoCompleteText;
             _log = log;
             _cancelationTokenSource = new CancellationTokenSource();
+        }
+
+        public void Execute()
+        {
+            if (CommandWithArguments != null)
+            {
+                CommandWithArguments.Execute(Arguments);
+            }
+            else
+            {
+                Command.Execute();
+            }
+        }
+
+        private IList<ICommand> _allOptions;
+        public IList<ICommand> AllOptions
+        {
+            get { return _allOptions; }
+            set
+            {
+                _allOptions = value;
+                NotifyOfPropertyChange(() => AllOptions);
+            }
+        }
+
+        public void ProcessShortcut(KeyEventArgs eventArgs)
+        {
+            if (eventArgs.KeyboardDevice.Modifiers != ModifierKeys.Control)
+            {
+                return;
+            }
+            
+            var str = new KeyConverter().ConvertToString(eventArgs.Key);
+            int index;
+            if (int.TryParse(str, out index))
+            {
+                index -= 1;
+                if (index < AllOptions.Count)
+                {
+                    Command = AllOptions[index];
+                    eventArgs.Handled = true;
+                }
+            }
+            
+        }
+
+        public void AutoComplete()
+        {
+            _cancelationTokenSource.Cancel();
+            _cancelationTokenSource = new CancellationTokenSource();
+
+            var token = _cancelationTokenSource.Token;
+            Task.Factory.StartNew(() =>
+                                      {
+                                          var result = _autoCompleteText.Autocomplete(Input);
+
+                                          token.ThrowIfCancellationRequested();
+
+                                          _log.Info("Got autocompletion '{0}' for '{1}' with {2} alternatives",
+                                                    result.AutoCompletedCommand, result.OriginalText,
+                                                    result.OtherOptions.Count());
+
+                                          if (result.HasAutoCompletion)
+                                          {
+                                              Command = result.AutoCompletedCommand;
+                                              AllOptions = new []{Command}.Concat(result.OtherOptions).ToList();
+                                              Arguments = string.Empty;
+                                          }
+                                          else
+                                          {
+                                              Command = new TextCommand(Input);
+                                              AllOptions = new List<ICommand>();
+                                          }
+                                      }, token);
+
         }
 
         private string _description;
@@ -46,7 +125,7 @@ namespace ILoveLucene.ViewModels
                 NotifyOfPropertyChange(() => ArgumentsVisible);
             }
         }
-        
+
         public ICommandWithArguments CommandWithArguments
         {
             get { return _command as ICommandWithArguments; }
@@ -90,44 +169,6 @@ namespace ILoveLucene.ViewModels
         public bool CanExecute
         {
             get { return !string.IsNullOrWhiteSpace(_input); }
-        }
-
-        public void Execute()
-        {
-            if (CommandWithArguments != null)
-                CommandWithArguments.Execute(Arguments);
-            else
-            {
-                Command.Execute();
-            }
-        }
-
-        public void AutoComplete()
-        {
-            _cancelationTokenSource.Cancel();
-            _cancelationTokenSource = new CancellationTokenSource();
-
-            var token = _cancelationTokenSource.Token;
-            Task.Factory.StartNew(() =>
-                                      {
-                                          var result = _autoCompleteText.Autocomplete(Input);
-
-                                          token.ThrowIfCancellationRequested();
-
-                                          _log.Info("Got autocompletion '{0}' for '{1}' with {2} alternatives",
-                                                    result.AutoCompletedCommand, result.OriginalText,
-                                                    result.OtherOptions.Count());
-
-                                          if (result.HasAutoCompletion)
-                                          {
-                                              Command = result.AutoCompletedCommand;
-                                              Arguments = string.Empty;
-                                          }
-                                          else
-                                          {
-                                              Command = new TextCommand(Input);
-                                          }
-                                      }, token);
         }
     }
 }

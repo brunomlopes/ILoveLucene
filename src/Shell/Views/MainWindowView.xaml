@@ -5,23 +5,39 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
         xmlns:cal="clr-namespace:Caliburn.Micro;assembly=Caliburn.Micro" 
-        xmlns:t="clr-namespace:ILoveLucene.ValueConverters" Height="202" Width="525">
-	<StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="503">
-        <TextBlock Name="Command" Text="{Binding Command, Converter={t:ICommandToStringConverter}}" FontWeight="Bold" FontSize="24" Margin="5" />
-        <TextBlock Name="Description" Text="TextBlock" Margin="5" />
-        <StackPanel Orientation="Vertical" Height="Auto">
-            <TextBox Name="Input" Text="Sample text here" FontSize="22" Width="Auto">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="KeyUp">
-                        <cal:ActionMessage MethodName="AutoComplete" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </TextBox>
-            <TextBox Name="Arguments" Text="" FontSize="22" Visibility="{Binding ArgumentsVisible}" Width="Auto" >
+        xmlns:t="clr-namespace:ILoveLucene.ValueConverters" Height="202" Width="780">
+    <StackPanel Orientation="Horizontal">
+	    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="503" >
+            <TextBlock Name="Command" Text="{Binding Command, Converter={t:ICommandToStringConverter}}" FontWeight="Bold" FontSize="24" Margin="5" />
+            <TextBlock Name="Description" Text="TextBlock" Margin="5" />
+            <StackPanel Orientation="Vertical" Height="Auto">
+                <TextBox Name="Input" Text="Sample text here" FontSize="22" >
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="KeyDown">
+                            <cal:ActionMessage MethodName="ProcessShortcut" >
+                                <cal:Parameter Value="$eventArgs"/>
+                            </cal:ActionMessage>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="TextChanged">
+                            <cal:ActionMessage MethodName="AutoComplete" >
+                                
+                            </cal:ActionMessage>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
+                <TextBox Name="Arguments" Text="" FontSize="22" Visibility="{Binding ArgumentsVisible}" Width="Auto" >
                
-            </TextBox>
-        </StackPanel>
+                </TextBox>
+            </StackPanel>
         
-        <Button Name="Execute" Content="Execute me!" IsDefault="True" Visibility="Visible" />
+            <Button Name="Execute" Content="Execute me!" IsDefault="True" Visibility="Visible" />
+        </StackPanel>
+        <ListBox Name="AllOptions"  >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Text}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </StackPanel>
 </Window>
