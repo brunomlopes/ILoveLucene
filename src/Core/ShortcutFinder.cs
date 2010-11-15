@@ -4,13 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Abstractions;
 using Core.Extensions;
 
 namespace Core
 {
-    public class ShortcutFinder
+    public class ShortcutFinder : IItemSource<FileInfo>
     {
-        private readonly Action<IEnumerable<FileInfo>> _foundFilesCallback;
         private HashSet<FileInfo> _shortcutPaths;
         public HashSet<FileInfo> ShortcutPaths
         {
@@ -26,27 +26,23 @@ namespace Core
         }
         private static object _shortcutPathsLock = new object();
         public static string[] _extensions = new[] { ".exe", ".bat", ".ps1", ".ipy", ".lnk", ".appref-ms" };
+        private List<string> _dirs;
 
+       
         public ShortcutFinder()
-            :this(files => {})
         {
-        }
-        public ShortcutFinder(Action<IEnumerable<FileInfo>> foundFilesCallback)
-        {
-            _foundFilesCallback = foundFilesCallback;
             _shortcutPaths = new HashSet<FileInfo>();
-            var dirs = new[]
-                           {
-                               @"%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu",
-                               @"%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu",
-                               @"%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Recent",
-                               @"%APPDATA%\Microsoft\Internet Explorer\Quick Launch",
-                               @"C:\Windows\System32",
-                               @"%USERPROFILE%\Favorites",
-                               @"%HOME%\utils"
-                           }.Select(Environment.ExpandEnvironmentVariables).ToList();
-            Task.Factory.StartNew(() => dirs.ForEach(ScanDirectoryForShortcuts))
-                .GuardForException(e => Debug.WriteLine("Exception on task:" + e));
+            _dirs = new[]
+                        {
+                            @"%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu",
+                            @"%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu",
+                            @"%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Recent",
+                            @"%APPDATA%\Microsoft\Internet Explorer\Quick Launch",
+                            @"C:\Windows\System32",
+                            @"%USERPROFILE%\Favorites",
+                            @"%HOME%\utils"
+                        }.Select(Environment.ExpandEnvironmentVariables).ToList();
+           
         }
         
         private void ScanDirectoryForShortcuts(string s)
@@ -59,7 +55,6 @@ namespace Core
                     .GetFiles("*.*", SearchOption.TopDirectoryOnly)
                     .Where(f => _extensions.Contains(f.Extension)).ToList();
                 Debug.WriteLine("Found {0} files in {1}", fileInfos.Count(), currentDir);
-                _foundFilesCallback(fileInfos);
                 lock (_shortcutPathsLock)
                 {
                     _shortcutPaths.UnionWith(fileInfos);
@@ -80,6 +75,16 @@ namespace Core
                 return;
             }
             directoryInfos.ForEach(d => ScanDirectoryForShortcuts(d.FullName));
+        }
+
+        public Task<IEnumerable<FileInfo>> GetItems()
+        {
+            return Task.Factory.StartNew(() =>
+                                             {
+                                                 _dirs.ForEach(ScanDirectoryForShortcuts);
+                                                 return _shortcutPaths.AsEnumerable();
+                                             })
+                .GuardForException(e => Debug.WriteLine("Exception on task:" + e));
         }
     }
 }

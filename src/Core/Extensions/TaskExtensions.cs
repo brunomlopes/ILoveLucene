@@ -5,9 +5,9 @@ namespace Core.Extensions
 {
     public static class TaskExtensions
     {
-        public static void GuardForException(this Task task, Action<Exception> callback)
+        public static Task GuardForException(this Task task, Action<Exception> callback)
         {
-            task.ContinueWith(t =>
+            return task.ContinueWith(t =>
                                   {
                                       if (t.Exception != null)
                                       {
@@ -16,9 +16,21 @@ namespace Core.Extensions
                                   });
         }
         
-        public static void GuardForException(this Task task, Action<Task, Exception> callback)
+        public static Task<T> GuardForException<T>(this Task<T> task, Action<Exception> callback)
         {
-            task.ContinueWith(t =>
+            return task.ContinueWith(t =>
+                                  {
+                                      if (t.Exception != null)
+                                      {
+                                          callback(t.Exception);
+                                      }
+                                      return t.Result;
+                                  });
+        }
+        
+        public static Task GuardForException(this Task task, Action<Task, Exception> callback)
+        {
+            return task.ContinueWith(t =>
                                   {
                                       if (t.Exception != null)
                                       {

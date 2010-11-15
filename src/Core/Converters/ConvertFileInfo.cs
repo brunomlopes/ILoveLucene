@@ -8,7 +8,6 @@ using Lucene.Net.Documents;
 namespace Core.Converters
 {
     [Export(typeof(IConverter))]
-    [Export(typeof(IConverter<FileInfo>))]
     class ConvertFileInfo : IConverter<FileInfo>
     {
         public string ToId(FileInfo fileInfo)

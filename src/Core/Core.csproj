@@ -48,6 +48,7 @@
     <Compile Include="Abstractions\IAutoCompleteText.cs" />
     <Compile Include="Abstractions\ICommand.cs" />
     <Compile Include="Abstractions\IConverter.cs" />
+    <Compile Include="Abstractions\IItemSource.cs" />
     <Compile Include="AutoCompletes\AutoCompleteBasedOnFiles.cs" />
     <Compile Include="AutoCompletes\AutoCompleteBasedOnLucene.cs" />
     <Compile Include="AutoCompletes\AutoCompleteText.cs" />

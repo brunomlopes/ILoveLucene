@@ -21,34 +21,42 @@ namespace Core.AutoCompletes
     {
         private Directory _directory;
 
-        [ImportMany(typeof(IConverter))]
         public IEnumerable<IConverter> Converters { get; set; }
 
-        public AutoCompleteBasedOnLucene()
+        [ImportingConstructor]
+        public AutoCompleteBasedOnLucene([ImportMany]IEnumerable<IConverter> converters)
         {
+            Converters = converters;
             EnsureIndexExists();
 
-            new ShortcutFinder(files =>
-                                   {
-                                       if (files.Count() == 0) return;
+            var host = new ConverterHost(Converters);
+            new ShortcutFinder()
+                .GetItems()
+                .ContinueWith(task =>
+                                  {
+                                      var files = task.Result;
+                                      if (files.Count() == 0) return;
 
-                                       var indexWriter = new IndexWriter(_directory,
-                                                                         new StandardAnalyzer(Version.LUCENE_29),
-                                                                         IndexWriter.MaxFieldLength.UNLIMITED);
-                                       var host = new ConverterHost(Converters);
-                                       try
-                                       {
-                                           foreach (var fileInfo in files)
-                                           {
-                                               host.UpdateDocumentForItem(indexWriter, fileInfo);
-                                           }
-                                           indexWriter.Commit();
-                                       }
-                                       finally
-                                       {
-                                           indexWriter.Close();
-                                       }
-                                   });
+                                      var indexWriter = new IndexWriter(_directory,
+                                                                        new StandardAnalyzer(
+                                                                            Version.LUCENE_29),
+                                                                        IndexWriter.
+                                                                            MaxFieldLength.
+                                                                            UNLIMITED);
+                                      try
+                                      {
+                                          foreach (var fileInfo in files)
+                                          {
+                                              host.UpdateDocumentForItem(indexWriter,
+                                                                         fileInfo);
+                                          }
+                                          indexWriter.Commit();
+                                      }
+                                      finally
+                                      {
+                                          indexWriter.Close();
+                                      }
+                                  });
         }
 
         private void EnsureIndexExists()
