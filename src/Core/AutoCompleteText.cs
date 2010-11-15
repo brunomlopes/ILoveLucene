@@ -9,7 +9,7 @@ namespace Core
     [Export(typeof(IAutoCompleteText))]
     public class AutoCompleteText : IAutoCompleteText
     {
-        private class Command : ICommand
+        private class Command : ICommandWithArguments
         {
             public Command(string text)
             {
@@ -18,6 +18,11 @@ namespace Core
 
             public string Text { get; private set; }
             public string Description { get; private set; }
+            public void Execute()
+            {
+                Execute(string.Empty);
+            }
+
             public void Execute(string arguments)
             {
                 System.Diagnostics.Debug.WriteLine(string.Format("Executing {0}:{1}", Text, arguments));

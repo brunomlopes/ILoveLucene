@@ -43,6 +43,35 @@ namespace ILoveLucene.ViewModels
             {
                 _command = value;
                 NotifyOfPropertyChange(() => Command);
+                NotifyOfPropertyChange(() => ArgumentsVisible);
+            }
+        }
+        
+        public ICommandWithArguments CommandWithArguments
+        {
+            get { return _command as ICommandWithArguments; }
+        }
+
+        private string _arguments;
+        public string Arguments
+        {
+            get { return _arguments; }
+            set
+            {
+                _arguments = value;
+                NotifyOfPropertyChange(() => Arguments);
+            }
+        }
+
+        public Visibility ArgumentsVisible
+        {
+            get
+            {
+                if (Command != null && Command is ICommandWithArguments)
+                {
+                    return Visibility.Visible;
+                }
+                else return Visibility.Hidden;
             }
         }
 
@@ -65,7 +94,12 @@ namespace ILoveLucene.ViewModels
 
         public void Execute()
         {
-            Command.Execute(string.Empty);
+            if (CommandWithArguments != null)
+                CommandWithArguments.Execute(Arguments);
+            else
+            {
+                Command.Execute();
+            }
         }
 
         public void AutoComplete()
@@ -87,6 +121,7 @@ namespace ILoveLucene.ViewModels
                                           if (result.HasAutoCompletion)
                                           {
                                               Command = result.AutoCompletedCommand;
+                                              Arguments = string.Empty;
                                           }
                                           else
                                           {

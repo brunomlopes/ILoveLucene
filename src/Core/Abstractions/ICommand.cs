@@ -9,6 +9,11 @@ namespace Core.Abstractions
         /// </summary>
         string Text { get; }
         string Description { get; }
+        void Execute();
+    } 
+    
+    public interface ICommandWithArguments : ICommand
+    {
         void Execute(string arguments);
     }
 
@@ -26,7 +31,7 @@ namespace Core.Abstractions
             get { return String.Empty; }
         }
 
-        public void Execute(string arguments)
+        public void Execute()
         {
         }
     }
