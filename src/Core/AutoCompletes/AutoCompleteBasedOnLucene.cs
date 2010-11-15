@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Core.Abstractions;
+using Core.Converters;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
@@ -24,6 +26,10 @@ namespace Core.AutoCompletes
         private Directory _directory;
 
         private Hashtable _stopwords;
+
+        [ImportMany(typeof(IConverter))]
+        public IEnumerable<IConverter> Converters { get; set; }
+
         public AutoCompleteBasedOnLucene()
         {
             _stopwords = new Hashtable(ShortcutFinder._extensions.ToDictionary(s => s, s => s));
@@ -38,20 +44,12 @@ namespace Core.AutoCompletes
                                                  if(files.Count() == 0) return;
 
                                                  var indexWriter = new IndexWriter(_directory, new StandardAnalyzer(Version.LUCENE_29, _stopwords), mfl: IndexWriter.MaxFieldLength.UNLIMITED);
+                                                 var host = new ConverterHost(Converters);
                                                  try
                                                  {
                                                      foreach (var fileInfo in files)
                                                      {
-                                                         indexWriter.DeleteDocuments(new Term("filepath", fileInfo.FullName));
-
-                                                         var name = new Field("filename", Path.GetFileNameWithoutExtension(fileInfo.Name), Field.Store.YES,
-                                                                              Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
-                                                         var path = new Field("filepath", fileInfo.FullName, Field.Store.YES,
-                                                                              Field.Index.NOT_ANALYZED_NO_NORMS);
-                                                         var document = new Document();
-                                                         document.Add(name);
-                                                         document.Add(path);
-                                                         indexWriter.AddDocument(document);
+                                                         host.UpdateDocumentForItem(indexWriter, fileInfo);
                                                      }
                                                      indexWriter.Commit();
                                                  }
@@ -71,11 +69,12 @@ namespace Core.AutoCompletes
             {
                 QueryParser queryParser = new QueryParser(Version.LUCENE_29, "filename",
                                                           new StandardAnalyzer(Version.LUCENE_29, _stopwords));
+                var converterHost = new ConverterHost(Converters);
+
                 queryParser.SetDefaultOperator(QueryParser.Operator.AND);
                 var results = searcher.Search(queryParser.Parse(text), 10);
                 var commands = results.scoreDocs
-                    .Select(d => searcher.Doc(d.doc).GetField("filepath").StringValue())
-                    .Select(path => new FileInfoCommand(new FileInfo(path)));
+                    .Select(d => converterHost.GetCommandForDocument(searcher.Doc(d.doc)));
                 return AutoCompletionResult.OrderedResult(text, commands);
             }
             catch (ParseException e)

@@ -65,7 +65,7 @@ namespace Core
                     _shortcutPaths.UnionWith(fileInfos);
                 }
             }
-            catch (UnauthorizedAccessException e)
+            catch (UnauthorizedAccessException)
             {
                 // Oh well, no biggie I guess
             }
@@ -75,7 +75,7 @@ namespace Core
             {
                 directoryInfos = currentDir.GetDirectories().ToList();
             }
-            catch (UnauthorizedAccessException e)
+            catch (UnauthorizedAccessException)
             {
                 return;
             }
