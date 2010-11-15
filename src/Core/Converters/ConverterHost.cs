@@ -30,6 +30,7 @@ namespace Core.Converters
         {
             var converter = GetConverter<T>();
             var id = converter.ToId(item);
+            var name = converter.ToName(item);
             var nmspace = converter.GetNamespaceForItems();
             writer.DeleteDocuments(new Term("_id", id));
 
@@ -37,6 +38,9 @@ namespace Core.Converters
             document.Add(new Field("_id", id, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
+            document.Add(new Field("_name", name, Field.Store.YES,
+                                   Field.Index.ANALYZED,
+                                   Field.TermVector.WITH_POSITIONS_OFFSETS));
             document.Add(new Field("_namespace", nmspace, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));

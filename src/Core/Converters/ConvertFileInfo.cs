@@ -15,6 +15,12 @@ namespace Core.Converters
         {
             return fileInfo.FullName;
         }
+
+        public string ToName(FileInfo t)
+        {
+            return Path.GetFileNameWithoutExtension(t.Name);
+        }
+
         public Document ToDocument(FileInfo fileInfo)
         {
             var name = new Field("filename", Path.GetFileNameWithoutExtension(fileInfo.Name), Field.Store.YES,
