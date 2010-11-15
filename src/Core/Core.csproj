@@ -43,9 +43,8 @@
   <ItemGroup>
     <Compile Include="Abstractions\AutoCompletionResult.cs" />
     <Compile Include="Abstractions\IAutoCompleteText.cs" />
-    <Compile Include="Abstractions\IExecuteCommand.cs" />
+    <Compile Include="Abstractions\ICommand.cs" />
     <Compile Include="AutoCompleteText.cs" />
-    <Compile Include="ExecuteCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

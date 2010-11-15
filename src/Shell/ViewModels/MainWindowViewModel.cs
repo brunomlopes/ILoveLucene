@@ -12,15 +12,13 @@ namespace ILoveLucene.ViewModels
     [Export(typeof(IShell))]
     public class MainWindowViewModel : PropertyChangedBase, IShell
     {
-        private readonly IExecuteCommand _executeCommand;
         private readonly IAutoCompleteText _autoCompleteText;
         private readonly ILog _log;
         private CancellationTokenSource _cancelationTokenSource;
 
         [ImportingConstructor]
-        public MainWindowViewModel(IExecuteCommand executeCommand, IAutoCompleteText autoCompleteText, ILog log)
+        public MainWindowViewModel(IAutoCompleteText autoCompleteText, ILog log)
         {
-            _executeCommand = executeCommand;
             _autoCompleteText = autoCompleteText;
             _log = log;
             _cancelationTokenSource = new CancellationTokenSource();
@@ -37,8 +35,8 @@ namespace ILoveLucene.ViewModels
             }
         }
 
-        private string _command;
-        public string Command
+        private ICommand _command;
+        public ICommand Command
         {
             get { return _command; }
             set
@@ -67,7 +65,7 @@ namespace ILoveLucene.ViewModels
 
         public void Execute()
         {
-            _executeCommand.Execute(_input);
+            Command.Execute(string.Empty);
         }
 
         public void AutoComplete()
@@ -83,19 +81,18 @@ namespace ILoveLucene.ViewModels
                                           token.ThrowIfCancellationRequested();
 
                                           _log.Info("Got autocompletion '{0}' for '{1}' with {2} alternatives",
-                                                    result.AutoCompletedText, result.OriginalText,
+                                                    result.AutoCompletedCommand, result.OriginalText,
                                                     result.OtherOptions.Count());
 
                                           if (result.HasAutoCompletion)
                                           {
-                                              Command = result.AutoCompletedText;
+                                              Command = result.AutoCompletedCommand;
+                                          }
+                                          else
+                                          {
+                                              Command = new TextCommand(Input);
                                           }
                                       }, token);
         }
-    }
-
-    public class HasCompletion
-    {
-        public AutoCompletionResult Completion { get; set; }
     }
 }

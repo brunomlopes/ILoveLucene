@@ -7,26 +7,26 @@ namespace Core.Abstractions
     {
         public bool HasAutoCompletion
         {
-            get { return AutoCompletedText != null; }
+            get { return AutoCompletedCommand != null; }
         }
 
         public string OriginalText { get; private set; }
-        public string AutoCompletedText { get; private set; }
-        public IEnumerable<string> OtherOptions { get; private set; }
+        public ICommand AutoCompletedCommand { get; private set; }
+        public IEnumerable<ICommand> OtherOptions { get; private set; }
 
         protected AutoCompletionResult()
         {
-            OtherOptions = new string[]{};
+            OtherOptions = new ICommand[]{};
         }
 
         public static AutoCompletionResult NoResult(string originalText)
         {
-            return new AutoCompletionResult(){OriginalText = originalText, AutoCompletedText = null};
+            return new AutoCompletionResult(){OriginalText = originalText, AutoCompletedCommand = null};
         }
         
-        public static AutoCompletionResult OrderedResult(string originalText, IEnumerable<string> result)
+        public static AutoCompletionResult OrderedResult(string originalText, IEnumerable<ICommand> result)
         {
-            return new AutoCompletionResult(){OriginalText = originalText, AutoCompletedText = result.First(), OtherOptions = result.Skip(1)};
+            return new AutoCompletionResult(){OriginalText = originalText, AutoCompletedCommand = result.First(), OtherOptions = result.Skip(1)};
         }
     }
 }
