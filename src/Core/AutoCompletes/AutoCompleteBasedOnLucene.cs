@@ -24,39 +24,41 @@ namespace Core.AutoCompletes
         public IEnumerable<IConverter> Converters { get; set; }
 
         [ImportingConstructor]
-        public AutoCompleteBasedOnLucene([ImportMany]IEnumerable<IConverter> converters)
+        public AutoCompleteBasedOnLucene([ImportMany]IEnumerable<IConverter> converters, [ImportMany]IEnumerable<IItemSource> sources)
         {
             Converters = converters;
             EnsureIndexExists();
 
             var host = new ConverterHost(Converters);
-            new ShortcutFinder()
-                .GetItems()
-                .ContinueWith(task =>
-                                  {
-                                      var files = task.Result;
-                                      if (files.Count() == 0) return;
 
-                                      var indexWriter = new IndexWriter(_directory,
-                                                                        new StandardAnalyzer(
-                                                                            Version.LUCENE_29),
-                                                                        IndexWriter.
-                                                                            MaxFieldLength.
-                                                                            UNLIMITED);
-                                      try
-                                      {
-                                          foreach (var fileInfo in files)
-                                          {
-                                              host.UpdateDocumentForItem(indexWriter,
-                                                                         fileInfo);
-                                          }
-                                          indexWriter.Commit();
-                                      }
-                                      finally
-                                      {
-                                          indexWriter.Close();
-                                      }
-                                  });
+            sources
+                .AsParallel()
+                .ForAll(s => s.GetItems()
+                                 .ContinueWith(task =>
+                                                   {
+                                                       var files = task.Result;
+                                                       if (files.Count() == 0) return;
+
+                                                       IndexItems(files, host);
+                                                   }));
+        }
+
+        private void IndexItems(IEnumerable<object> items, ConverterHost host)
+        {
+            var indexWriter = new IndexWriter(_directory, new StandardAnalyzer(Version.LUCENE_29),
+                                              IndexWriter.MaxFieldLength.UNLIMITED);
+            try
+            {
+                foreach (var item in items)
+                {
+                    host.UpdateDocumentForObject(indexWriter,item);
+                }
+                indexWriter.Commit();
+            }
+            finally
+            {
+                indexWriter.Close();
+            }
         }
 
         private void EnsureIndexExists()

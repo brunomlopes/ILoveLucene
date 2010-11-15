@@ -70,6 +70,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Commands\ExitApplication.cs" />
     <Compile Include="DebugLogger.cs" />
     <Compile Include="IShell.cs" />
     <Compile Include="MefBootstrapper.cs" />

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Reflection;
 using Core.Abstractions;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
@@ -26,6 +27,14 @@ namespace Core.Converters
             }
             throw new NotImplementedException(string.Format("No converter for {0} found ", typeof(T)));
         }
+
+        public void UpdateDocumentForObject(IndexWriter writer, object item)
+        {
+            var type = item.GetType();
+            this.GetType().GetMethod("UpdateDocumentForItem").MakeGenericMethod(type)
+                .Invoke(this, new[] {writer, item});
+        }
+
         public void UpdateDocumentForItem<T>(IndexWriter writer, T item)
         {
             var converter = GetConverter<T>();

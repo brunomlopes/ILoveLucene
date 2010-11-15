@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace Core.Abstractions
 {
-    public interface IItemSource<T>
+    public interface IItemSource
     {
-        Task<IEnumerable<T>> GetItems();
+        Task<IEnumerable<object>> GetItems();
     }
 }

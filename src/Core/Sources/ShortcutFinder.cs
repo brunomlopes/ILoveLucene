@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -7,23 +8,12 @@ using System.Threading.Tasks;
 using Core.Abstractions;
 using Core.Extensions;
 
-namespace Core
+namespace Core.Sources
 {
-    public class ShortcutFinder : IItemSource<FileInfo>
+    [Export(typeof(IItemSource))]
+    public class ShortcutFinder : IItemSource
     {
         private HashSet<FileInfo> _shortcutPaths;
-        public HashSet<FileInfo> ShortcutPaths
-        {
-            get
-            {
-                HashSet<FileInfo> shortcuts;
-                lock (_shortcutPathsLock)
-                {
-                    shortcuts = new HashSet<FileInfo>(_shortcutPaths);
-                }
-                return shortcuts;
-            }
-        }
         private static object _shortcutPathsLock = new object();
         public static string[] _extensions = new[] { ".exe", ".bat", ".ps1", ".ipy", ".lnk", ".appref-ms" };
         private List<string> _dirs;
@@ -77,12 +67,12 @@ namespace Core
             directoryInfos.ForEach(d => ScanDirectoryForShortcuts(d.FullName));
         }
 
-        public Task<IEnumerable<FileInfo>> GetItems()
+        public Task<IEnumerable<object>> GetItems()
         {
             return Task.Factory.StartNew(() =>
                                              {
                                                  _dirs.ForEach(ScanDirectoryForShortcuts);
-                                                 return _shortcutPaths.AsEnumerable();
+                                                 return _shortcutPaths.Cast<object>();
                                              })
                 .GuardForException(e => Debug.WriteLine("Exception on task:" + e));
         }
