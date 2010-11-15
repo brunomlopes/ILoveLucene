@@ -44,7 +44,9 @@
     <Compile Include="Abstractions\AutoCompletionResult.cs" />
     <Compile Include="Abstractions\IAutoCompleteText.cs" />
     <Compile Include="Abstractions\ICommand.cs" />
-    <Compile Include="AutoCompleteText.cs" />
+    <Compile Include="AutoCompletes\AutoCompleteBasedOnFiles.cs" />
+    <Compile Include="AutoCompletes\AutoCompleteText.cs" />
+    <Compile Include="AutoCompletes\SlowAutoCompleteText.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShortcutFinder.cs" />
