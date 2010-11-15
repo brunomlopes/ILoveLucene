@@ -26,6 +26,11 @@ namespace Core.Abstractions
         
         public static AutoCompletionResult OrderedResult(string originalText, IEnumerable<ICommand> result)
         {
+            result = result.ToList();
+            if (result.Count() == 0)
+            {
+                return new AutoCompletionResult() {OriginalText = originalText, AutoCompletedCommand = null};
+            }
             return new AutoCompletionResult(){OriginalText = originalText, AutoCompletedCommand = result.First(), OtherOptions = result.Skip(1)};
         }
     }
