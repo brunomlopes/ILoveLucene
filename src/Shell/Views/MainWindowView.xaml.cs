@@ -29,14 +29,20 @@ namespace ILoveLucene.Views
                 this.Visibility = Visibility.Visible;
                 this.Show();
                 _focusHandler.SetForegroundWindow();
-                SetTextTo(string.Empty);
                 Input.Focus();
                 
             }
             else
             {
+                SetTextTo(string.Empty);
+                SetArgumentsTo(string.Empty);
                 this.Visibility = Visibility.Hidden;
             }
+        }
+
+        private void SetArgumentsTo(string text)
+        {
+            Arguments.Text = text;
         }
 
         private void SetTextTo(string text)
