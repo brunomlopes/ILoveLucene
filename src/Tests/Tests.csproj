@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{28E91DF6-B35A-4341-AB82-E9CE24B04750}</ProjectGuid>
+    <ProjectGuid>{2ED5DB10-13DC-470A-9D82-6056BE7B7E04}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Core</RootNamespace>
-    <AssemblyName>Core</AssemblyName>
+    <RootNamespace>Tests</RootNamespace>
+    <AssemblyName>Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,9 +31,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Lucene.Net">
-      <HintPath>..\..\lib\lucene\Lucene.Net.dll</HintPath>
-    </Reference>
+    <Reference Include="Lucene.Net, Version=2.9.2.2, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -42,25 +40,22 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="xunit">
+      <HintPath>..\..\lib\xunit\xunit.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.extensions">
+      <HintPath>..\..\lib\xunit\xunit.extensions.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Abstractions\AutoCompletionResult.cs" />
-    <Compile Include="Abstractions\IAutoCompleteText.cs" />
-    <Compile Include="Abstractions\ICommand.cs" />
-    <Compile Include="Abstractions\IConverter.cs" />
-    <Compile Include="Abstractions\IItemSource.cs" />
-    <Compile Include="AutoCompletes\AutoCompleteBasedOnLucene.cs" />
-    <Compile Include="AutoCompletes\FileInfoCommand.cs" />
-    <Compile Include="Converters\ConverterHost.cs" />
-    <Compile Include="Converters\ConvertFileInfo.cs" />
-    <Compile Include="Converters\ICommandConverter.cs" />
-    <Compile Include="Extensions\TaskExtensions.cs" />
+    <Compile Include="ConverterHostTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sources\ShortcutSource.cs" />
-    <Compile Include="Sources\StandaloneCommandsSource.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Commands\" />
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{28E91DF6-B35A-4341-AB82-E9CE24B04750}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

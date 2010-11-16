@@ -11,15 +11,14 @@ using Core.Extensions;
 namespace Core.Sources
 {
     [Export(typeof(IItemSource))]
-    public class ShortcutFinder : IItemSource
+    public class ShortcutSource : IItemSource
     {
         private HashSet<FileInfo> _shortcutPaths;
         private static object _shortcutPathsLock = new object();
         public static string[] _extensions = new[] { ".exe", ".bat", ".ps1", ".ipy", ".lnk", ".appref-ms" };
         private List<string> _dirs;
 
-       
-        public ShortcutFinder()
+        public ShortcutSource()
         {
             _shortcutPaths = new HashSet<FileInfo>();
             _dirs = new[]

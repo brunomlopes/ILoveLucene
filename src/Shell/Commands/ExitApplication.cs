@@ -5,11 +5,9 @@ using Core.Abstractions;
 
 namespace ILoveLucene.Commands
 {
+    [Export(typeof(ICommand))]
     public class ExitApplication : ICommand
     {
-        [Import]
-        public IWindowManager WindowManager { get; set; }
-
         public string Text
         {
             get { return "Exit"; }

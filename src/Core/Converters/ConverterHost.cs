@@ -9,7 +9,7 @@ using Lucene.Net.Index;
 
 namespace Core.Converters
 {
-    internal class ConverterHost
+    public class ConverterHost
     {
         private Dictionary<string, IConverter> _convertersForNamespaces;
 
@@ -18,7 +18,7 @@ namespace Core.Converters
             _convertersForNamespaces = converters.ToDictionary(c => c.GetNamespaceForItems());
         }
 
-        private IConverter<T> GetConverter<T>()
+        public IConverter<T> GetConverter<T>()
         {
             foreach (var converter in _convertersForNamespaces.Select(kvp => kvp.Value))
             {
@@ -39,10 +39,11 @@ namespace Core.Converters
         {
             var converter = GetConverter<T>();
             var id = converter.ToId(item);
-            var name = converter.ToName(item);
-            var nmspace = converter.GetNamespaceForItems();
             writer.DeleteDocuments(new Term("_id", id));
 
+
+            var nmspace = converter.GetNamespaceForItems();
+            var name = converter.ToName(item);
             var document = converter.ToDocument(item);
             document.Add(new Field("_id", id, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
