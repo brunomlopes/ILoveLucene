@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Abstractions\ArgumentAutoCompletionResult.cs" />
     <Compile Include="Abstractions\AutoCompletionResult.cs" />
     <Compile Include="Abstractions\IAutoCompleteText.cs" />
     <Compile Include="Abstractions\ICommand.cs" />
@@ -51,6 +52,7 @@
     <Compile Include="Abstractions\IItemSource.cs" />
     <Compile Include="AutoCompletes\AutoCompleteBasedOnLucene.cs" />
     <Compile Include="AutoCompletes\FileInfoCommand.cs" />
+    <Compile Include="Commands\Putty.cs" />
     <Compile Include="Converters\ConverterHost.cs" />
     <Compile Include="Converters\ConvertFileInfo.cs" />
     <Compile Include="Converters\ICommandConverter.cs" />
@@ -59,9 +61,7 @@
     <Compile Include="Sources\ShortcutSource.cs" />
     <Compile Include="Sources\StandaloneCommandsSource.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Commands\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

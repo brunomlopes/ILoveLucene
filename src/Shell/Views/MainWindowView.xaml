@@ -20,25 +20,35 @@
                             </cal:ActionMessage>
                         </i:EventTrigger>
                         <i:EventTrigger EventName="TextChanged">
-                            <cal:ActionMessage MethodName="AutoComplete" >
-                                
-                            </cal:ActionMessage>
+                            <cal:ActionMessage MethodName="AutoComplete" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
                 <TextBox Name="Arguments" Text="" FontSize="22" Visibility="{Binding ArgumentsVisible}" Width="Auto" >
-               
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="KeyDown">
+                            <cal:ActionMessage MethodName="ProcessArgumentShortcut" >
+                                <cal:Parameter Value="$source"/>
+                                <cal:Parameter Value="$eventArgs"/>
+                            </cal:ActionMessage>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="TextChanged">
+                            <cal:ActionMessage MethodName="AutoCompleteArgument" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </TextBox>
             </StackPanel>
         
             <Button Name="Execute" Content="Execute me!" IsDefault="True" Visibility="Visible" />
         </StackPanel>
-        <ListBox Name="AllOptions"  >
+        <ListBox Name="CommandOptions" >
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Text}"/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
+        </ListBox>
+        <ListBox Name="ArgumentOptions">
         </ListBox>
     </StackPanel>
 </Window>

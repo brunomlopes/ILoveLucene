@@ -38,4 +38,9 @@ namespace Core.Abstractions
         {
         }
     }
+
+    public interface ICommandWithAutoCompletedArguments : ICommandWithArguments
+    {
+        ArgumentAutoCompletionResult AutoCompleteArguments(string arguments);
+    }
 }
