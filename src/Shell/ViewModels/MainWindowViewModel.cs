@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading;
@@ -32,17 +33,25 @@ namespace ILoveLucene.ViewModels
 
         public void Execute(FrameworkElement source)
         {
-            if (CommandWithArguments != null)
+            try
             {
-                CommandWithArguments.Execute(Arguments);
-            }
-            else
-            {
-                Command.Execute();
-            }
+                if (CommandWithArguments != null)
+                {
+                    CommandWithArguments.Execute(Arguments);
+                }
+                else
+                {
+                    Command.Execute();
+                }
 
-            // HACK
-            ((MainWindowView)Window.GetWindow(source)).Toggle();
+                // HACK
+                ((MainWindowView)Window.GetWindow(source)).Toggle();
+            }
+            catch (Exception e)
+            {
+                Description = e.Message;
+                _log.Error(e);
+            }
         }
 
         private IList<ICommand> _commandOptions;
