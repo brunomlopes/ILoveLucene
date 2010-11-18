@@ -46,8 +46,7 @@ namespace Core.AutoCompletes
 
         private void IndexItems(IEnumerable<object> items, ConverterHost host)
         {
-            var indexWriter = new IndexWriter(_directory, new StandardAnalyzer(Version.LUCENE_29),
-                                              IndexWriter.MaxFieldLength.UNLIMITED);
+            var indexWriter = GetIndexWriter();
             try
             {
                 foreach (var item in items)
@@ -60,6 +59,12 @@ namespace Core.AutoCompletes
             {
                 indexWriter.Close();
             }
+        }
+
+        private IndexWriter GetIndexWriter()
+        {
+            return new IndexWriter(_directory, new StandardAnalyzer(Version.LUCENE_29),
+                                   IndexWriter.MaxFieldLength.UNLIMITED);
         }
 
         private void EnsureIndexExists()
@@ -88,14 +93,25 @@ namespace Core.AutoCompletes
 
                 var results = searcher.Search(queryParser.Parse(textWithFuzzy), 10);
                 var commands = results.scoreDocs
-                    .Select(d => converterHost.GetCommandForDocument(searcher.Doc(d.doc)));
+                    .Select(d => converterHost.GetCommandResultForDocument(searcher.Doc(d.doc)));
                 return AutoCompletionResult.OrderedResult(text, commands);
             }
             catch (ParseException e)
             {
-                return AutoCompletionResult.SingleResult(text, new TextCommand(text, "Error parsing input: " + e.Message));
+                return AutoCompletionResult.SingleResult(text,
+                                                         new AutoCompletionResult.CommandResult(
+                                                             new TextCommand(text, "Error parsing input: " + e.Message),
+                                                             null));
             }
             
+        }
+
+        public void LearnInputForCommandResult(string input, AutoCompletionResult.CommandResult result)
+        {
+            var writer = GetIndexWriter();
+
+            var host = new ConverterHost(Converters);
+            host.LearnCommandForInput(writer, result.CompletionId, input);
         }
     }
 }

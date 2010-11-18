@@ -44,7 +44,7 @@
         <ListBox Name="CommandOptions" >
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Text}"/>
+                    <TextBlock Text="{Binding Command, Converter=ICommandToStringConverter}"/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
