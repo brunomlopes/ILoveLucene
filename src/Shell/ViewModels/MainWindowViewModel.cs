@@ -42,8 +42,8 @@ namespace ILoveLucene.ViewModels
                 }
                 else
                 {
-                    _autoCompleteText.LearnInputForCommandResult(Input, Result);
                     Result.Command.Execute();
+                    _autoCompleteText.LearnInputForCommandResult(Input, Result);
                 }
 
                 // HACK

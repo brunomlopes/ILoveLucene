@@ -76,7 +76,6 @@ namespace Core.Converters
             var id = converter.ToId(item);
 
             var sha1 = new CommandId(nspace, id).GetSha1();
-            //writer.DeleteDocuments(new Term("_sha1", sha1));
 
             Document oldDocument = PopDocument(writer, sha1);
             string learnings = string.Empty;
@@ -129,8 +128,6 @@ namespace Core.Converters
                 throw new InvalidOperationException("Id is not CommandId. It means the command didn't originate from this class");
             }
             var commandId = (CommandId) commandIdObject;
-            var id = commandId.Id;
-            var nspace = commandId.Namespace;
 
             var document = PopDocument(writer, commandId.GetSha1());
 
