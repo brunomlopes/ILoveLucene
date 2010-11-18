@@ -97,7 +97,7 @@ namespace Core.Lucene
                                    Field.Index.ANALYZED,
                                    Field.TermVector.WITH_POSITIONS_OFFSETS));
             document.Add(new Field(SpecialFields.Learnings, learnings, Field.Store.YES,
-                                   Field.Index.NOT_ANALYZED,
+                                   Field.Index.ANALYZED,
                                    Field.TermVector.WITH_POSITIONS_OFFSETS));
             document.Add(new Field(SpecialFields.Namespace, nspace, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
@@ -141,7 +141,7 @@ namespace Core.Lucene
                 document.RemoveField(SpecialFields.Learnings);
             }
             learnings = string.Join(" ", new HashSet<string>(writer.GetAnalyzer().Tokenize(learnings)));
-            var newField = new Field(SpecialFields.Learnings, learnings, Field.Store.YES, Field.Index.NOT_ANALYZED);
+            var newField = new Field(SpecialFields.Learnings, learnings, Field.Store.YES, Field.Index.ANALYZED);
 
             document.Add(newField);
 
