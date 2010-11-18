@@ -7,6 +7,7 @@ using Core.Abstractions;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
+using Core.AutoCompletes;
 
 namespace Core.Converters
 {
@@ -142,6 +143,7 @@ namespace Core.Converters
                 learnings = field.StringValue() + " " + input;
                 document.RemoveField("_learnings");
             }
+            learnings = string.Join(" ", new HashSet<string>(writer.GetAnalyzer().Tokenize(learnings)));
             var newField = new Field("_learnings", learnings, Field.Store.YES, Field.Index.ANALYZED);
 
             document.Add(newField);

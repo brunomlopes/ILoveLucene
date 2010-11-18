@@ -46,7 +46,6 @@ namespace Tests
         [Fact]
         public void ICommandConverterCanConvertCommandBackAndForth()
         {
-            ConverterHost conversionHost;
             ICommandConverter[] converters = SetupCommandConverter();
 
             var converter = converters.First();

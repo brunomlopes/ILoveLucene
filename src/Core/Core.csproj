@@ -51,6 +51,7 @@
     <Compile Include="Abstractions\IConverter.cs" />
     <Compile Include="Abstractions\IItemSource.cs" />
     <Compile Include="AutoCompletes\AutoCompleteBasedOnLucene.cs" />
+    <Compile Include="AutoCompletes\AnalyzerExtension.cs" />
     <Compile Include="AutoCompletes\FileInfoCommand.cs" />
     <Compile Include="Commands\Putty.cs" />
     <Compile Include="Converters\ConverterHost.cs" />
