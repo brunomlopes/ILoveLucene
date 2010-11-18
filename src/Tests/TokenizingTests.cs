@@ -1,10 +1,7 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Core.AutoCompletes;
-using Lucene.Net.Analysis;
+using Core.Lucene;
 using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Util;
 using Xunit;
 

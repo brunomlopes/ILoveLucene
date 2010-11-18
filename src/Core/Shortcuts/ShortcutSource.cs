@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Core.Abstractions;
 using Core.Extensions;
 
-namespace Core.Sources
+namespace Core.Shortcuts
 {
     [Export(typeof(IItemSource))]
     public class ShortcutSource : IItemSource

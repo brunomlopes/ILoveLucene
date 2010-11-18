@@ -1,9 +1,9 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Tokenattributes;
 
-namespace Core.AutoCompletes
+namespace Core.Lucene
 {
     public static class AnalyzerExtension
     {

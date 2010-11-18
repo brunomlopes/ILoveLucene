@@ -2,7 +2,7 @@
 using System.IO;
 using Core.Abstractions;
 
-namespace Core.AutoCompletes
+namespace Core.Shortcuts
 {
     class FileInfoCommand : ICommand
     {

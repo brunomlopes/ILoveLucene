@@ -5,7 +5,7 @@ using System.Linq;
 using Core.Abstractions;
 using Lucene.Net.Documents;
 
-namespace Core.Converters
+namespace Core.Commands
 {
     [Export(typeof(IConverter))]
     public class ICommandConverter : IConverter<ICommand>

@@ -7,9 +7,9 @@ using Core.Abstractions;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
-using Core.AutoCompletes;
+using Enumerable = System.Linq.Enumerable;
 
-namespace Core.Converters
+namespace Core.Lucene
 {
     public class ConverterHost
     {
@@ -37,7 +37,7 @@ namespace Core.Converters
 
                 return
                     BitConverter.ToString(
-                        sha1.ComputeHash(Encoding.UTF8.GetBytes(Namespace).Concat(Encoding.UTF8.GetBytes(Id)).ToArray()))
+                        sha1.ComputeHash(Enumerable.ToArray<byte>(Encoding.UTF8.GetBytes(Namespace).Concat(Encoding.UTF8.GetBytes(Id)))))
                         .Replace("-", "");
             }
 
@@ -50,7 +50,7 @@ namespace Core.Converters
 
         public ConverterHost(IEnumerable<IConverter> converters)
         {
-            _convertersForNamespaces = converters.ToDictionary(c => c.GetNamespaceForItems());
+            _convertersForNamespaces = converters.ToDictionary(c => IConverterExtensions.GetNamespaceForItems(c));
         }
 
         public IConverter<T> GetConverter<T>()

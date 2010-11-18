@@ -2,10 +2,9 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using Core.Abstractions;
-using Core.AutoCompletes;
 using Lucene.Net.Documents;
 
-namespace Core.Converters
+namespace Core.Shortcuts
 {
     [Export(typeof(IConverter))]
     class ConvertFileInfo : IConverter<FileInfo>

@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Core.Abstractions;
-using Core.Converters;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
+using Lucene.Net.Util;
 using Directory = Lucene.Net.Store.Directory;
-using Version = Lucene.Net.Util.Version;
 
-namespace Core.AutoCompletes
+namespace Core.Lucene
 {
     [Export(typeof(IAutoCompleteText))]
     public class AutoCompleteBasedOnLucene : IAutoCompleteText

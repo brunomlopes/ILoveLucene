@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Abstractions;
 
-namespace Core.Sources
+namespace Core.Commands
 {
     [Export(typeof(IItemSource))]
     public class StandaloneCommandsSource : IItemSource
