@@ -93,7 +93,7 @@ namespace Core.Lucene
             document.Add(new Field(SpecialFields.Id, id, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
-            document.Add(new Field(SpecialFields.Namespace, name, Field.Store.YES,
+            document.Add(new Field(SpecialFields.Name, name, Field.Store.YES,
                                    Field.Index.ANALYZED,
                                    Field.TermVector.WITH_POSITIONS_OFFSETS));
             document.Add(new Field(SpecialFields.Learnings, learnings, Field.Store.YES,
