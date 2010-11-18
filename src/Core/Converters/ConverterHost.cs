@@ -1,17 +1,12 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 using Core.Abstractions;
-using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
-using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
-using Version = Lucene.Net.Util.Version;
 
 namespace Core.Converters
 {
@@ -22,13 +17,35 @@ namespace Core.Converters
             public string Namespace { get; private set; }
             public string Id { get; private set; }
 
+            public CommandId(string ns, string id)
+            {
+                Namespace = ns;
+                Id = id;
+            }
+
             public CommandId(Document document)
             {
                 Namespace = document.GetField("_namespace").StringValue();
                 Id = document.GetField("_id").StringValue();
             }
+
+            public string GetSha1()
+            {
+                var sha1 = System.Security.Cryptography.SHA1.Create();
+                sha1.Initialize();
+
+                return
+                    BitConverter.ToString(
+                        sha1.ComputeHash(Encoding.UTF8.GetBytes(Namespace).Concat(Encoding.UTF8.GetBytes(Id)).ToArray()))
+                        .Replace("-", "");
+            }
+
+            public override string ToString()
+            {
+                return string.Format("<Command Namespace:'{0}' Id:'{1}'>", Namespace, Id);
+            }
         }
-        private Dictionary<string, IConverter> _convertersForNamespaces;
+        private readonly Dictionary<string, IConverter> _convertersForNamespaces;
 
         public ConverterHost(IEnumerable<IConverter> converters)
         {
@@ -58,8 +75,10 @@ namespace Core.Converters
             var nspace = converter.GetNamespaceForItems();
             var id = converter.ToId(item);
 
-            var oldDocument = PopDocument(writer, id, nspace);
+            var sha1 = new CommandId(nspace, id).GetSha1();
+            //writer.DeleteDocuments(new Term("_sha1", sha1));
 
+            Document oldDocument = PopDocument(writer, sha1);
             string learnings = string.Empty;
             if(oldDocument != null){
                 learnings = (oldDocument.GetField("_learnings") ??
@@ -68,6 +87,7 @@ namespace Core.Converters
 
             var name = converter.ToName(item);
             var document = converter.ToDocument(item);
+            
             document.Add(new Field("_id", id, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
@@ -79,6 +99,8 @@ namespace Core.Converters
                                    Field.TermVector.WITH_POSITIONS_OFFSETS));
             document.Add(new Field("_namespace", nspace, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
+                                   Field.TermVector.NO));
+            document.Add(new Field("_sha1", sha1, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
             writer.AddDocument(document);
         }
@@ -110,12 +132,11 @@ namespace Core.Converters
             var id = commandId.Id;
             var nspace = commandId.Namespace;
 
-
-            var document = PopDocument(writer, id, nspace);
+            var document = PopDocument(writer, commandId.GetSha1());
 
             if (document == null)
             {
-                throw new InvalidOperationException(string.Format("Didn't find command for id '{0}' and namespace '{1}'", id,nspace));
+                throw new InvalidOperationException(string.Format("Didn't find command {0}", commandId));
             }
             var field = document.GetField("_learnings");
             string learnings = string.Empty;
@@ -131,30 +152,26 @@ namespace Core.Converters
             writer.AddDocument(document);
         }
 
-        private Document PopDocument(IndexWriter writer, string id, string nspace)
+        private Document PopDocument(IndexWriter writer, string sha1)
         {
-            var indexReader = writer.GetReader();
+            var searcher = new IndexSearcher(writer.GetDirectory(), false);
             try
             {
-                var searcher = new IndexSearcher(indexReader);
-
-                var parser = new QueryParser(Version.LUCENE_29, "_none", new StandardAnalyzer(Version.LUCENE_29));
-
-                var query = parser.Parse(string.Format("(_id:\"{0}\") AND (_namespace:\"{1}\")", id, nspace));
+                var query = new TermQuery(new Term("_sha1", sha1));
                 var documents = searcher.Search(query, 1);
 
-                Debug.Assert(documents.totalHits <= 1, "Search for id and namespace should result in only one hit or none at all");
+                Debug.Assert(documents.totalHits <= 1, string.Format("Sha1 {0} matched more than one document", sha1));
 
                 if (documents.totalHits == 0) return null;
 
                 var docNum = documents.scoreDocs.First().doc;
                 var document = searcher.Doc(docNum);
-                indexReader.DeleteDocument(docNum);
+                writer.DeleteDocuments(new Term("_sha1", sha1));
                 return document;
             }
             finally
             {
-                indexReader.Close();
+                searcher.Close();
             }
             
         }
