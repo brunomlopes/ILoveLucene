@@ -11,7 +11,7 @@ using Enumerable = System.Linq.Enumerable;
 
 namespace Core.Lucene
 {
-    public class ConverterHost
+    public class LuceneStorage
     {
         private class CommandId
         {
@@ -48,7 +48,7 @@ namespace Core.Lucene
         }
         private readonly Dictionary<string, IConverter> _convertersForNamespaces;
 
-        public ConverterHost(IEnumerable<IConverter> converters)
+        public LuceneStorage(IEnumerable<IConverter> converters)
         {
             _convertersForNamespaces = converters.ToDictionary(c => IConverterExtensions.GetNamespaceForItems(c));
         }
@@ -78,73 +78,70 @@ namespace Core.Lucene
 
             var sha1 = new CommandId(nspace, id).GetSha1();
 
-            Document oldDocument = PopDocument(writer, sha1);
-            string learnings = string.Empty;
-            if(oldDocument != null){
-                learnings = (oldDocument.GetField("_learnings") ??
-                             new Field("_learnings", string.Empty, Field.Store.YES, Field.Index.ANALYZED)).StringValue();
+            var oldDocument = PopDocument(writer, sha1);
+            var learnings = string.Empty;
+            if (oldDocument != null)
+            {
+                learnings = (oldDocument.GetField(SpecialFields.Learnings) ??
+                             new Field(SpecialFields.Learnings, string.Empty, Field.Store.YES, Field.Index.ANALYZED)).
+                    StringValue();
             }
 
             var name = converter.ToName(item);
             var document = converter.ToDocument(item);
             
-            document.Add(new Field("_id", id, Field.Store.YES,
+            document.Add(new Field(SpecialFields.Id, id, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
-            document.Add(new Field("_name", name, Field.Store.YES,
+            document.Add(new Field(SpecialFields.Namespace, name, Field.Store.YES,
                                    Field.Index.ANALYZED,
                                    Field.TermVector.WITH_POSITIONS_OFFSETS));
-            document.Add(new Field("_learnings", learnings, Field.Store.YES,
-                                   Field.Index.ANALYZED,
+            document.Add(new Field(SpecialFields.Learnings, learnings, Field.Store.YES,
+                                   Field.Index.NOT_ANALYZED,
                                    Field.TermVector.WITH_POSITIONS_OFFSETS));
-            document.Add(new Field("_namespace", nspace, Field.Store.YES,
+            document.Add(new Field(SpecialFields.Namespace, nspace, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
-            document.Add(new Field("_sha1", sha1, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS,
+            document.Add(new Field(SpecialFields.Sha1, sha1, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
             writer.AddDocument(document);
         }
 
         public AutoCompletionResult.CommandResult GetCommandResultForDocument(Document document)
         {
-            var nmspace = document.GetField("_namespace").StringValue();
-            if (!_convertersForNamespaces.ContainsKey(nmspace))
+            var nspace = document.GetField(SpecialFields.Namespace).StringValue();
+            if (!_convertersForNamespaces.ContainsKey(nspace))
             {
-                throw new NotImplementedException(string.Format("No converter for namespace {0} found", nmspace));
+                throw new NotImplementedException(string.Format("No converter for namespace {0} found", nspace));
             }
-            var command = _convertersForNamespaces[nmspace].FromDocumentToCommand(document);
-            
+            var command = _convertersForNamespaces[nspace].FromDocumentToCommand(document);
+
             return new AutoCompletionResult.CommandResult(command, new CommandId(document));
         }
 
         public void LearnCommandForInput(IndexWriter writer, object commandIdObject, string input)
         {
-            if (commandIdObject == null)
-            {
-                // fickle command, isn't learnable
-                return;
-            }
-            if(!(commandIdObject is CommandId))
-            {
-                throw new InvalidOperationException("Id is not CommandId. It means the command didn't originate from this class");
-            }
-            var commandId = (CommandId) commandIdObject;
+            // fickle command, isn't learnable
+            if (commandIdObject == null) return;
 
+            if(!(commandIdObject is CommandId))
+                throw new InvalidOperationException("Id is not CommandId. It means the command didn't originate from this class");
+
+            var commandId = (CommandId) commandIdObject;
             var document = PopDocument(writer, commandId.GetSha1());
 
             if (document == null)
-            {
                 throw new InvalidOperationException(string.Format("Didn't find command {0}", commandId));
-            }
-            var field = document.GetField("_learnings");
-            string learnings = string.Empty;
+
+            var field = document.GetField(SpecialFields.Learnings);
+            var learnings = input;
             if(field != null)
             {
-                learnings = field.StringValue() + " " + input;
-                document.RemoveField("_learnings");
+                learnings = field.StringValue() + " " + learnings;
+                document.RemoveField(SpecialFields.Learnings);
             }
             learnings = string.Join(" ", new HashSet<string>(writer.GetAnalyzer().Tokenize(learnings)));
-            var newField = new Field("_learnings", learnings, Field.Store.YES, Field.Index.ANALYZED);
+            var newField = new Field(SpecialFields.Learnings, learnings, Field.Store.YES, Field.Index.NOT_ANALYZED);
 
             document.Add(newField);
 
@@ -156,23 +153,21 @@ namespace Core.Lucene
             var searcher = new IndexSearcher(writer.GetDirectory(), false);
             try
             {
-                var query = new TermQuery(new Term("_sha1", sha1));
+                var query = new TermQuery(new Term(SpecialFields.Sha1, sha1));
                 var documents = searcher.Search(query, 1);
 
-                Debug.Assert(documents.totalHits <= 1, string.Format("Sha1 {0} matched more than one document", sha1));
+                Debug.Assert(documents.totalHits <= 1, string.Format("Sha1 '{0}' matched more than one document", sha1));
 
                 if (documents.totalHits == 0) return null;
 
-                var docNum = documents.scoreDocs.First().doc;
-                var document = searcher.Doc(docNum);
-                writer.DeleteDocuments(new Term("_sha1", sha1));
+                var document = searcher.Doc(documents.scoreDocs.First().doc);
+                writer.DeleteDocuments(new Term(SpecialFields.Sha1, sha1));
                 return document;
             }
             finally
             {
                 searcher.Close();
             }
-            
         }
     }
 

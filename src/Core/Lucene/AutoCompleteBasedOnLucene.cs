@@ -17,31 +17,33 @@ namespace Core.Lucene
     [Export(typeof(IAutoCompleteText))]
     public class AutoCompleteBasedOnLucene : IAutoCompleteText
     {
+        private readonly IEnumerable<IItemSource> _sources;
         private Directory _directory;
 
-        public IEnumerable<IConverter> Converters { get; set; }
+        private IEnumerable<IConverter> _converters;
 
         [ImportingConstructor]
         public AutoCompleteBasedOnLucene([ImportMany]IEnumerable<IConverter> converters, [ImportMany]IEnumerable<IItemSource> sources)
         {
-            Converters = converters;
+            _sources = sources;
+            _converters = converters;
             EnsureIndexExists();
 
-            var host = new ConverterHost(Converters);
+            var host = new LuceneStorage(_converters);
 
-            sources
+            _sources
                 .AsParallel()
                 .ForAll(s => s.GetItems()
                                  .ContinueWith(task =>
                                                    {
-                                                       var files = task.Result;
-                                                       if (files.Count() == 0) return;
+                                                       var items = task.Result;
+                                                       if (items.Count() == 0) return;
 
-                                                       IndexItems(files, host);
+                                                       IndexItems(items, host);
                                                    }));
         }
 
-        private void IndexItems(IEnumerable<object> items, ConverterHost host)
+        private void IndexItems(IEnumerable<object> items, LuceneStorage host)
         {
             var indexWriter = GetIndexWriter();
             try
@@ -79,14 +81,12 @@ namespace Core.Lucene
             var searcher = new IndexSearcher(_directory, true);
             try
             {
-                var textWithFuzzy = text.Trim().Replace(" ", "~ ").Trim()+"~";
-                var queryParser = new MultiFieldQueryParser(Version.LUCENE_29, new string[]{"_name", "_learnings"},
+                var textWithFuzzy = text.Trim().Replace(" ", "~ ").Trim() + "~";
+                var queryParser = new MultiFieldQueryParser(Version.LUCENE_29, new string[]{SpecialFields.Name, SpecialFields.Learnings},
                                                           new StandardAnalyzer(Version.LUCENE_29));
-                var converterHost = new ConverterHost(Converters);
+                var converterHost = new LuceneStorage(_converters);
                 queryParser.SetFuzzyMinSim((float)0.2);
                 queryParser.SetDefaultOperator(QueryParser.Operator.AND);
-
-
 
                 var results = searcher.Search(queryParser.Parse(textWithFuzzy), 10);
                 var commands = results.scoreDocs
@@ -109,7 +109,7 @@ namespace Core.Lucene
 
             try
             {
-                var host = new ConverterHost(Converters);
+                var host = new LuceneStorage(_converters);
                 host.LearnCommandForInput(writer, result.CompletionId, input);
             }
             finally

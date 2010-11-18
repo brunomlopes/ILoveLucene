@@ -31,7 +31,7 @@ namespace Tests
     public class ConverterHostTests
     {
         private CompositionContainer _container;
-        private ConverterHost _converterHost;
+        private LuceneStorage _luceneStorage;
         private SimpleCommand _command;
 
         [Fact]
@@ -39,8 +39,8 @@ namespace Tests
         {
             ICommandConverter[] converters = SetupCommandConverter();
 
-            Assert.Equal(converters.First(), _converterHost.GetConverter<SimpleCommand>());
-            Assert.Equal(converters.First(), _converterHost.GetConverter<ICommand>());
+            Assert.Equal(converters.First(), _luceneStorage.GetConverter<SimpleCommand>());
+            Assert.Equal(converters.First(), _luceneStorage.GetConverter<ICommand>());
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace Tests
             _container.Compose(batch);
 
             var converters = new[] {new ICommandConverter(_container)};
-            _converterHost = new ConverterHost(converters);
+            _luceneStorage = new LuceneStorage(converters);
             return converters;
         }
     }
