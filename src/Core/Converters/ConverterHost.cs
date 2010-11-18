@@ -134,21 +134,29 @@ namespace Core.Converters
         private Document PopDocument(IndexWriter writer, string id, string nspace)
         {
             var indexReader = writer.GetReader();
-            var searcher = new IndexSearcher(indexReader);
+            try
+            {
+                var searcher = new IndexSearcher(indexReader);
 
-            var parser = new QueryParser(Version.LUCENE_29, "_none", new StandardAnalyzer(Version.LUCENE_29));
+                var parser = new QueryParser(Version.LUCENE_29, "_none", new StandardAnalyzer(Version.LUCENE_29));
 
-            var query = parser.Parse(string.Format("(_id:\"{0}\") AND (_namespace:\"{1}\")", id, nspace));
-            var documents = searcher.Search(query, 1);
+                var query = parser.Parse(string.Format("(_id:\"{0}\") AND (_namespace:\"{1}\")", id, nspace));
+                var documents = searcher.Search(query, 1);
 
-            Debug.Assert(documents.totalHits <= 1, "Search for id and namespace should result in only one hit or none at all");
+                Debug.Assert(documents.totalHits <= 1, "Search for id and namespace should result in only one hit or none at all");
 
-            if (documents.totalHits == 0) return null;
+                if (documents.totalHits == 0) return null;
 
-            var docNum = documents.scoreDocs.First().doc;
-            var document = searcher.Doc(docNum);
-            indexReader.DeleteDocument(docNum);
-            return document;
+                var docNum = documents.scoreDocs.First().doc;
+                var document = searcher.Doc(docNum);
+                indexReader.DeleteDocument(docNum);
+                return document;
+            }
+            finally
+            {
+                indexReader.Close();
+            }
+            
         }
     }
 

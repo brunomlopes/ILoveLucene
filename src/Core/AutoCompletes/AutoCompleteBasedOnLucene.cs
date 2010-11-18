@@ -110,8 +110,15 @@ namespace Core.AutoCompletes
         {
             var writer = GetIndexWriter();
 
-            var host = new ConverterHost(Converters);
-            host.LearnCommandForInput(writer, result.CompletionId, input);
+            try
+            {
+                var host = new ConverterHost(Converters);
+                host.LearnCommandForInput(writer, result.CompletionId, input);
+            }
+            finally
+            {
+                writer.Close();
+            }
         }
     }
 }
