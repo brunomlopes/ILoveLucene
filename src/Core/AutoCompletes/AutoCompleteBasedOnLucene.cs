@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -76,12 +77,16 @@ namespace Core.AutoCompletes
             var searcher = new IndexSearcher(_directory, true);
             try
             {
-                QueryParser queryParser = new QueryParser(Version.LUCENE_29, "_name",
+                var textWithFuzzy = text.Trim().Replace(" ", "~ ").Trim()+"~";
+                var queryParser = new MultiFieldQueryParser(Version.LUCENE_29, new string[]{"_name", "_learnings"},
                                                           new StandardAnalyzer(Version.LUCENE_29));
                 var converterHost = new ConverterHost(Converters);
-
+                queryParser.SetFuzzyMinSim((float)0.2);
                 queryParser.SetDefaultOperator(QueryParser.Operator.AND);
-                var results = searcher.Search(queryParser.Parse(text), 10);
+
+
+
+                var results = searcher.Search(queryParser.Parse(textWithFuzzy), 10);
                 var commands = results.scoreDocs
                     .Select(d => converterHost.GetCommandForDocument(searcher.Doc(d.doc)));
                 return AutoCompletionResult.OrderedResult(text, commands);
