@@ -2,8 +2,8 @@
 using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using Core.Abstractions;
-using Core.Commands;
 using Core.Lucene;
+using Plugins.Commands;
 using Xunit;
 
 namespace Tests

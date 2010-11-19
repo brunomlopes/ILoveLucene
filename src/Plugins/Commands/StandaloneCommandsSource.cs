@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Abstractions;
 
-namespace Core.Commands
+namespace Plugins.Commands
 {
     [Export(typeof(IItemSource))]
     public class StandaloneCommandsSource : IItemSource

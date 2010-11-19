@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Lucene;
 using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Util;
 using Xunit;
+using Version = Lucene.Net.Util.Version;
 
 namespace Tests
 {

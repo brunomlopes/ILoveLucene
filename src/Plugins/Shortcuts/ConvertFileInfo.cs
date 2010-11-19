@@ -4,7 +4,7 @@ using System.IO;
 using Core.Abstractions;
 using Lucene.Net.Documents;
 
-namespace Core.Shortcuts
+namespace Plugins.Shortcuts
 {
     [Export(typeof(IConverter))]
     public class ConvertFileInfo : IConverter<FileInfo>

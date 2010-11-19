@@ -2,7 +2,7 @@
 using System.IO;
 using Core.Abstractions;
 
-namespace Core.Shortcuts
+namespace Plugins.Shortcuts
 {
     internal class FileInfoCommand : ICommand
     {
