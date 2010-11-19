@@ -1,6 +1,5 @@
 ﻿using System;
 using Lucene.Net.Documents;
-using Lucene.Net.Search.Function;
 
 namespace Core.Abstractions
 {
