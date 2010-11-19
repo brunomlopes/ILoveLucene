@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Lucene.Net">
+      <HintPath>..\..\lib\lucene\Lucene.Net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -41,8 +44,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\ICommandConverter.cs" />
+    <Compile Include="Commands\StandaloneCommandsSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Putty.cs" />
+    <Compile Include="Shortcuts\ConvertFileInfo.cs" />
+    <Compile Include="Shortcuts\FileInfoCommand.cs" />
+    <Compile Include="Shortcuts\ShortcutSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

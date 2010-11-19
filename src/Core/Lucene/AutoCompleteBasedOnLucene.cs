@@ -14,7 +14,6 @@ using Directory = Lucene.Net.Store.Directory;
 
 namespace Core.Lucene
 {
-    [Export(typeof(IAutoCompleteText))]
     public class AutoCompleteBasedOnLucene : IAutoCompleteText
     {
         private readonly IEnumerable<IItemSource> _sources;
@@ -22,8 +21,7 @@ namespace Core.Lucene
 
         private IEnumerable<IConverter> _converters;
 
-        [ImportingConstructor]
-        public AutoCompleteBasedOnLucene([ImportMany]IEnumerable<IConverter> converters, [ImportMany]IEnumerable<IItemSource> sources)
+        public AutoCompleteBasedOnLucene(IEnumerable<IConverter> converters, IEnumerable<IItemSource> sources)
         {
             _sources = sources;
             _converters = converters;
