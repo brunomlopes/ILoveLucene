@@ -14,6 +14,7 @@ namespace ILoveLucene.Views
             InitializeComponent();
             _globalHotKeyHandler = new KeyboardHandler(this, Toggle);
             _focusHandler = new FocusHandler(this);
+            Input.Focus();
         }
 
         protected override void OnClosed(EventArgs e)
@@ -24,30 +25,42 @@ namespace ILoveLucene.Views
 
         public void Toggle()
         {
-            if (this.Visibility == Visibility.Hidden)
+            if (WindowState == WindowState.Minimized)
             {
-                this.Visibility = Visibility.Visible;
-                this.Show();
-                _focusHandler.SetForegroundWindow();
-                Input.Focus();
-                
+                ClearInputBoxes();
+                ShowThisWindow();
+                return;
             }
+
+            if (this.Visibility == Visibility.Hidden || this.Visibility == System.Windows.Visibility.Collapsed)
+            {
+                ShowThisWindow();
+            }
+
             else
             {
-                SetTextTo(string.Empty);
-                SetArgumentsTo(string.Empty);
-                this.Visibility = Visibility.Hidden;
+                ClearInputBoxes();
+                HideThisWindow();
             }
         }
 
-        private void SetArgumentsTo(string text)
+        private void HideThisWindow()
         {
-            Arguments.Text = text;
+            this.Visibility = Visibility.Hidden;
         }
 
-        private void SetTextTo(string text)
+        private void ClearInputBoxes()
         {
-            Input.Text = text;
+            Input.Text = string.Empty;
+            Arguments.Text = string.Empty;
+        }
+
+        private void ShowThisWindow()
+        {
+            this.Visibility = Visibility.Visible;
+            this.Show();
+            _focusHandler.SetForegroundWindow();
+            Input.Focus();
         }
     }
 }
