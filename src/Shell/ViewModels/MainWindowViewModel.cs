@@ -107,6 +107,8 @@ namespace ILoveLucene.ViewModels
             int index;
             if (int.TryParse(str, out index))
             {
+                if (index == 0) index = 10;
+
                 index -= 1;
                 if (index < CommandOptions.Count)
                 {

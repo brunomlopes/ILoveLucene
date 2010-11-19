@@ -44,7 +44,11 @@
         <ListBox Name="CommandOptions" >
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Command, Converter={t:ICommandToStringConverter}}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType=ListBoxItem}, Converter={t:PositionConverter}}" TextDecorations="underline"/>
+                        <TextBlock Text=" - "></TextBlock>
+                        <TextBlock Text="{Binding Command, Converter={t:ICommandToStringConverter}}"/>
+                    </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
