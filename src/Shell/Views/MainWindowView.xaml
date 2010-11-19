@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
         xmlns:cal="clr-namespace:Caliburn.Micro;assembly=Caliburn.Micro" 
-        xmlns:t="clr-namespace:ILoveLucene.ValueConverters" Height="202" Width="780">
+        xmlns:t="clr-namespace:ILoveLucene.ValueConverters" Height="202" Width="1011">
     <StackPanel Orientation="Horizontal">
 	    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="503" >
             <TextBlock Name="Command" Text="{Binding Command, Converter={t:ICommandToStringConverter}}" FontWeight="Bold" FontSize="24" Margin="5" />

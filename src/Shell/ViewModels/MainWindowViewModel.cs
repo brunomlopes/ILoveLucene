@@ -10,6 +10,7 @@ using Caliburn.Micro;
 using Core.Abstractions;
 using ILoveLucene.Views;
 using ICommand = Core.Abstractions.ICommand;
+using Core.Extensions;
 
 namespace ILoveLucene.ViewModels
 {
@@ -83,7 +84,7 @@ namespace ILoveLucene.ViewModels
         {
             get
             {
-                return (Result is ICommandWithArguments) && ArgumentOptions.Count > 0
+                return (Command is ICommandWithArguments) && ArgumentOptions.Count > 0
                            ? Visibility.Visible
                            : Visibility.Hidden;
             }
@@ -135,7 +136,7 @@ namespace ILoveLucene.ViewModels
             if (int.TryParse(str, out index))
             {
                 index -= 1;
-                if (index < CommandOptions.Count)
+                if (index < ArgumentOptions.Count)
                 {
                     Arguments = ArgumentOptions[index];
                     eventArgs.Handled = true;
@@ -163,15 +164,17 @@ namespace ILoveLucene.ViewModels
                                           if (result.HasAutoCompletion)
                                           {
                                               Result = result.AutoCompletedCommand;
-                                              CommandOptions = new []{Result}.Concat(result.OtherOptions).ToList();
+                                              CommandOptions = new[] {Result}.Concat(result.OtherOptions).ToList();
                                               Arguments = string.Empty;
                                           }
                                           else
                                           {
-                                              Result = new AutoCompletionResult.CommandResult(new TextCommand(Input), null);
+                                              Result = new AutoCompletionResult.CommandResult(new TextCommand(Input),
+                                                                                              null);
                                               CommandOptions = new List<AutoCompletionResult.CommandResult>();
                                           }
-                                      }, token);
+                                      }, token)
+                .GuardForException(e => Description = e.Message);
 
         }
 
@@ -181,7 +184,7 @@ namespace ILoveLucene.ViewModels
             _argumentCancelationTokenSource = new CancellationTokenSource();
 
             var token = _argumentCancelationTokenSource.Token;
-            var autoCompleteArgumentsCommand = Result as ICommandWithAutoCompletedArguments;
+            var autoCompleteArgumentsCommand = Command as ICommandWithAutoCompletedArguments;
             if(autoCompleteArgumentsCommand == null)
                 return;
             Task.Factory.StartNew(() =>
@@ -203,7 +206,8 @@ namespace ILoveLucene.ViewModels
                                               ArgumentOptions = new List<string>();
                                           }
 
-                                      }, token);
+                                      }, token)
+                .GuardForException(e => Description = e.Message);
         }
 
 
@@ -240,7 +244,7 @@ namespace ILoveLucene.ViewModels
 
         public ICommandWithArguments CommandWithArguments
         {
-            get { return _result as ICommandWithArguments; }
+            get { return Command as ICommandWithArguments; }
         }
 
         private string _arguments;
@@ -256,7 +260,7 @@ namespace ILoveLucene.ViewModels
 
         public Visibility ArgumentsVisible
         {
-            get { return Result != null && Result is ICommandWithArguments ? Visibility.Visible : Visibility.Hidden; }
+            get { return Result != null && Command is ICommandWithArguments ? Visibility.Visible : Visibility.Hidden; }
         }
 
         private string _input;
