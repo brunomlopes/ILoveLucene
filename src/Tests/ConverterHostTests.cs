@@ -63,7 +63,7 @@ namespace Tests
 
             _container.Compose(batch);
 
-            var converters = new[] {new ICommandConverter(_container)};
+            var converters = new[] { new ICommandConverter(new[] { _command }) };
             _luceneStorage = new LuceneStorage(converters);
             return converters;
         }

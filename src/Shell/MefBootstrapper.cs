@@ -10,6 +10,7 @@ using System.ComponentModel.Composition;
 
 namespace ILoveLucene
 {
+
     public class MefBootstrapper : Bootstrapper<IShell>
     {
         private CompositionContainer container;

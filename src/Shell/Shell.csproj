@@ -36,6 +36,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\..\lib\autofac\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Integration.Mef">
+      <HintPath>..\..\lib\autofac\Autofac.Integration.Mef.dll</HintPath>
+    </Reference>
     <Reference Include="Caliburn.Micro">
       <HintPath>..\..\lib\caliburn_micro\Caliburn.Micro.dll</HintPath>
     </Reference>
@@ -70,6 +76,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="AutofacBootstrapper.cs" />
+    <Compile Include="Modules\LoggingModule.cs" />
+    <Compile Include="TypedAutofacBootStrapper.cs" />
     <Compile Include="Commands\ExitApplication.cs" />
     <Compile Include="DebugLogger.cs" />
     <Compile Include="IShell.cs" />

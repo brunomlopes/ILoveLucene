@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using Core.Abstractions;
 using Lucene.Net.Documents;
@@ -10,12 +10,12 @@ namespace Core.Commands
     [Export(typeof(IConverter))]
     public class ICommandConverter : IConverter<ICommand>
     {
-        private readonly CompositionContainer _container;
+        private readonly IEnumerable<ICommand> _commands;
 
         [ImportingConstructor]
-        public ICommandConverter(CompositionContainer container)
+        public ICommandConverter(IEnumerable<ICommand> commands)
         {
-            _container = container;
+            _commands = commands;
         }
 
         public Type ConvertedType
@@ -27,8 +27,7 @@ namespace Core.Commands
         {
             var fullname = document.GetField("fullname").StringValue();
             var export =
-                _container.GetExportedValues<ICommand>(AttributedModelServices.GetContractName(typeof (ICommand)))
-                    .SingleOrDefault(c => c.GetType().FullName == fullname);
+                _commands.SingleOrDefault(c => c.GetType().FullName == fullname);
 
             if(export == null)
                 throw new InvalidOperationException(string.Format("Missing ICommand {0}", fullname));

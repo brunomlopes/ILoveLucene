@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\..\..\..\My Dropbox\netponto\IoC_DI_TechDays_2010\Demos\Autofac\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="Lucene.Net">
       <HintPath>..\..\lib\lucene\Lucene.Net.dll</HintPath>
     </Reference>
@@ -48,6 +51,7 @@
     <Compile Include="Abstractions\AutoCompletionResult.cs" />
     <Compile Include="Abstractions\IAutoCompleteText.cs" />
     <Compile Include="Abstractions\ICommand.cs" />
+    <Compile Include="Abstractions\ICommandMetadata.cs" />
     <Compile Include="Abstractions\IConverter.cs" />
     <Compile Include="Abstractions\IItemSource.cs" />
     <Compile Include="Commands\ICommandConverter.cs" />
