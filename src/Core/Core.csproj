@@ -50,6 +50,7 @@
     <Compile Include="Abstractions\ICommand.cs" />
     <Compile Include="Abstractions\IConverter.cs" />
     <Compile Include="Abstractions\IItemSource.cs" />
+    <Compile Include="Commands\Browse.cs" />
     <Compile Include="Commands\ICommandConverter.cs" />
     <Compile Include="Commands\Putty.cs" />
     <Compile Include="Commands\StandaloneCommandsSource.cs" />
