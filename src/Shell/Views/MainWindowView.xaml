@@ -53,6 +53,15 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <ListBox Name="ArgumentOptions">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType=ListBoxItem}, Converter={t:PositionConverter}}" TextDecorations="underline"/>
+                        <TextBlock Text=" - "></TextBlock>
+                        <TextBlock Text="{Binding}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
         </ListBox>
     </StackPanel>
 </Window>

@@ -174,6 +174,7 @@ namespace ILoveLucene.ViewModels
                                               Result = new AutoCompletionResult.CommandResult(new TextCommand(Input),
                                                                                               null);
                                               CommandOptions = new List<AutoCompletionResult.CommandResult>();
+                                              ArgumentOptions = new List<string>();
                                           }
                                       }, token)
                 .GuardForException(e => Description = e.Message);
