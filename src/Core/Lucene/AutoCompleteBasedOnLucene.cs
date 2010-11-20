@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,20 +17,25 @@ namespace Core.Lucene
 {
     public class AutoCompleteBasedOnLucene : IAutoCompleteText
     {
-        private readonly IEnumerable<IItemSource> _sources;
+        private readonly CompositionContainer _mefContainer;
         private Directory _directory;
 
-        private IEnumerable<IConverter> _converters;
+        [ImportMany]
+        public IEnumerable<IConverter> Converters { get; set; }
 
-        public AutoCompleteBasedOnLucene(IEnumerable<IConverter> converters, IEnumerable<IItemSource> sources)
+        [ImportMany]
+        public IEnumerable<IItemSource> Sources { get; set; }
+
+        public AutoCompleteBasedOnLucene(CompositionContainer mefContainer)
         {
-            _sources = sources;
-            _converters = converters;
+            _mefContainer = mefContainer;
+            _mefContainer.SatisfyImportsOnce(this);
+
             EnsureIndexExists();
 
-            var host = new LuceneStorage(_converters);
+            var host = new LuceneStorage(Converters);
 
-            _sources
+            Sources
                 .AsParallel()
                 .ForAll(s => s.GetItems()
                                  .ContinueWith(task =>
@@ -82,7 +88,7 @@ namespace Core.Lucene
                 var textWithFuzzy = text.Trim().Replace(" ", "~ ").Trim() + "~";
                 var queryParser = new MultiFieldQueryParser(Version.LUCENE_29, new string[]{SpecialFields.Name, SpecialFields.Learnings},
                                                           new StandardAnalyzer(Version.LUCENE_29));
-                var converterHost = new LuceneStorage(_converters);
+                var converterHost = new LuceneStorage(Converters);
                 queryParser.SetFuzzyMinSim((float)0.2);
                 queryParser.SetDefaultOperator(QueryParser.Operator.AND);
 
@@ -107,7 +113,7 @@ namespace Core.Lucene
 
             try
             {
-                var host = new LuceneStorage(_converters);
+                var host = new LuceneStorage(Converters);
                 host.LearnCommandForInput(writer, result.CompletionId, input);
             }
             finally
