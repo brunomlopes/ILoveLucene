@@ -8,13 +8,12 @@ using Core.Abstractions;
 
 namespace Plugins.Commands
 {
-    [Export(typeof(IItemSource))]
+    [Export(typeof (IItemSource))]
     public class StandaloneCommandsSource : IItemSource
     {
         private readonly CompositionContainer _mefContainer;
 
-        [ImportMany] 
-        public IEnumerable<ICommand> Commands;
+        [ImportMany] public IEnumerable<ICommand> Commands;
 
         [ImportingConstructor]
         public StandaloneCommandsSource(CompositionContainer mefContainer)

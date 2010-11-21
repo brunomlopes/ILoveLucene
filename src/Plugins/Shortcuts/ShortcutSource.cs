@@ -10,13 +10,13 @@ using Core.Extensions;
 
 namespace Plugins.Shortcuts
 {
-    [Export(typeof(IItemSource))]
+    [Export(typeof (IItemSource))]
     public class ShortcutSource : IItemSource
     {
-        private HashSet<FileInfo> _shortcutPaths;
-        private static object _shortcutPathsLock = new object();
-        public static string[] _extensions = new[] { ".exe", ".bat", ".ps1", ".ipy", ".lnk", ".appref-ms" };
-        private List<string> _dirs;
+        private readonly HashSet<FileInfo> _shortcutPaths;
+        private static readonly object _shortcutPathsLock = new object();
+        public static string[] _extensions = new[] {".exe", ".bat", ".ps1", ".ipy", ".lnk", ".appref-ms"};
+        private readonly List<string> _dirs;
 
         public ShortcutSource()
         {
@@ -31,9 +31,8 @@ namespace Plugins.Shortcuts
                             @"%USERPROFILE%\Favorites",
                             @"%HOME%\utils"
                         }.Select(Environment.ExpandEnvironmentVariables).ToList();
-           
         }
-        
+
         private void ScanDirectoryForShortcuts(string s)
         {
             var currentDir = new DirectoryInfo(s);

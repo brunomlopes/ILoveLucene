@@ -13,8 +13,15 @@ namespace Plugins.Shortcuts
             _shortcut = shortcut;
         }
 
-        public string Text { get { return _shortcut.Name; } }
-        public string Description { get { return _shortcut.FullName; } }
+        public string Text
+        {
+            get { return _shortcut.Name; }
+        }
+
+        public string Description
+        {
+            get { return _shortcut.FullName; }
+        }
 
         public void Execute()
         {

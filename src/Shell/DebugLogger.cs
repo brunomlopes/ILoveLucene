@@ -1,5 +1,5 @@
 ﻿using System;
-using System.ComponentModel.Composition;
+using System.Diagnostics;
 using Caliburn.Micro;
 
 namespace ILoveLucene
@@ -8,17 +8,17 @@ namespace ILoveLucene
     {
         public void Info(string format, params object[] args)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(format, args));
+            Debug.WriteLine(string.Format(format, args));
         }
 
         public void Warn(string format, params object[] args)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(format, args));
+            Debug.WriteLine(string.Format(format, args));
         }
 
         public void Error(Exception exception)
         {
-            System.Diagnostics.Debug.WriteLine(exception.ToString());
+            Debug.WriteLine(exception.ToString());
         }
     }
 }

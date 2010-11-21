@@ -1,67 +1,60 @@
-﻿<Window x:Class="ILoveLucene.Views.MainWindowView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
-        xmlns:cal="clr-namespace:Caliburn.Micro;assembly=Caliburn.Micro" 
-        xmlns:t="clr-namespace:ILoveLucene.ValueConverters" Height="202" Width="1011">
-    <StackPanel Orientation="Horizontal">
-	    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="503" >
-            <TextBlock Name="Command" Text="{Binding Command, Converter={t:ICommandToStringConverter}}" FontWeight="Bold" FontSize="24" Margin="5" />
-            <TextBlock Name="Description" Text="TextBlock" Margin="5" />
-            <StackPanel Orientation="Vertical" Height="Auto">
-                <TextBox Name="Input" Text="Sample text here" FontSize="22" >
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="KeyDown">
-                            <cal:ActionMessage MethodName="ProcessShortcut" >
-                                <cal:Parameter Value="$source"/>
-                                <cal:Parameter Value="$eventArgs"/>
-                            </cal:ActionMessage>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="TextChanged">
-                            <cal:ActionMessage MethodName="AutoComplete" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </TextBox>
-                <TextBox Name="Arguments" Text="" FontSize="22" Visibility="{Binding ArgumentsVisible}" Width="Auto" >
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="KeyDown">
-                            <cal:ActionMessage MethodName="ProcessArgumentShortcut" >
-                                <cal:Parameter Value="$source"/>
-                                <cal:Parameter Value="$eventArgs"/>
-                            </cal:ActionMessage>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="TextChanged">
-                            <cal:ActionMessage MethodName="AutoCompleteArgument" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </TextBox>
-            </StackPanel>
-        
-            <Button Name="Execute" Content="Execute me!" IsDefault="True" Visibility="Visible" />
-        </StackPanel>
-        <ListBox Name="CommandOptions" >
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType=ListBoxItem}, Converter={t:PositionConverter}}" TextDecorations="underline"/>
-                        <TextBlock Text=" - "></TextBlock>
-                        <TextBlock Text="{Binding Command, Converter={t:ICommandToStringConverter}}"/>
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        <ListBox Name="ArgumentOptions">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType=ListBoxItem}, Converter={t:PositionConverter}}" TextDecorations="underline"/>
-                        <TextBlock Text=" - "></TextBlock>
-                        <TextBlock Text="{Binding}"/>
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-    </StackPanel>
+﻿<Window x:Class="ILoveLucene.Views.MainWindowView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="MainWindow" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" xmlns:cal="clr-namespace:Caliburn.Micro;assembly=Caliburn.Micro" xmlns:t="clr-namespace:ILoveLucene.ValueConverters" Height="202" Width="1011">
+	<StackPanel Orientation="Horizontal">
+		<StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="503">
+			<TextBlock Name="Command" Text="{Binding Command, Converter={t:ICommandToStringConverter}}" FontWeight="Bold" FontSize="24" Margin="5" />
+			<TextBlock Name="Description" Text="TextBlock" Margin="5" />
+			<StackPanel Orientation="Vertical" Height="Auto">
+				<TextBox Name="Input" Text="Sample text here" FontSize="22">
+					<i:Interaction.Triggers>
+						<i:EventTrigger EventName="KeyDown">
+							<cal:ActionMessage MethodName="ProcessShortcut">
+								<cal:Parameter Value="$source" />
+								<cal:Parameter Value="$eventArgs" />
+							</cal:ActionMessage>
+						</i:EventTrigger>
+						<i:EventTrigger EventName="TextChanged">
+							<cal:ActionMessage MethodName="AutoComplete" />
+						</i:EventTrigger>
+					</i:Interaction.Triggers>
+				</TextBox>
+				<TextBox Name="Arguments" Text="" FontSize="22" Visibility="{Binding ArgumentsVisible}" Width="Auto">
+					<i:Interaction.Triggers>
+						<i:EventTrigger EventName="KeyDown">
+							<cal:ActionMessage MethodName="ProcessArgumentShortcut">
+								<cal:Parameter Value="$source" />
+								<cal:Parameter Value="$eventArgs" />
+							</cal:ActionMessage>
+						</i:EventTrigger>
+						<i:EventTrigger EventName="TextChanged">
+							<cal:ActionMessage MethodName="AutoCompleteArgument" />
+						</i:EventTrigger>
+					</i:Interaction.Triggers>
+				</TextBox>
+			</StackPanel>
+
+			<Button Name="Execute" Content="Execute me!" IsDefault="True" Visibility="Visible" />
+		</StackPanel>
+		<ListBox Name="CommandOptions">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType=ListBoxItem}, Converter={t:PositionConverter}}" TextDecorations="underline" />
+						<TextBlock Text=" - "></TextBlock>
+						<TextBlock Text="{Binding Command, Converter={t:ICommandToStringConverter}}" />
+					</StackPanel>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+		<ListBox Name="ArgumentOptions">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType=ListBoxItem}, Converter={t:PositionConverter}}" TextDecorations="underline" />
+						<TextBlock Text=" - "></TextBlock>
+						<TextBlock Text="{Binding}" />
+					</StackPanel>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+	</StackPanel>
 </Window>

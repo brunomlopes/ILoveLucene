@@ -3,9 +3,9 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using Core.Abstractions;
 
-namespace Core.Commands
+namespace Plugins
 {
-    [Export(typeof(ICommand))]
+    [Export(typeof (ICommand))]
     public class Browse : ICommandWithArguments
     {
         public string Text

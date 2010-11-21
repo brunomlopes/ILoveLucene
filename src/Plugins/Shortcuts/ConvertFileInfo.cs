@@ -6,7 +6,7 @@ using Lucene.Net.Documents;
 
 namespace Plugins.Shortcuts
 {
-    [Export(typeof(IConverter))]
+    [Export(typeof (IConverter))]
     public class ConvertFileInfo : IConverter<FileInfo>
     {
         public string ToId(FileInfo fileInfo)
@@ -37,7 +37,7 @@ namespace Plugins.Shortcuts
 
         public Type ConvertedType
         {
-            get { return typeof(FileInfo); }
+            get { return typeof (FileInfo); }
         }
     }
 }

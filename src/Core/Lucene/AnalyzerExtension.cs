@@ -12,7 +12,7 @@ namespace Core.Lucene
             var stream = self.TokenStream("test", new StringReader(text));
 
             stream.Reset();
-            var termAtt = (TermAttribute)stream.AddAttribute(typeof(TermAttribute));
+            var termAtt = (TermAttribute) stream.AddAttribute(typeof (TermAttribute));
 
             while (stream.IncrementToken())
             {

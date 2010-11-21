@@ -6,15 +6,15 @@ using Microsoft.Win32;
 
 namespace Plugins
 {
-    [Export(typeof(ICommand))]
+    [Export(typeof (ICommand))]
     public class Putty : ICommandWithAutoCompletedArguments
     {
-        private string[] _sessionNames;
+        private readonly string[] _sessionNames;
 
         public Putty()
         {
             var sessionsKey = Registry.CurrentUser.OpenSubKey(@"Software\SimonTatham\PuTTY\Sessions");
-            if(sessionsKey == null) _sessionNames = new string[]{};
+            if (sessionsKey == null) _sessionNames = new string[] {};
             else _sessionNames = sessionsKey.GetSubKeyNames();
         }
 

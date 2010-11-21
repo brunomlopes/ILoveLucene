@@ -6,7 +6,7 @@ using Core.Abstractions;
 
 namespace ILoveLucene.ValueConverters
 {
-    [ValueConversion(typeof(AutoCompletionResult.CommandResult), typeof(string))]
+    [ValueConversion(typeof (AutoCompletionResult.CommandResult), typeof (string))]
     public class CommandResultToStringConverter : MarkupExtension, IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

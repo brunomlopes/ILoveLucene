@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Tests
 {
-    [Export(typeof(ICommand))]
+    [Export(typeof (ICommand))]
     internal class SimpleCommand : ICommand
     {
         public string Text
@@ -21,7 +21,8 @@ namespace Tests
             get { return Description; }
         }
 
-        public bool HasExecuted = false;
+        public bool HasExecuted;
+
         public void Execute()
         {
             HasExecuted = true;
@@ -63,7 +64,7 @@ namespace Tests
 
             _container.Compose(batch);
 
-            var converters = new[] { new ICommandConverter(_container) };
+            var converters = new[] {new ICommandConverter(_container)};
             _luceneStorage = new LuceneStorage(converters);
             return converters;
         }

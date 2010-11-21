@@ -8,17 +8,17 @@ using System.Windows;
 using System.Windows.Input;
 using Caliburn.Micro;
 using Core.Abstractions;
+using Core.Extensions;
 using ILoveLucene.Views;
 using ICommand = Core.Abstractions.ICommand;
-using Core.Extensions;
 
 namespace ILoveLucene.ViewModels
 {
-    [Export(typeof(IShell))]
+    [Export(typeof (IShell))]
     public class MainWindowViewModel : PropertyChangedBase, IShell
     {
         private readonly IAutoCompleteText _autoCompleteText;
-        private readonly ILog _log = LogManager.GetLog(typeof(MainWindowViewModel));
+        private readonly ILog _log = LogManager.GetLog(typeof (MainWindowViewModel));
         private CancellationTokenSource _cancelationTokenSource;
 
         [ImportingConstructor]
@@ -47,7 +47,7 @@ namespace ILoveLucene.ViewModels
                 }
 
                 // HACK
-                ((MainWindowView)Window.GetWindow(source)).Toggle();
+                ((MainWindowView) Window.GetWindow(source)).Toggle();
             }
             catch (Exception e)
             {
@@ -57,6 +57,7 @@ namespace ILoveLucene.ViewModels
         }
 
         private IList<AutoCompletionResult.CommandResult> _commandOptions;
+
         public IList<AutoCompletionResult.CommandResult> CommandOptions
         {
             get { return _commandOptions; }
@@ -66,8 +67,9 @@ namespace ILoveLucene.ViewModels
                 NotifyOfPropertyChange(() => CommandOptions);
             }
         }
-        
+
         private IList<string> _ArgumentOptions;
+
         public IList<string> ArgumentOptions
         {
             get { return _ArgumentOptions; }
@@ -93,7 +95,7 @@ namespace ILoveLucene.ViewModels
         {
             if (eventArgs.Key == Key.Escape)
             {
-                ((MainWindowView)Window.GetWindow(source)).Toggle();
+                ((MainWindowView) Window.GetWindow(source)).Toggle();
                 return;
             }
 
@@ -101,7 +103,7 @@ namespace ILoveLucene.ViewModels
             {
                 return;
             }
-            
+
             var str = new KeyConverter().ConvertToString(eventArgs.Key);
             int index;
             if (int.TryParse(str, out index))
@@ -115,14 +117,13 @@ namespace ILoveLucene.ViewModels
                     eventArgs.Handled = true;
                 }
             }
-            
         }
 
         public void ProcessArgumentShortcut(FrameworkElement source, KeyEventArgs eventArgs)
         {
             if (eventArgs.Key == Key.Escape)
             {
-                ((MainWindowView)Window.GetWindow(source)).Toggle();
+                ((MainWindowView) Window.GetWindow(source)).Toggle();
                 eventArgs.Handled = true;
                 return;
             }
@@ -143,7 +144,6 @@ namespace ILoveLucene.ViewModels
                     eventArgs.Handled = true;
                 }
             }
-
         }
 
         public void AutoComplete()
@@ -177,7 +177,6 @@ namespace ILoveLucene.ViewModels
                                           }
                                       }, token)
                 .GuardForException(e => Description = e.Message);
-
         }
 
         public void AutoCompleteArgument()
@@ -187,12 +186,12 @@ namespace ILoveLucene.ViewModels
 
             var token = _argumentCancelationTokenSource.Token;
             var autoCompleteArgumentsCommand = Command as ICommandWithAutoCompletedArguments;
-            if(autoCompleteArgumentsCommand == null)
+            if (autoCompleteArgumentsCommand == null)
                 return;
             Task.Factory.StartNew(() =>
                                       {
                                           var result = autoCompleteArgumentsCommand.AutoCompleteArguments(Arguments);
-                                          
+
                                           token.ThrowIfCancellationRequested();
                                           _log.Info("Got autocompletion '{0}' for '{1}' with {2} alternatives",
                                                     result.AutoCompletedArgument, result.OriginalText,
@@ -207,13 +206,13 @@ namespace ILoveLucene.ViewModels
                                           {
                                               ArgumentOptions = new List<string>();
                                           }
-
                                       }, token)
                 .GuardForException(e => Description = e.Message);
         }
 
 
         private string _description;
+
         public string Description
         {
             get { return _description; }
@@ -230,6 +229,7 @@ namespace ILoveLucene.ViewModels
         }
 
         private AutoCompletionResult.CommandResult _result;
+
         public AutoCompletionResult.CommandResult Result
         {
             get { return _result; }
@@ -250,6 +250,7 @@ namespace ILoveLucene.ViewModels
         }
 
         private string _arguments;
+
         public string Arguments
         {
             get { return _arguments; }

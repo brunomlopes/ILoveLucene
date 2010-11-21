@@ -19,8 +19,8 @@ namespace ILoveLucene.Views
 
         protected override void OnClosed(EventArgs e)
         {
-            if(_globalHotKeyHandler != null)
-                _globalHotKeyHandler.Dispose(); 
+            if (_globalHotKeyHandler != null)
+                _globalHotKeyHandler.Dispose();
         }
 
         public void Toggle()
@@ -32,7 +32,7 @@ namespace ILoveLucene.Views
                 return;
             }
 
-            if (this.Visibility == Visibility.Hidden || this.Visibility == System.Windows.Visibility.Collapsed)
+            if (Visibility == Visibility.Hidden || Visibility == Visibility.Collapsed)
             {
                 ShowThisWindow();
             }
@@ -46,7 +46,7 @@ namespace ILoveLucene.Views
 
         private void HideThisWindow()
         {
-            this.Visibility = Visibility.Hidden;
+            Visibility = Visibility.Hidden;
         }
 
         private void ClearInputBoxes()
@@ -57,8 +57,8 @@ namespace ILoveLucene.Views
 
         private void ShowThisWindow()
         {
-            this.Visibility = Visibility.Visible;
-            this.Show();
+            Visibility = Visibility.Visible;
+            Show();
             _focusHandler.SetForegroundWindow();
             Input.Focus();
         }

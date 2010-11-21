@@ -1,11 +1,10 @@
 using System.ComponentModel.Composition;
 using System.Windows;
-using Caliburn.Micro;
 using Core.Abstractions;
 
 namespace ILoveLucene.Commands
 {
-    [Export(typeof(ICommand))]
+    [Export(typeof (ICommand))]
     public class ExitApplication : ICommand
     {
         public string Text

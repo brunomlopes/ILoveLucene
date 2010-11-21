@@ -16,12 +16,12 @@ namespace Core.Abstractions
 
         protected ArgumentAutoCompletionResult()
         {
-            OtherOptions = new string[]{};
+            OtherOptions = new string[] {};
         }
 
         public static ArgumentAutoCompletionResult NoResult(string originalText)
         {
-            return new ArgumentAutoCompletionResult {OriginalText = originalText, AutoCompletedArgument= null};
+            return new ArgumentAutoCompletionResult {OriginalText = originalText, AutoCompletedArgument = null};
         }
 
         public static ArgumentAutoCompletionResult OrderedResult(string originalText, IEnumerable<string> result)
@@ -29,9 +29,14 @@ namespace Core.Abstractions
             result = result.ToList();
             if (result.Count() == 0)
             {
-                return new ArgumentAutoCompletionResult { OriginalText = originalText, AutoCompletedArgument = null };
+                return new ArgumentAutoCompletionResult {OriginalText = originalText, AutoCompletedArgument = null};
             }
-            return new ArgumentAutoCompletionResult { OriginalText = originalText, AutoCompletedArgument = result.First(), OtherOptions = result.Skip(1) };
+            return new ArgumentAutoCompletionResult
+                       {
+                           OriginalText = originalText,
+                           AutoCompletedArgument = result.First(),
+                           OtherOptions = result.Skip(1)
+                       };
         }
 
         public static ArgumentAutoCompletionResult SingleResult(string text, string textCommand)

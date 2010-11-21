@@ -8,7 +8,7 @@ using Lucene.Net.Documents;
 
 namespace Plugins.Commands
 {
-    [Export(typeof(IConverter))]
+    [Export(typeof (IConverter))]
     public class ICommandConverter : IConverter<ICommand>
     {
         private readonly CompositionContainer _mefContainer;
@@ -34,7 +34,7 @@ namespace Plugins.Commands
             var export =
                 Commands.SingleOrDefault(c => c.GetType().FullName == fullname);
 
-            if(export == null)
+            if (export == null)
                 throw new InvalidOperationException(string.Format("Missing ICommand {0}", fullname));
             return export;
         }

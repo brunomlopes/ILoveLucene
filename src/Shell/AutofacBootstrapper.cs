@@ -1,3 +1,4 @@
+using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.IO;
@@ -9,7 +10,6 @@ using Core.Abstractions;
 using Core.Lucene;
 using ILoveLucene.Modules;
 using ILoveLucene.ViewModels;
-using System.ComponentModel.Composition;
 
 namespace ILoveLucene
 {

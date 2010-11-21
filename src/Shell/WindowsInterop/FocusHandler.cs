@@ -11,15 +11,16 @@ namespace ILoveLucene.WindowsInterop
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool SetForegroundWindow(IntPtr hWnd);
-        WindowInteropHelper _host;
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        private readonly WindowInteropHelper _host;
 
         public FocusHandler(Window window)
         {
             _window = window;
             _host = new WindowInteropHelper(window);
-
         }
+
         public void SetForegroundWindow()
         {
             SetForegroundWindow(_host.Handle);

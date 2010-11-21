@@ -54,7 +54,7 @@ namespace Core.Lucene
             {
                 foreach (var item in items)
                 {
-                    host.UpdateDocumentForObject(indexWriter,item);
+                    host.UpdateDocumentForObject(indexWriter, item);
                 }
                 indexWriter.Commit();
             }
@@ -72,10 +72,13 @@ namespace Core.Lucene
 
         private void EnsureIndexExists()
         {
-            var indexDirectory = new DirectoryInfo(Path.Combine(new FileInfo(Assembly.GetExecutingAssembly().FullName).DirectoryName, "index"));
+            var indexDirectory =
+                new DirectoryInfo(Path.Combine(new FileInfo(Assembly.GetExecutingAssembly().FullName).DirectoryName,
+                                               "index"));
             var createIndex = !indexDirectory.Exists;
             _directory = new SimpleFSDirectory(indexDirectory);
-            new IndexWriter(_directory, new StandardAnalyzer(Version.LUCENE_29), createIndex, IndexWriter.MaxFieldLength.UNLIMITED).Close();
+            new IndexWriter(_directory, new StandardAnalyzer(Version.LUCENE_29), createIndex,
+                            IndexWriter.MaxFieldLength.UNLIMITED).Close();
         }
 
         public AutoCompletionResult Autocomplete(string text)
@@ -86,10 +89,11 @@ namespace Core.Lucene
             try
             {
                 var textWithFuzzy = text.Trim().Replace(" ", "~ ").Trim() + "~";
-                var queryParser = new MultiFieldQueryParser(Version.LUCENE_29, new string[]{SpecialFields.Name, SpecialFields.Learnings},
-                                                          new StandardAnalyzer(Version.LUCENE_29));
+                var queryParser = new MultiFieldQueryParser(Version.LUCENE_29,
+                                                            new[] {SpecialFields.Name, SpecialFields.Learnings},
+                                                            new StandardAnalyzer(Version.LUCENE_29));
                 var converterHost = new LuceneStorage(Converters);
-                queryParser.SetFuzzyMinSim((float)0.2);
+                queryParser.SetFuzzyMinSim((float) 0.2);
                 queryParser.SetDefaultOperator(QueryParser.Operator.AND);
 
                 var results = searcher.Search(queryParser.Parse(textWithFuzzy), 10);
@@ -104,7 +108,6 @@ namespace Core.Lucene
                                                              new TextCommand(text, "Error parsing input: " + e.Message),
                                                              null));
             }
-            
         }
 
         public void LearnInputForCommandResult(string input, AutoCompletionResult.CommandResult result)

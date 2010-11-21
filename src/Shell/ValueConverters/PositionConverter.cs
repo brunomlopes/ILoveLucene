@@ -6,13 +6,13 @@ using System.Windows.Markup;
 
 namespace ILoveLucene.ValueConverters
 {
-    [ValueConversion(typeof(ListBoxItem), typeof(string))]
+    [ValueConversion(typeof (ListBoxItem), typeof (string))]
     public class PositionConverter : MarkupExtension, IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            ListBoxItem item = (ListBoxItem)value;
-            ListBox view = (ListBox)ItemsControl.ItemsControlFromItemContainer(item);
+            ListBoxItem item = (ListBoxItem) value;
+            ListBox view = (ListBox) ItemsControl.ItemsControlFromItemContainer(item);
             int index = (view.ItemContainerGenerator.IndexFromContainer(item) + 1);
             return index.ToString();
         }
@@ -27,5 +27,4 @@ namespace ILoveLucene.ValueConverters
             return this;
         }
     }
-
 }

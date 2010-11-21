@@ -5,8 +5,8 @@ using System.Windows.Markup;
 using Core.Abstractions;
 
 namespace ILoveLucene.ValueConverters
-{ 
-    [ValueConversion(typeof(ICommand), typeof(string))]
+{
+    [ValueConversion(typeof (ICommand), typeof (string))]
     public class ICommandToStringConverter : MarkupExtension, IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

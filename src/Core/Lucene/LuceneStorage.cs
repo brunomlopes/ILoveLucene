@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using Core.Abstractions;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
-using Enumerable = System.Linq.Enumerable;
 
 namespace Core.Lucene
 {
@@ -32,12 +32,12 @@ namespace Core.Lucene
 
             public string GetSha1()
             {
-                var sha1 = System.Security.Cryptography.SHA1.Create();
+                var sha1 = SHA1.Create();
                 sha1.Initialize();
 
                 return
                     BitConverter.ToString(
-                        sha1.ComputeHash(Enumerable.ToArray<byte>(Encoding.UTF8.GetBytes(Namespace).Concat(Encoding.UTF8.GetBytes(Id)))))
+                        sha1.ComputeHash(Encoding.UTF8.GetBytes(Namespace).Concat(Encoding.UTF8.GetBytes(Id)).ToArray()))
                         .Replace("-", "");
             }
 
@@ -46,11 +46,12 @@ namespace Core.Lucene
                 return string.Format("<Command Namespace:'{0}' Id:'{1}'>", Namespace, Id);
             }
         }
+
         private readonly Dictionary<string, IConverter> _convertersForNamespaces;
 
         public LuceneStorage(IEnumerable<IConverter> converters)
         {
-            _convertersForNamespaces = converters.ToDictionary(c => IConverterExtensions.GetNamespaceForItems(c));
+            _convertersForNamespaces = converters.ToDictionary(c => c.GetNamespaceForItems());
         }
 
         public IConverter<T> GetConverter<T>()
@@ -58,15 +59,15 @@ namespace Core.Lucene
             foreach (var converter in _convertersForNamespaces.Select(kvp => kvp.Value))
             {
                 if (converter is IConverter<T>)
-                    return (IConverter<T>)converter;
+                    return (IConverter<T>) converter;
             }
-            throw new NotImplementedException(string.Format("No converter for {0} found ", typeof(T)));
+            throw new NotImplementedException(string.Format("No converter for {0} found ", typeof (T)));
         }
 
         public void UpdateDocumentForObject(IndexWriter writer, object item)
         {
             var type = item.GetType();
-            this.GetType().GetMethod("UpdateDocumentForItem").MakeGenericMethod(type)
+            GetType().GetMethod("UpdateDocumentForItem").MakeGenericMethod(type)
                 .Invoke(this, new[] {writer, item});
         }
 
@@ -89,7 +90,7 @@ namespace Core.Lucene
 
             var name = converter.ToName(item);
             var document = converter.ToDocument(item);
-            
+
             document.Add(new Field(SpecialFields.Id, id, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
@@ -124,8 +125,9 @@ namespace Core.Lucene
             // fickle command, isn't learnable
             if (commandIdObject == null) return;
 
-            if(!(commandIdObject is CommandId))
-                throw new InvalidOperationException("Id is not CommandId. It means the command didn't originate from this class");
+            if (!(commandIdObject is CommandId))
+                throw new InvalidOperationException(
+                    "Id is not CommandId. It means the command didn't originate from this class");
 
             var commandId = (CommandId) commandIdObject;
             var document = PopDocument(writer, commandId.GetSha1());
@@ -135,7 +137,7 @@ namespace Core.Lucene
 
             var field = document.GetField(SpecialFields.Learnings);
             var learnings = input;
-            if(field != null)
+            if (field != null)
             {
                 learnings = field.StringValue() + " " + learnings;
                 document.RemoveField(SpecialFields.Learnings);
@@ -170,5 +172,4 @@ namespace Core.Lucene
             }
         }
     }
-
 }

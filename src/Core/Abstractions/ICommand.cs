@@ -1,5 +1,3 @@
-using System;
-
 namespace Core.Abstractions
 {
     public interface ICommand
@@ -8,10 +6,11 @@ namespace Core.Abstractions
         /// The text representation of a command that can be found and is autocompleted
         /// </summary>
         string Text { get; }
+
         string Description { get; }
         void Execute();
-    } 
-    
+    }
+
     public interface ICommandWithArguments : ICommand
     {
         void Execute(string arguments);
@@ -20,7 +19,7 @@ namespace Core.Abstractions
     public class TextCommand : ICommand
     {
         public TextCommand(string input)
-            :this(input, string.Empty)
+            : this(input, string.Empty)
         {
         }
 
