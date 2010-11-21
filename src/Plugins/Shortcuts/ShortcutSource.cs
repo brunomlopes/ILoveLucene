@@ -31,6 +31,7 @@ namespace Plugins.Shortcuts
                             @"%USERPROFILE%\Favorites",
                             @"%HOME%\utils"
                         }.Select(Environment.ExpandEnvironmentVariables).ToList();
+            NeedsReindexing = true;
         }
 
         private void ScanDirectoryForShortcuts(string s)
@@ -65,8 +66,11 @@ namespace Plugins.Shortcuts
             directoryInfos.ForEach(d => ScanDirectoryForShortcuts(d.FullName));
         }
 
+        public bool NeedsReindexing { get; private set; }
+
         public Task<IEnumerable<object>> GetItems()
         {
+            NeedsReindexing = false;
             return Task.Factory.StartNew(() =>
                                              {
                                                  _dirs.ForEach(ScanDirectoryForShortcuts);

@@ -1,9 +1,11 @@
+using System;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Autofac;
 using Caliburn.Micro;
 using Core.Abstractions;
@@ -44,6 +46,17 @@ namespace ILoveLucene
 
             builder.RegisterType<MainWindowViewModel>().As<IShell>();
             builder.RegisterType<AutoCompleteBasedOnLucene>().As<IAutoCompleteText>();
+
+            builder.RegisterType<Indexer>().As<IIndexer>();
+            builder.RegisterType<TaskExecuter>().AsSelf();
+
+            
+        }
+
+        protected override void Configure()
+        {
+            base.Configure();
+            Task.Factory.StartNew(() => Container.Resolve<TaskExecuter>().Start());
         }
     }
 }

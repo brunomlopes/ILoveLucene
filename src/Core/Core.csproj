@@ -49,12 +49,17 @@
     <Compile Include="Abstractions\IAutoCompleteText.cs" />
     <Compile Include="Abstractions\ICommand.cs" />
     <Compile Include="Abstractions\IConverter.cs" />
+    <Compile Include="Abstractions\IIndexer.cs" />
     <Compile Include="Abstractions\IItemSource.cs" />
+    <Compile Include="Abstractions\IBackgroundStartTask.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Lucene\AnalyzerExtension.cs" />
     <Compile Include="Lucene\AutoCompleteBasedOnLucene.cs" />
+    <Compile Include="Lucene\Indexer.cs" />
+    <Compile Include="Lucene\LuceneBase.cs" />
     <Compile Include="Lucene\LuceneStorage.cs" />
     <Compile Include="Lucene\SpecialFields.cs" />
+    <Compile Include="Lucene\TaskExecuter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

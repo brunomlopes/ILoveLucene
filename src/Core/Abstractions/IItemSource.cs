@@ -5,6 +5,7 @@ namespace Core.Abstractions
 {
     public interface IItemSource
     {
+        bool NeedsReindexing { get; }
         Task<IEnumerable<object>> GetItems();
     }
 }

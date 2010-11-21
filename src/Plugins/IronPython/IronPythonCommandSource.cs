@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.Abstractions;
 using IronPython.Hosting;
@@ -13,10 +14,10 @@ using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 using IronPython.Runtime.Types;
 
-namespace Plugins.Commands
+namespace Plugins.IronPython
 {
-    [Export(typeof(IItemSource))]
-    public class IronPythonCommandSource : IItemSource
+    [Export(typeof(IBackgroundStartTask))]
+    public class IronPythonCommandSource : IBackgroundStartTask
     {
         private readonly CompositionContainer _mefContainer;
         private ScriptEngine _engine;
@@ -27,24 +28,7 @@ namespace Plugins.Commands
             _mefContainer = mefContainer;
         }
 
-        public Task<IEnumerable<object>> GetItems()
-        {
-            return Task.Factory.StartNew(() =>
-                                             {
-                                                 _engine = Python.CreateEngine();
-
-                                                 DirectoryInfo directory = GetIronPythonPluginsDirectory();
-                                                 
-                                                 var pythonFiles =
-                                                     directory.GetFiles()
-                                                         .Where(f => f.Extension.ToLowerInvariant() == ".ipy");
-
-                                                 return CommandsFromFiles(pythonFiles);
-
-                                             });
-        }
-
-        private IEnumerable<object> CommandsFromFiles(IEnumerable<FileInfo> pythonFiles)
+        private void ExportCommandsFromFilesIntoMef(IEnumerable<FileInfo> pythonFiles)
         {
             foreach (var pythonFile in pythonFiles)
             {
@@ -82,13 +66,12 @@ namespace Plugins.Commands
                     .Where(kvp => typeof (ICommand).IsAssignableFrom(((PythonType) kvp.Value).__clrtype__()))
                     .Where(kvp => !kvp.Key.StartsWith("ICommand"));
                 var instances =
-                    pluginClasses.Select(nameAndClass => _engine.Operations.Invoke(nameAndClass.Value, new object[] {}))
+                    pluginClasses.Select<KeyValuePair<string, object>, object>(nameAndClass => _engine.Operations.Invoke(nameAndClass.Value, new object[] {}))
                         .Cast<ICommand>();
 
                 var batch = new CompositionBatch();
                 foreach (var instance in instances)
                 {
-                    yield return instance;
                     batch.AddExportedValue(instance);
                 }
                 _mefContainer.Compose(batch);
@@ -141,15 +124,29 @@ namespace Plugins.Commands
                 }
             }
         }
-    }
 
-    public static class ScriptScopeExtensionMethods
-    {
-        public static ScriptScope InjectType<T>(this ScriptScope scope)
+        public bool Executed { get; private set; }
+
+        public void Execute()
         {
-            var name = typeof(T).Name;
-            scope.SetVariable(name, ClrModule.GetPythonType(typeof(T)));
-            return scope;
+            try
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(5));
+                _engine = Python.CreateEngine();
+
+                DirectoryInfo directory = GetIronPythonPluginsDirectory();
+
+                var pythonFiles =
+                    directory.GetFiles()
+                        .Where(f => f.Extension.ToLowerInvariant() == ".ipy");
+
+                ExportCommandsFromFilesIntoMef(pythonFiles);
+            }
+            finally
+            {
+                Executed = true;
+            }
+            
         }
     }
 }

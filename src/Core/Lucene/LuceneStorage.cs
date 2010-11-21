@@ -64,14 +64,14 @@ namespace Core.Lucene
             throw new NotImplementedException(string.Format("No converter for {0} found ", typeof (T)));
         }
 
-        public void UpdateDocumentForObject(IndexWriter writer, object item)
+        public void UpdateDocumentForObject(IndexWriter writer, IItemSource source, object item)
         {
             var type = item.GetType();
             GetType().GetMethod("UpdateDocumentForItem").MakeGenericMethod(type)
-                .Invoke(this, new[] {writer, item});
+                .Invoke(this, new[] {writer, source, item});
         }
 
-        public void UpdateDocumentForItem<T>(IndexWriter writer, T item)
+        public void UpdateDocumentForItem<T>(IndexWriter writer, IItemSource source, T item)
         {
             var converter = GetConverter<T>();
             var nspace = converter.GetNamespaceForItems();
@@ -90,6 +90,7 @@ namespace Core.Lucene
 
             var name = converter.ToName(item);
             var document = converter.ToDocument(item);
+            var sourceId = SourceId(source);
 
             document.Add(new Field(SpecialFields.Id, id, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
@@ -103,9 +104,17 @@ namespace Core.Lucene
             document.Add(new Field(SpecialFields.Namespace, nspace, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
+            document.Add(new Field(SpecialFields.SourceId, sourceId, Field.Store.YES,
+                                   Field.Index.NOT_ANALYZED_NO_NORMS,
+                                   Field.TermVector.NO));
             document.Add(new Field(SpecialFields.Sha1, sha1, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
             writer.AddDocument(document);
+        }
+
+        private string SourceId(IItemSource source)
+        {
+            return source.GetType().FullName;
         }
 
         public AutoCompletionResult.CommandResult GetCommandResultForDocument(Document document)
@@ -170,6 +179,11 @@ namespace Core.Lucene
             {
                 searcher.Close();
             }
+        }
+
+        public void ClearSource(IndexWriter writer, IItemSource source)
+        {
+            writer.DeleteDocuments(new Term(SpecialFields.SourceId, SourceId(source)));
         }
     }
 }

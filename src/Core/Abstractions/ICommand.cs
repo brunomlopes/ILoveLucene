@@ -13,6 +13,10 @@ namespace Core.Abstractions
 
     public interface ICommandWithArguments : ICommand
     {
+        /// <summary>
+        /// Executes the command with the given arguments
+        /// </summary>
+        /// <param name="arguments">Can be an empty string</param>
         void Execute(string arguments);
     }
 
@@ -40,6 +44,7 @@ namespace Core.Abstractions
 
     public interface ICommandWithAutoCompletedArguments : ICommandWithArguments
     {
+        /// <param name="arguments">Can be empty</param>
         ArgumentAutoCompletionResult AutoCompleteArguments(string arguments);
     }
 }

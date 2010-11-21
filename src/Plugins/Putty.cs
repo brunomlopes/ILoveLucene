@@ -44,6 +44,10 @@ namespace Plugins
 
         public ArgumentAutoCompletionResult AutoCompleteArguments(string arguments)
         {
+            if (string.IsNullOrWhiteSpace(arguments))
+            {
+                return ArgumentAutoCompletionResult.NoResult(arguments);
+            }
             return ArgumentAutoCompletionResult.OrderedResult(arguments,
                                                               _sessionNames.Where(s => s.Contains(arguments)));
         }

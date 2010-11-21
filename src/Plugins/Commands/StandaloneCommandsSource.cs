@@ -9,12 +9,12 @@ using Core.Abstractions;
 namespace Plugins.Commands
 {
     [Export(typeof (IItemSource))]
-    public class StandaloneCommandsSource : IItemSource
+    public class StandaloneCommandsSource : IItemSource, IPartImportsSatisfiedNotification
     {
         private readonly CompositionContainer _mefContainer;
 
-        // FIXME: when this is recomposed, resend the items?
-        [ImportMany(AllowRecomposition = true)] public IEnumerable<ICommand> Commands;
+        [ImportMany(AllowRecomposition = true)] 
+        public IEnumerable<ICommand> Commands;
 
         [ImportingConstructor]
         public StandaloneCommandsSource(CompositionContainer mefContainer)
@@ -23,10 +23,18 @@ namespace Plugins.Commands
             _mefContainer.SatisfyImportsOnce(this);
         }
 
+        public bool NeedsReindexing { get; private set; }
+
         public Task<IEnumerable<object>> GetItems()
         {
+            NeedsReindexing = false;
             var commands = Commands; //FIXME:  this can be recomposed mid-iteration. we don't want that for now
             return Task.Factory.StartNew(() => commands.Cast<Object>());
+        }
+
+        public void OnImportsSatisfied()
+        {
+            NeedsReindexing = true;
         }
     }
 }
