@@ -61,7 +61,6 @@ namespace Core.Lucene
             var indexWriter = GetIndexWriter();
             try
             {
-                host.ClearSource(indexWriter, source);
                 foreach (var item in items)
                 {
                     host.UpdateDocumentForObject(indexWriter, source, item);

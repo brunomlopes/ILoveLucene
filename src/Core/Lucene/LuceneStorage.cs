@@ -180,10 +180,5 @@ namespace Core.Lucene
                 searcher.Close();
             }
         }
-
-        public void ClearSource(IndexWriter writer, IItemSource source)
-        {
-            writer.DeleteDocuments(new Term(SpecialFields.SourceId, SourceId(source)));
-        }
     }
 }
