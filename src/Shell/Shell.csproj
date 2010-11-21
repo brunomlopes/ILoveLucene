@@ -82,7 +82,6 @@
     <Compile Include="Commands\ExitApplication.cs" />
     <Compile Include="DebugLogger.cs" />
     <Compile Include="IShell.cs" />
-    <Compile Include="MefBootstrapper.cs" />
     <Compile Include="ValueConverters\CommandResultToStringConverter.cs" />
     <Compile Include="ValueConverters\ICommandToStringConverter.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
