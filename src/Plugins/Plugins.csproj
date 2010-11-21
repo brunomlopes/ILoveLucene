@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{28E91DF6-B35A-4341-AB82-E9CE24B04750}</ProjectGuid>
+    <ProjectGuid>{133FD5D5-7C29-4A09-9DD3-A8E1506767C7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Core</RootNamespace>
-    <AssemblyName>Core</AssemblyName>
+    <RootNamespace>Plugins</RootNamespace>
+    <AssemblyName>Plugins</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -44,20 +44,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Abstractions\ArgumentAutoCompletionResult.cs" />
-    <Compile Include="Abstractions\AutoCompletionResult.cs" />
-    <Compile Include="Abstractions\IAutoCompleteText.cs" />
-    <Compile Include="Abstractions\ICommand.cs" />
-    <Compile Include="Abstractions\IConverter.cs" />
-    <Compile Include="Abstractions\IItemSource.cs" />
-    <Compile Include="Extensions\TaskExtensions.cs" />
-    <Compile Include="Lucene\AnalyzerExtension.cs" />
-    <Compile Include="Lucene\AutoCompleteBasedOnLucene.cs" />
-    <Compile Include="Lucene\LuceneStorage.cs" />
-    <Compile Include="Lucene\SpecialFields.cs" />
+    <Compile Include="Browse.cs" />
+    <Compile Include="Commands\ICommandConverter.cs" />
+    <Compile Include="Commands\StandaloneCommandsSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Putty.cs" />
+    <Compile Include="Shortcuts\ConvertFileInfo.cs" />
+    <Compile Include="Shortcuts\FileInfoCommand.cs" />
+    <Compile Include="Shortcuts\ShortcutSource.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{28E91DF6-B35A-4341-AB82-E9CE24B04750}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

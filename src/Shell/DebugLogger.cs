@@ -4,7 +4,6 @@ using Caliburn.Micro;
 
 namespace ILoveLucene
 {
-    [Export(typeof(ILog))]
     public class DebugLogger : ILog
     {
         public void Info(string format, params object[] args)

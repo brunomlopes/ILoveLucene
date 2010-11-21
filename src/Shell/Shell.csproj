@@ -36,6 +36,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\..\lib\autofac\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Integration.Mef">
+      <HintPath>..\..\lib\autofac\Autofac.Integration.Mef.dll</HintPath>
+    </Reference>
     <Reference Include="Caliburn.Micro">
       <HintPath>..\..\lib\caliburn_micro\Caliburn.Micro.dll</HintPath>
     </Reference>
@@ -70,10 +76,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="AutofacBootstrapper.cs" />
+    <Compile Include="Modules\LoggingModule.cs" />
+    <Compile Include="TypedAutofacBootStrapper.cs" />
     <Compile Include="Commands\ExitApplication.cs" />
     <Compile Include="DebugLogger.cs" />
     <Compile Include="IShell.cs" />
-    <Compile Include="MefBootstrapper.cs" />
     <Compile Include="ValueConverters\PositionConverter.cs" />
     <Compile Include="ValueConverters\CommandResultToStringConverter.cs" />
     <Compile Include="ValueConverters\ICommandToStringConverter.cs" />
@@ -114,6 +122,10 @@
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{28E91DF6-B35A-4341-AB82-E9CE24B04750}</Project>
       <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Plugins\Plugins.csproj">
+      <Project>{133FD5D5-7C29-4A09-9DD3-A8E1506767C7}</Project>
+      <Name>Plugins</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

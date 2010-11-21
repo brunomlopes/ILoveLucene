@@ -2,9 +2,9 @@
 using System.IO;
 using Core.Abstractions;
 
-namespace Core.Shortcuts
+namespace Plugins.Shortcuts
 {
-    class FileInfoCommand : ICommand
+    internal class FileInfoCommand : ICommand
     {
         private readonly FileInfo _shortcut;
 

@@ -4,7 +4,7 @@ using System.Linq;
 using Core.Abstractions;
 using Microsoft.Win32;
 
-namespace Core.Commands
+namespace Plugins
 {
     [Export(typeof(ICommand))]
     public class Putty : ICommandWithAutoCompletedArguments

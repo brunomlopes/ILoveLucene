@@ -2,8 +2,8 @@
 using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using Core.Abstractions;
-using Core.Commands;
 using Core.Lucene;
+using Plugins.Commands;
 using Xunit;
 
 namespace Tests
@@ -63,7 +63,7 @@ namespace Tests
 
             _container.Compose(batch);
 
-            var converters = new[] {new ICommandConverter(_container)};
+            var converters = new[] { new ICommandConverter(_container) };
             _luceneStorage = new LuceneStorage(converters);
             return converters;
         }

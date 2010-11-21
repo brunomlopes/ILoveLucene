@@ -57,6 +57,10 @@
       <Project>{28E91DF6-B35A-4341-AB82-E9CE24B04750}</Project>
       <Name>Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Plugins\Plugins.csproj">
+      <Project>{133FD5D5-7C29-4A09-9DD3-A8E1506767C7}</Project>
+      <Name>Plugins</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

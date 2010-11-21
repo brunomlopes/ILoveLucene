@@ -1,21 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using Core.Abstractions;
 using Lucene.Net.Documents;
 
-namespace Core.Commands
+namespace Plugins.Commands
 {
     [Export(typeof(IConverter))]
     public class ICommandConverter : IConverter<ICommand>
     {
-        private readonly CompositionContainer _container;
+        private readonly CompositionContainer _mefContainer;
+
+        [ImportMany]
+        public IEnumerable<ICommand> Commands { get; set; }
 
         [ImportingConstructor]
-        public ICommandConverter(CompositionContainer container)
+        public ICommandConverter(CompositionContainer mefContainer)
         {
-            _container = container;
+            _mefContainer = mefContainer;
+            _mefContainer.SatisfyImportsOnce(this);
         }
 
         public Type ConvertedType
@@ -27,8 +32,7 @@ namespace Core.Commands
         {
             var fullname = document.GetField("fullname").StringValue();
             var export =
-                _container.GetExportedValues<ICommand>(AttributedModelServices.GetContractName(typeof (ICommand)))
-                    .SingleOrDefault(c => c.GetType().FullName == fullname);
+                Commands.SingleOrDefault(c => c.GetType().FullName == fullname);
 
             if(export == null)
                 throw new InvalidOperationException(string.Format("Missing ICommand {0}", fullname));

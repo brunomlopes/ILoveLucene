@@ -18,14 +18,13 @@ namespace ILoveLucene.ViewModels
     public class MainWindowViewModel : PropertyChangedBase, IShell
     {
         private readonly IAutoCompleteText _autoCompleteText;
-        private readonly ILog _log;
+        private readonly ILog _log = LogManager.GetLog(typeof(MainWindowViewModel));
         private CancellationTokenSource _cancelationTokenSource;
 
         [ImportingConstructor]
-        public MainWindowViewModel(IAutoCompleteText autoCompleteText, ILog log)
+        public MainWindowViewModel(IAutoCompleteText autoCompleteText)
         {
             _autoCompleteText = autoCompleteText;
-            _log = log;
             _cancelationTokenSource = new CancellationTokenSource();
             _argumentCancelationTokenSource = new CancellationTokenSource();
             CommandOptions = new List<AutoCompletionResult.CommandResult>();

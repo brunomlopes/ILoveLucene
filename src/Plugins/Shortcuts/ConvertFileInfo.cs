@@ -4,10 +4,10 @@ using System.IO;
 using Core.Abstractions;
 using Lucene.Net.Documents;
 
-namespace Core.Shortcuts
+namespace Plugins.Shortcuts
 {
     [Export(typeof(IConverter))]
-    class ConvertFileInfo : IConverter<FileInfo>
+    public class ConvertFileInfo : IConverter<FileInfo>
     {
         public string ToId(FileInfo fileInfo)
         {
