@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Linq;
 using Core.Abstractions;
 using Lucene.Net.Analysis.Standard;
@@ -61,15 +62,35 @@ namespace Core.Lucene
             var indexWriter = GetIndexWriter();
             try
             {
+                var conf = host.GetObject<Configuration>(indexWriter, "IndexerConfiguration");
+                if (conf == null) conf = new Configuration();
+                var newTag = conf.SetNewTagForSourceId(host.SourceId(source));
+
                 foreach (var item in items)
                 {
-                    host.UpdateDocumentForObject(indexWriter, source, item);
+                    host.UpdateDocumentForObject(indexWriter, source, newTag, item);
                 }
+                
+                host.DeleteDocumentsForSourceWithoutTag(indexWriter, source, newTag);
+
+                host.StoreObject(indexWriter, "IndexerConfiguration", conf);
                 indexWriter.Commit();
             }
             finally
             {
                 indexWriter.Close();
+            }
+        }
+
+        class Configuration
+        {
+            public Dictionary<string, Guid> Tags = new Dictionary<string, Guid>();
+
+            public string SetNewTagForSourceId(string sourceId)
+            {
+                var newGuid = Guid.NewGuid();
+                Debug.WriteLine(string.Format("New tag '{0}' for source id '{1}'", newGuid, sourceId));
+                return (Tags[sourceId] = newGuid).ToString();
             }
         }
     }

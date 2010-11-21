@@ -8,23 +8,24 @@ using Core.Abstractions;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
+using Newtonsoft.Json;
 
 namespace Core.Lucene
 {
     public class LuceneStorage
     {
-        private class CommandId
+        private class DocumentId
         {
             public string Namespace { get; private set; }
             public string Id { get; private set; }
 
-            public CommandId(string ns, string id)
+            public DocumentId(string ns, string id)
             {
                 Namespace = ns;
                 Id = id;
             }
 
-            public CommandId(Document document)
+            public DocumentId(Document document)
             {
                 Namespace = document.GetField("_namespace").StringValue();
                 Id = document.GetField("_id").StringValue();
@@ -64,20 +65,20 @@ namespace Core.Lucene
             throw new NotImplementedException(string.Format("No converter for {0} found ", typeof (T)));
         }
 
-        public void UpdateDocumentForObject(IndexWriter writer, IItemSource source, object item)
+        public void UpdateDocumentForObject(IndexWriter writer, IItemSource source, string tag, object item)
         {
             var type = item.GetType();
             GetType().GetMethod("UpdateDocumentForItem").MakeGenericMethod(type)
-                .Invoke(this, new[] {writer, source, item});
+                .Invoke(this, new[] {writer, source, tag, item});
         }
 
-        public void UpdateDocumentForItem<T>(IndexWriter writer, IItemSource source, T item)
+        public void UpdateDocumentForItem<T>(IndexWriter writer, IItemSource source, string tag, T item)
         {
             var converter = GetConverter<T>();
             var nspace = converter.GetNamespaceForItems();
             var id = converter.ToId(item);
 
-            var sha1 = new CommandId(nspace, id).GetSha1();
+            var sha1 = new DocumentId(nspace, id).GetSha1();
 
             var oldDocument = PopDocument(writer, sha1);
             var learnings = string.Empty;
@@ -107,12 +108,15 @@ namespace Core.Lucene
             document.Add(new Field(SpecialFields.SourceId, sourceId, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
+            document.Add(new Field(SpecialFields.Tag, tag, Field.Store.YES,
+                                   Field.Index.NOT_ANALYZED_NO_NORMS,
+                                   Field.TermVector.NO));
             document.Add(new Field(SpecialFields.Sha1, sha1, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
             writer.AddDocument(document);
         }
 
-        private string SourceId(IItemSource source)
+        public string SourceId(IItemSource source)
         {
             return source.GetType().FullName;
         }
@@ -126,7 +130,7 @@ namespace Core.Lucene
             }
             var command = _convertersForNamespaces[nspace].FromDocumentToCommand(document);
 
-            return new AutoCompletionResult.CommandResult(command, new CommandId(document));
+            return new AutoCompletionResult.CommandResult(command, new DocumentId(document));
         }
 
         public void LearnCommandForInput(IndexWriter writer, object commandIdObject, string input)
@@ -134,11 +138,11 @@ namespace Core.Lucene
             // fickle command, isn't learnable
             if (commandIdObject == null) return;
 
-            if (!(commandIdObject is CommandId))
+            if (!(commandIdObject is DocumentId))
                 throw new InvalidOperationException(
-                    "Id is not CommandId. It means the command didn't originate from this class");
+                    "Id is not DocumentId. It means the command didn't originate from this class");
 
-            var commandId = (CommandId) commandIdObject;
+            var commandId = (DocumentId) commandIdObject;
             var document = PopDocument(writer, commandId.GetSha1());
 
             if (document == null)
@@ -179,6 +183,59 @@ namespace Core.Lucene
             {
                 searcher.Close();
             }
+        }
+
+        public void StoreObject<T>(IndexWriter writer, string id, T obj)
+        {
+            var jsonObject = JsonConvert.SerializeObject(obj);
+            var docId = new DocumentId("_object", id);
+            writer.DeleteDocuments(new Term(SpecialFields.Sha1, docId.GetSha1()));
+
+            var document = new Document();
+            document.Add(new Field(SpecialFields.Sha1, docId.GetSha1(), Field.Store.YES,
+                                   Field.Index.NOT_ANALYZED_NO_NORMS, Field.TermVector.NO));
+            document.Add(new Field(SpecialFields.Id, docId.Id, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS,
+                                   Field.TermVector.NO));
+            document.Add(new Field(SpecialFields.Namespace, docId.Namespace, Field.Store.YES,
+                                   Field.Index.NOT_ANALYZED_NO_NORMS, Field.TermVector.NO));
+
+            document.Add(new Field(SpecialFields.Object, jsonObject, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS,
+                                   Field.TermVector.NO));
+            writer.AddDocument(document);
+        }
+
+        public T GetObject<T>(IndexWriter writer, string id)
+        {
+            var searcher = new IndexSearcher(writer.GetDirectory(), true);
+            var docId = new DocumentId("_object", id);
+            try
+            {
+                var query = new TermQuery(new Term(SpecialFields.Sha1, docId.GetSha1()));
+                var searchResult = searcher.Search(query, 1);
+
+                Debug.Assert(searchResult.totalHits <= 1,
+                             string.Format("Object id '{0}' found for more than one object", id));
+                
+                if(searchResult.totalHits == 0) return default(T);
+
+                var luceneDoc = searcher.Doc(searchResult.scoreDocs.First().doc);
+
+                return JsonConvert.DeserializeObject<T>(luceneDoc.GetField(SpecialFields.Object).StringValue());
+            }
+            finally
+            {
+                searcher.Close();
+            }
+        }
+
+        public void DeleteDocumentsForSourceWithoutTag(IndexWriter indexWriter, IItemSource source, string tag)
+        {
+            var query = new BooleanQuery();
+            query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.SourceId, SourceId(source))),
+                                        BooleanClause.Occur.MUST));
+            query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.Tag, tag)),
+                                        BooleanClause.Occur.MUST_NOT));
+            indexWriter.DeleteDocuments(query);
         }
     }
 }

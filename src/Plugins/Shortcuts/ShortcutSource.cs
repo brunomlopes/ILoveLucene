@@ -10,10 +10,11 @@ using Core.Extensions;
 
 namespace Plugins.Shortcuts
 {
+    [Export(typeof (ShortcutSource))]
     [Export(typeof (IItemSource))]
     public class ShortcutSource : IItemSource
     {
-        private readonly HashSet<FileInfo> _shortcutPaths;
+        private HashSet<FileInfo> _shortcutPaths;
         private static readonly object _shortcutPathsLock = new object();
         public static string[] _extensions = new[] {".exe", ".bat", ".ps1", ".ipy", ".lnk", ".appref-ms"};
         private readonly List<string> _dirs;
@@ -29,7 +30,8 @@ namespace Plugins.Shortcuts
                             @"%APPDATA%\Microsoft\Internet Explorer\Quick Launch",
                             @"C:\Windows\System32",
                             @"%USERPROFILE%\Favorites",
-                            @"%HOME%\utils"
+                            @"%HOME%\utils",
+                            @"E:\temp"
                         }.Select(Environment.ExpandEnvironmentVariables).ToList();
             NeedsReindexing = true;
         }
@@ -66,13 +68,14 @@ namespace Plugins.Shortcuts
             directoryInfos.ForEach(d => ScanDirectoryForShortcuts(d.FullName));
         }
 
-        public bool NeedsReindexing { get; private set; }
+        public bool NeedsReindexing { get; set; }
 
         public Task<IEnumerable<object>> GetItems()
         {
             NeedsReindexing = false;
             return Task.Factory.StartNew(() =>
                                              {
+                                                 _shortcutPaths = new HashSet<FileInfo>();
                                                  _dirs.ForEach(ScanDirectoryForShortcuts);
                                                  return _shortcutPaths.Cast<object>();
                                              })

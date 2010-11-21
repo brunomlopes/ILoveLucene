@@ -17,13 +17,13 @@ using IronPython.Runtime.Types;
 namespace Plugins.IronPython
 {
     [Export(typeof(IBackgroundStartTask))]
-    public class IronPythonCommandSource : IBackgroundStartTask
+    public class IronPythonCommandsMefExport : IBackgroundStartTask
     {
         private readonly CompositionContainer _mefContainer;
         private ScriptEngine _engine;
 
         [ImportingConstructor]
-        public IronPythonCommandSource(CompositionContainer mefContainer)
+        public IronPythonCommandsMefExport(CompositionContainer mefContainer)
         {
             _mefContainer = mefContainer;
         }

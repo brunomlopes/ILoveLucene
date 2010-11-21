@@ -65,13 +65,14 @@
   <ItemGroup>
     <Compile Include="Browse.cs" />
     <Compile Include="Commands\ICommandConverter.cs" />
-    <Compile Include="IronPython\IronPythonCommandSource.cs" />
+    <Compile Include="IronPython\IronPythonCommandsMefExport.cs" />
     <Compile Include="Commands\StandaloneCommandsSource.cs" />
     <Compile Include="IronPython\ScriptScopeExtensionMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Putty.cs" />
     <Compile Include="Shortcuts\ConvertFileInfo.cs" />
     <Compile Include="Shortcuts\FileInfoCommand.cs" />
+    <Compile Include="Shortcuts\ReindexShortcutSource.cs" />
     <Compile Include="Shortcuts\ShortcutSource.cs" />
     <Compile Include="ShowItemSources.cs" />
     <Compile Include="TriggerReindex.cs" />

@@ -28,9 +28,11 @@ namespace ILoveLucene
 
             MefContainer =
                 CompositionHost.Initialize(new AggregateCatalog(
-                                               AssemblySource.Instance.Select(x => new AssemblyCatalog(x)).OfType
-                                                   <ComposablePartCatalog>()),
-                                           new DirectoryCatalog(assemblyDirectory, "Plugins.*")
+                                               AssemblySource.Instance.Select(x => new AssemblyCatalog(x))
+                                                   .OfType<ComposablePartCatalog>()),
+                                           new DirectoryCatalog(assemblyDirectory, "Plugins.*.dll"),
+                                           new DirectoryCatalog(assemblyDirectory, "Plugins.dll"),
+                                           new AssemblyCatalog(typeof (Core.Abstractions.ICommand).Assembly)
                     );
 
             var batch = new CompositionBatch();
