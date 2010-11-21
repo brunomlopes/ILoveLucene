@@ -13,7 +13,7 @@ namespace Plugins.Commands
     {
         private readonly CompositionContainer _mefContainer;
 
-        [ImportMany]
+        [ImportMany(AllowRecomposition = true)]
         public IEnumerable<ICommand> Commands { get; set; }
 
         [ImportingConstructor]

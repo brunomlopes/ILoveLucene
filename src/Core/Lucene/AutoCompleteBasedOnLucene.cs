@@ -40,8 +40,7 @@ namespace Core.Lucene
                 .ForAll(s => s.GetItems()
                                  .ContinueWith(task =>
                                                    {
-                                                       var items = task.Result;
-                                                       if (items.Count() == 0) return;
+                                                       var items = task.Result; 
 
                                                        IndexItems(items, host);
                                                    }));
@@ -73,7 +72,7 @@ namespace Core.Lucene
         private void EnsureIndexExists()
         {
             var indexDirectory =
-                new DirectoryInfo(Path.Combine(new FileInfo(Assembly.GetExecutingAssembly().FullName).DirectoryName,
+                new DirectoryInfo(Path.Combine(new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName,
                                                "index"));
             var createIndex = !indexDirectory.Exists;
             _directory = new SimpleFSDirectory(indexDirectory);

@@ -13,7 +13,8 @@ namespace Plugins.Commands
     {
         private readonly CompositionContainer _mefContainer;
 
-        [ImportMany] public IEnumerable<ICommand> Commands;
+        // FIXME: when this is recomposed, resend the items?
+        [ImportMany(AllowRecomposition = true)] public IEnumerable<ICommand> Commands;
 
         [ImportingConstructor]
         public StandaloneCommandsSource(CompositionContainer mefContainer)
@@ -24,7 +25,8 @@ namespace Plugins.Commands
 
         public Task<IEnumerable<object>> GetItems()
         {
-            return Task.Factory.StartNew(() => Commands.Cast<Object>());
+            var commands = Commands; //FIXME:  this can be recomposed mid-iteration. we don't want that for now
+            return Task.Factory.StartNew(() => commands.Cast<Object>());
         }
     }
 }
