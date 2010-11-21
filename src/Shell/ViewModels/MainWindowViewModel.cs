@@ -34,26 +34,29 @@ namespace ILoveLucene.ViewModels
 
         public void Execute(FrameworkElement source)
         {
-            try
-            {
-                if (CommandWithArguments != null)
-                {
-                    CommandWithArguments.Execute(Arguments);
-                }
-                else
-                {
-                    Result.Command.Execute();
-                    _autoCompleteText.LearnInputForCommandResult(Input, Result);
-                }
+            Task.Factory.StartNew(() =>
+                                      {
+                                          try
+                                          {
+                                              if (CommandWithArguments != null)
+                                              {
+                                                  CommandWithArguments.Execute(Arguments);
+                                              }
+                                              else
+                                              {
+                                                  Result.Command.Execute();
+                                                  _autoCompleteText.LearnInputForCommandResult(Input, Result);
+                                              }
 
-                // HACK
-                ((MainWindowView) Window.GetWindow(source)).Toggle();
-            }
-            catch (Exception e)
-            {
-                Description = e.Message;
-                _log.Error(e);
-            }
+                                              // HACK
+                                              Caliburn.Micro.Execute.OnUIThread(() => ((MainWindowView)Window.GetWindow(source)).Toggle());
+                                          }
+                                          catch (Exception e)
+                                          {
+                                              Description = e.Message;
+                                              _log.Error(e);
+                                          }
+                                      });
         }
 
         private IList<AutoCompletionResult.CommandResult> _commandOptions;

@@ -19,7 +19,7 @@ namespace ILoveLucene.Commands
 
         public void Execute()
         {
-            Application.Current.Shutdown();
+            Caliburn.Micro.Execute.OnUIThread(() => Application.Current.Shutdown());
         }
     }
 }
