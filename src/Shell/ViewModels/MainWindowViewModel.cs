@@ -14,14 +14,12 @@ using ICommand = Core.Abstractions.ICommand;
 
 namespace ILoveLucene.ViewModels
 {
-    [Export(typeof (IShell))]
     public class MainWindowViewModel : PropertyChangedBase, IShell
     {
         private readonly IAutoCompleteText _autoCompleteText;
         private readonly ILog _log = LogManager.GetLog(typeof (MainWindowViewModel));
         private CancellationTokenSource _cancelationTokenSource;
 
-        [ImportingConstructor]
         public MainWindowViewModel(IAutoCompleteText autoCompleteText)
         {
             _autoCompleteText = autoCompleteText;

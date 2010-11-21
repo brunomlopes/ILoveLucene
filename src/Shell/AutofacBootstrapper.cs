@@ -30,7 +30,7 @@ namespace ILoveLucene
                 CompositionHost.Initialize(new AggregateCatalog(
                                                AssemblySource.Instance.Select(x => new AssemblyCatalog(x)).OfType
                                                    <ComposablePartCatalog>()),
-                                           new DirectoryCatalog(assemblyDirectory)
+                                           new DirectoryCatalog(assemblyDirectory, "Plugins.*")
                     );
 
             var batch = new CompositionBatch();
