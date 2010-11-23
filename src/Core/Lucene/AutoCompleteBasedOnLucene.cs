@@ -24,13 +24,21 @@ namespace Core.Lucene
         [ImportMany]
         public IEnumerable<IConverter> Converters { get; set; }
 
-        [ImportMany]
-        public IEnumerable<IItemSource> Sources { get; set; }
-
         public AutoCompleteBasedOnLucene(CompositionContainer mefContainer)
         {
             _mefContainer = mefContainer;
             _mefContainer.SatisfyImportsOnce(this);
+        }
+
+        private AutoCompleteBasedOnLucene(Directory directory)
+            : base(directory)
+        {
+            
+        }
+
+        public static AutoCompleteBasedOnLucene WithDirectory(Directory directory)
+        {
+            return new AutoCompleteBasedOnLucene(directory);
         }
 
         public AutoCompletionResult Autocomplete(string text)

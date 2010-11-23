@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConverterHostTests.cs" />
+    <Compile Include="IndexerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TokenizingTests.cs" />
   </ItemGroup>

@@ -1,15 +1,17 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Reflection;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
 using Lucene.Net.Store;
-using Lucene.Net.Util;
+using Directory = Lucene.Net.Store.Directory;
+using Version = Lucene.Net.Util.Version;
 
 namespace Core.Lucene
 {
     public class LuceneBase
     {
-        protected SimpleFSDirectory Directory;
+        protected Directory Directory;
 
         public LuceneBase()
         {
@@ -17,6 +19,11 @@ namespace Core.Lucene
                 new DirectoryInfo(Path.Combine(new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName,
                                                "index"));
             Directory = new SimpleFSDirectory(indexDirectory);
+        }
+
+        protected LuceneBase(Directory directory)
+        {
+            Directory = directory;
         }
 
         protected IndexWriter GetIndexWriter()

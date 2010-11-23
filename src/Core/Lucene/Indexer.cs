@@ -6,6 +6,7 @@ using System.Linq;
 using Core.Abstractions;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
+using Lucene.Net.Store;
 using Version = Lucene.Net.Util.Version;
 
 namespace Core.Lucene
@@ -23,6 +24,16 @@ namespace Core.Lucene
         public Indexer()
         {
             EnsureIndexExists();
+            Converters = new IConverter[] { };
+            Sources = new IItemSource[] { };
+        }
+        
+        public Indexer(Directory directory)
+            :base(directory)
+        {
+            EnsureIndexExists();
+            Converters = new IConverter[] {};
+            Sources = new IItemSource[] {};
         }
 
         public bool Executed { get; private set; }
@@ -52,12 +63,13 @@ namespace Core.Lucene
 
         private void EnsureIndexExists()
         {
-            var createIndex = !Directory.GetDirectory().Exists;
-            new IndexWriter(Directory, new StandardAnalyzer(Version.LUCENE_29), createIndex,
-                            IndexWriter.MaxFieldLength.UNLIMITED).Close();
+            var dir = Directory as FSDirectory;
+            if (dir != null)
+                new IndexWriter(Directory, new StandardAnalyzer(Version.LUCENE_29), !dir.GetDirectory().Exists,
+                                IndexWriter.MaxFieldLength.UNLIMITED).Close();
         }
 
-        private void IndexItems(IItemSource source, IEnumerable<object> items, LuceneStorage host)
+        public void IndexItems(IItemSource source, IEnumerable<object> items, LuceneStorage host)
         {
             var indexWriter = GetIndexWriter();
             try
@@ -70,7 +82,7 @@ namespace Core.Lucene
                 {
                     host.UpdateDocumentForObject(indexWriter, source, newTag, item);
                 }
-                
+
                 host.DeleteDocumentsForSourceWithoutTag(indexWriter, source, newTag);
 
                 host.StoreObject(indexWriter, "IndexerConfiguration", conf);
