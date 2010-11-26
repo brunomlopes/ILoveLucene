@@ -25,6 +25,13 @@ namespace ILoveLucene.Views
 
         public void Toggle()
         {
+            if (!IsActive)
+            {
+                ClearInputBoxes();
+                ShowThisWindow();
+                return;
+            }
+
             if (WindowState == WindowState.Minimized)
             {
                 ClearInputBoxes();
