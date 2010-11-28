@@ -16,12 +16,14 @@ namespace ILoveLucene.ViewModels
     public class MainWindowViewModel : PropertyChangedBase, IShell
     {
         private readonly IAutoCompleteText _autoCompleteText;
+        private readonly IGetActionsForItem _getActionsForItem;
         private readonly ILog _log = LogManager.GetLog(typeof (MainWindowViewModel));
         private CancellationTokenSource _cancelationTokenSource;
 
-        public MainWindowViewModel(IAutoCompleteText autoCompleteText)
+        public MainWindowViewModel(IAutoCompleteText autoCompleteText, IGetActionsForItem getActionsForItem)
         {
             _autoCompleteText = autoCompleteText;
+            _getActionsForItem = getActionsForItem;
             _cancelationTokenSource = new CancellationTokenSource();
             _argumentCancelationTokenSource = new CancellationTokenSource();
             CommandOptions = new List<AutoCompletionResult.CommandResult>();
@@ -166,8 +168,6 @@ namespace ILoveLucene.ViewModels
                                           {
                                               Result = result.AutoCompletedCommand;
                                               CommandOptions = new[] {Result}.Concat(result.OtherOptions).ToList();
-                                              Actions = new List<IActOnItem> { new RunFileInfo(), new RunFileInfoWithArguments() };
-                                              SelectedAction = Actions.FirstOrDefault();
                                               Arguments = string.Empty;
                                           }
                                           else
@@ -175,11 +175,11 @@ namespace ILoveLucene.ViewModels
                                               Result = new AutoCompletionResult.CommandResult(new TextItem(Input),
                                                                                               null);
                                               CommandOptions = new List<AutoCompletionResult.CommandResult>();
-                                              Actions = new List<IActOnItem> {  };
-
-                                              SelectedAction = Actions.FirstOrDefault();
                                               ArgumentOptions = new List<string>();
                                           }
+                                          Actions = _getActionsForItem.ActionsForItem(Result.Item);
+                                          SelectedAction = Actions.FirstOrDefault();
+
                                       }, token)
                 .GuardForException(e => Description = e.Message);
         }

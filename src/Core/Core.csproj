@@ -51,6 +51,7 @@
     <Compile Include="Abstractions\AutoCompletionResult.cs" />
     <Compile Include="Abstractions\IActOnItem.cs" />
     <Compile Include="Abstractions\IAutoCompleteText.cs" />
+    <Compile Include="Abstractions\IGetActionsForItem.cs" />
     <Compile Include="Abstractions\IItem.cs" />
     <Compile Include="Abstractions\IConverter.cs" />
     <Compile Include="Abstractions\IIndexer.cs" />

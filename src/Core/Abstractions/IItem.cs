@@ -1,3 +1,5 @@
+using System;
+
 namespace Core.Abstractions
 {
     public interface IItem
@@ -15,7 +17,7 @@ namespace Core.Abstractions
         T Item { get; }
     }
 
-    public class TextItem : IItem
+    public class TextItem : ITypedItem<string>
     {
         public TextItem(string input)
             : this(input, string.Empty)
@@ -34,6 +36,11 @@ namespace Core.Abstractions
 
         public void Execute()
         {
+        }
+
+        public string Item
+        {
+            get { return Text; }
         }
     }
 

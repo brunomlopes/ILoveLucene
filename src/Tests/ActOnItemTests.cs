@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using Core.Abstractions;
 using Plugins.Shortcuts;
@@ -29,6 +28,19 @@ namespace Tests
             Assert.True(act.Acted);
             Assert.Equal(act.Info, info.Item);
             Assert.Equal("argument", act.Arguments);
+        }
+        
+        [Fact]
+        public void CanFindAction()
+        {
+            var act = new MockActOnFileInfo();
+            var info = new FileInfoItem(new FileInfo("does.not.exist"));
+
+            var getItems = new GetActionsForItem(new[] {act});
+
+            var actionsForItem = getItems.ActionsForItem(info);
+            Assert.NotEmpty(actionsForItem);
+            Assert.Contains(act, actionsForItem);
         }
     }
 

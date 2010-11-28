@@ -58,6 +58,7 @@ namespace ILoveLucene
 
             builder.RegisterType<MainWindowViewModel>().As<IShell>();
             builder.RegisterType<AutoCompleteBasedOnLucene>().As<IAutoCompleteText>();
+            builder.RegisterType<GetActionsForItem>().As<IGetActionsForItem>();
 
             builder.RegisterType<Indexer>().As<IIndexer>();
             builder.RegisterType<TaskExecuter>().AsSelf();
