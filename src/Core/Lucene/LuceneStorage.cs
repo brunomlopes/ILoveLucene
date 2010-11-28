@@ -128,7 +128,7 @@ namespace Core.Lucene
             {
                 throw new NotImplementedException(string.Format("No converter for namespace {0} found", nspace));
             }
-            var command = _convertersForNamespaces[nspace].FromDocumentToCommand(document);
+            var command = _convertersForNamespaces[nspace].FromDocumentToItem(document);
 
             return new AutoCompletionResult.CommandResult(command, new DocumentId(document));
         }

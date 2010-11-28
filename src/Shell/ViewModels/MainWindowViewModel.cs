@@ -116,9 +116,17 @@ namespace ILoveLucene.ViewModels
                 if (index < CommandOptions.Count)
                 {
                     Result = CommandOptions[index];
+                    Task.Factory.StartNew(() => SetActionsForResult(Result))
+                        .GuardForException(SetError);
                     eventArgs.Handled = true;
                 }
             }
+        }
+
+        private void SetActionsForResult(AutoCompletionResult.CommandResult result)
+        {
+            Actions = _getActionsForItem.ActionsForItem(result.Item);
+            SelectedAction = Actions.FirstOrDefault();
         }
 
         public void ProcessArgumentShortcut(FrameworkElement source, KeyEventArgs eventArgs)
@@ -177,10 +185,14 @@ namespace ILoveLucene.ViewModels
                                               CommandOptions = new List<AutoCompletionResult.CommandResult>();
                                               ArgumentOptions = new List<string>();
                                           }
-                                          Actions = _getActionsForItem.ActionsForItem(Result.Item);
-                                          SelectedAction = Actions.FirstOrDefault();
+                                          SetActionsForResult(Result);
                                       }, token)
-                .GuardForException(e => Description = e.Message);
+                .GuardForException(SetError);
+        }
+
+        private void SetError(Exception e)
+        {
+            Description = e.Message;
         }
 
         public void AutoCompleteArgument()

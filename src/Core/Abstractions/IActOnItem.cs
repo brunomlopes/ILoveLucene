@@ -41,6 +41,11 @@ namespace Core.Abstractions
             get { return this.GetTypedItemType(); }
         }
     }
+    public abstract class BaseCommand<T> : BaseActOnTypedItem<T>,ITypedItem<T>
+    {
+        public abstract string Description { get; }
+        public abstract T Item { get; }
+    }
 
     public interface IActOnTypedItemWithArguments<in T> : IActOnItemWithArguments
     {

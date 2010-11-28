@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.Composition;
 using System.Windows;
 using Core.Abstractions;
@@ -5,21 +6,27 @@ using Core.Abstractions;
 namespace ILoveLucene.Commands
 {
     [Export(typeof (IItem))]
-    public class ExitApplication : IItem
+    [Export(typeof (IActOnItem))]
+    public class ExitApplication : BaseCommand<ExitApplication>
     {
-        public string Text
+        public override void ActOn(ITypedItem<ExitApplication> item)
+        {
+            Caliburn.Micro.Execute.OnUIThread(() => Application.Current.Shutdown());
+        }
+
+        public override string Text
         {
             get { return "Exit"; }
         }
 
-        public string Description
+        public override string Description
         {
             get { return "Exit application"; }
         }
 
-        public void Execute()
+        public override ExitApplication Item
         {
-            Caliburn.Micro.Execute.OnUIThread(() => Application.Current.Shutdown());
+            get { return this; }
         }
     }
 }

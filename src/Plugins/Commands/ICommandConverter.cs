@@ -28,14 +28,14 @@ namespace Plugins.Commands
             get { return typeof (IItem); }
         }
 
-        public IItem FromDocumentToCommand(Document document)
+        public IItem FromDocumentToItem(Document document)
         {
             var fullname = document.GetField("fullname").StringValue();
             var export =
                 Commands.SingleOrDefault(c => c.GetType().FullName == fullname);
 
             if (export == null)
-                throw new InvalidOperationException(string.Format("Missing ICommand {0}", fullname));
+                throw new InvalidOperationException(string.Format("Missing IItem {0}", fullname));
             return export;
         }
 

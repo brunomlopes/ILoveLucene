@@ -6,24 +6,30 @@ using Core.Lucene;
 namespace Plugins
 {
     [Export(typeof(IItem))]
-    public class TriggerReindex : IItem
+    [Export(typeof(IActOnItem))]
+    public class TriggerReindex : BaseCommand<TriggerReindex>
     {
         [Import]
         public IIndexer Indexer { get; set; }
-    
-        public string Text
+
+        public override void ActOn(ITypedItem<TriggerReindex> item)
+        {
+            Indexer.Index();
+        }
+
+        public override string Text
         {
             get { return "Trigger reindex check"; }
         }
 
-        public string Description
+        public override string Description
         {
             get { return "Causes the indexer to check if any of the sources need a re-index"; }
         }
 
-        public void Execute()
+        public override TriggerReindex Item
         {
-            Indexer.Index();
+            get { return this; }
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Core;
 using Core.Abstractions;
+using Plugins.Commands;
 using Plugins.Shortcuts;
 using Xunit;
 
@@ -59,6 +60,47 @@ namespace Tests
             Assert.Contains(act, actionsForItem);
             Assert.DoesNotContain(dontAct, actionsForItem);
         }
+        
+        [Fact]
+        public void CommandCanActOnItself()
+        {
+            var command = new MockCommand();
+
+            var getItems = new GetActionsForItem(new IActOnItem[] {command});
+
+            var actionsForItem = getItems.ActionsForItem(command);
+            Assert.NotEmpty(actionsForItem);
+            Assert.Contains(command, actionsForItem);
+
+            command.ActOn(command);
+            Assert.True(command.Acted);
+        }
+    }
+
+    class MockCommand : BaseCommand<MockCommand>
+    {
+        public bool Acted;
+        public MockCommand Command;
+
+        public override void ActOn(ITypedItem<MockCommand> item)
+        {
+            Acted = true;
+        }
+
+        public override string Text
+        {
+            get { return "not relevant"; }
+        }
+
+        public override string Description
+        {
+            get { return "description"; }
+        }
+
+        public override MockCommand Item
+        {
+            get { return this; }
+        }
     }
 
     class MockActOnFileInfo: BaseActOnTypedItem<FileInfo>, IActOnTypedItemWithArguments<FileInfo>
@@ -86,6 +128,7 @@ namespace Tests
             get { return "not relevant"; }
         }
     }
+
 
     class MockActOnFileInfoWithFilter : BaseActOnTypedItem<FileInfo>, IActOnTypedItemWithArguments<FileInfo>, ICanActOnTypedItem<FileInfo>
     {

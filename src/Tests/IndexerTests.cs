@@ -98,7 +98,7 @@ namespace Tests
             get { return typeof (Item); }
         }
 
-        public IItem FromDocumentToCommand(Document document)
+        public IItem FromDocumentToItem(Document document)
         {
             return new TextItem(document.GetField("id").StringValue());
         }

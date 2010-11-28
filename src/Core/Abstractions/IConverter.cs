@@ -6,7 +6,7 @@ namespace Core.Abstractions
     public interface IConverter
     {
         Type ConvertedType { get; }
-        IItem FromDocumentToCommand(Document document);
+        IItem FromDocumentToItem(Document document);
     }
 
     public interface IConverter<in T> : IConverter
