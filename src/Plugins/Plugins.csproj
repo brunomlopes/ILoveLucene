@@ -67,6 +67,7 @@
     <Compile Include="Commands\ICommandConverter.cs" />
     <Compile Include="Commands\StandaloneCommandsSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Putty.cs" />
     <Compile Include="Shortcuts\Configuration.cs" />
     <Compile Include="Shortcuts\ConvertFileInfo.cs" />
     <Compile Include="Shortcuts\FileInfoItem.cs" />

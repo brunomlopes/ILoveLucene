@@ -1,13 +1,10 @@
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
 using Core.Abstractions;
 using IronPython.Hosting;
-using IronPython.Runtime;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
-using Microsoft.Scripting.Interpreter;
 
 namespace Plugins
 {
@@ -28,8 +25,9 @@ namespace Plugins
 
         public override void ActOn(ITypedItem<string> item)
         {
+            // TODO: is this the best way to show the result?
+            // my quick usability check says it is (using it for a while)
             CanActOn(item);
-            // TODO: is this the best way?
         }
 
         public override string Text

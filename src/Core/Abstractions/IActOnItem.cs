@@ -51,7 +51,7 @@ namespace Core.Abstractions
         void ActOn(ITypedItem<T> item, string arguments);
     }
 
-    public interface IActOnTypedItemWithAutoCompletedArguments<in T> : IActOnItemWithArguments
+    public interface IActOnTypedItemWithAutoCompletedArguments<in T> : IActOnItemWithAutoCompletedArguments
     {
         /// <param name="arguments">Can be empty</param>
         ArgumentAutoCompletionResult AutoCompleteArguments(ITypedItem<T> item, string arguments);

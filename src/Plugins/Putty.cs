@@ -1,13 +1,17 @@
+using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Core.Abstractions;
 using Microsoft.Win32;
 
 namespace Plugins
 {
-    [Export(typeof (IItem))]
-    public class Putty : ICommandWithAutoCompletedArguments
+    [Export(typeof (IActOnItem))]
+    public class Putty : BaseActOnTypedItem<FileInfo>, ICanActOnTypedItem<FileInfo>,
+                         IActOnTypedItemWithArguments<FileInfo>,
+                         IActOnTypedItemWithAutoCompletedArguments<FileInfo>
     {
         private readonly string[] _sessionNames;
 
@@ -18,22 +22,22 @@ namespace Plugins
             else _sessionNames = sessionsKey.GetSubKeyNames();
         }
 
-        public string Text
+        public override void ActOn(ITypedItem<FileInfo> item)
         {
-            get { return "Putty"; }
+            Process.Start(item.Item.FullName);
         }
 
-        public string Description
+        public ArgumentAutoCompletionResult AutoCompleteArguments(ITypedItem<FileInfo> item, string arguments)
         {
-            get { return "Putty launcher"; }
+            if (string.IsNullOrWhiteSpace(arguments))
+            {
+                return ArgumentAutoCompletionResult.NoResult(arguments);
+            }
+            return ArgumentAutoCompletionResult.OrderedResult(arguments,
+                                                              _sessionNames.Where(s => s.Contains(arguments)));
         }
 
-        public void Execute()
-        {
-            Process.Start("putty");
-        }
-
-        public void Execute(string arguments)
+        public void ActOn(ITypedItem<FileInfo> item, string arguments)
         {
             if (_sessionNames.Contains(arguments))
             {
@@ -42,14 +46,20 @@ namespace Plugins
             Process.Start("putty", arguments);
         }
 
-        public ArgumentAutoCompletionResult AutoCompleteArguments(string arguments)
+        public override string Text
         {
-            if (string.IsNullOrWhiteSpace(arguments))
-            {
-                return ArgumentAutoCompletionResult.NoResult(arguments);
-            }
-            return ArgumentAutoCompletionResult.OrderedResult(arguments,
-                                                              _sessionNames.Where(s => s.Contains(arguments)));
+            get { return "Launch putty session"; }
+        }
+
+        public string Description
+        {
+            get { return "Putty launcher"; }
+        }
+
+        public bool CanActOn(ITypedItem<FileInfo> item)
+        {
+            return Path.GetFileNameWithoutExtension(item.Item.Name)
+                .Equals("putty", StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }
