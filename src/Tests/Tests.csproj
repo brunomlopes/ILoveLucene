@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActOnItemTests.cs" />
+    <Compile Include="CalculatorTests.cs" />
     <Compile Include="ConfigurationPart.cs" />
     <Compile Include="ConfigurationTests.cs" />
     <Compile Include="IndexerTests.cs" />

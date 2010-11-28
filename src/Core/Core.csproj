@@ -59,6 +59,7 @@
     <Compile Include="Abstractions\IBackgroundStartTask.cs" />
     <Compile Include="Abstractions\ILoadConfiguration.cs" />
     <Compile Include="Abstractions\ImportConfiguration.cs" />
+    <Compile Include="GetActionsForItem.cs" />
     <Compile Include="LoadConfiguration.cs" />
     <Compile Include="ConfigurationPart.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />

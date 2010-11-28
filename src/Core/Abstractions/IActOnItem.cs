@@ -8,6 +8,10 @@ namespace Core.Abstractions
         string Text { get; }
         Type TypedItemType { get; }
     }
+    
+    public interface ICanActOnItem
+    {
+    }
 
     public interface IActOnItemWithArguments : IActOnItem
     {
@@ -39,6 +43,16 @@ namespace Core.Abstractions
                 .GetMethod("AutoCompleteArguments", BindingFlags.Instance | BindingFlags.Public, null, new[] { self.TypedItemType, typeof(string) }, null)
                 .Invoke(self, new object[] {item, arguments});
         }
+        
+        public static bool CanActOn(this IActOnItem self, IItem item)
+        {
+            if (!(self is ICanActOnItem))
+                return true;
+
+            return (bool)self.GetType()
+                .GetMethod("CanActOn", BindingFlags.Instance | BindingFlags.Public, null, new[] { self.TypedItemType}, null)
+                .Invoke(self, new object[] {item});
+        }
 
         public static Type GetTypedItemType<T>(this IActOnTypedItem<T> self)
         {
@@ -54,6 +68,11 @@ namespace Core.Abstractions
     public interface IActOnTypedItem<in T> : IActOnItem
     {
         void ActOn(ITypedItem<T> item);
+    }
+
+    public interface ICanActOnTypedItem<in T> : ICanActOnItem
+    {
+        bool CanActOn(ITypedItem<T> item);
     }
     
     public abstract class BaseActOnTypedItem<T> : IActOnTypedItem<T>

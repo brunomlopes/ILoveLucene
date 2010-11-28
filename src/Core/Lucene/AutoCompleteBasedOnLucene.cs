@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using Core.Abstractions;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
-using Lucene.Net.Store;
 using Directory = Lucene.Net.Store.Directory;
 using Version = Lucene.Net.Util.Version;
 
@@ -53,7 +50,7 @@ namespace Core.Lucene
                                                             new[] {SpecialFields.Name, SpecialFields.Learnings},
                                                             new StandardAnalyzer(Version.LUCENE_29));
                 var converterHost = new LuceneStorage(Converters);
-                queryParser.SetFuzzyMinSim((float) 0.2);
+                queryParser.SetFuzzyMinSim((float) 0.8);
                 queryParser.SetDefaultOperator(QueryParser.Operator.AND);
 
                 var results = searcher.Search(queryParser.Parse(textWithFuzzy), 10);
@@ -75,10 +72,8 @@ namespace Core.Lucene
             }
             catch (ParseException e)
             {
-                return AutoCompletionResult.SingleResult(text,
-                                                         new AutoCompletionResult.CommandResult(
-                                                             new TextItem(text, "Error parsing input: " + e.Message),
-                                                             null));
+                Debug.WriteLine("Error parsing: "+e);
+                return AutoCompletionResult.NoResult(text);
             }
         }
 

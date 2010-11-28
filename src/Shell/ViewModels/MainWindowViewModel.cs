@@ -179,7 +179,6 @@ namespace ILoveLucene.ViewModels
                                           }
                                           Actions = _getActionsForItem.ActionsForItem(Result.Item);
                                           SelectedAction = Actions.FirstOrDefault();
-
                                       }, token)
                 .GuardForException(e => Description = e.Message);
         }
