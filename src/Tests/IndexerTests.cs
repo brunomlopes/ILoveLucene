@@ -29,7 +29,7 @@ namespace Tests
 
             var results = searcher.Autocomplete("simple");
             Assert.True(results.HasAutoCompletion);
-            Assert.Equal(results.AutoCompletedCommand.Command.Text, "simple");
+            Assert.Equal(results.AutoCompletedCommand.Item.Text, "simple");
         }
         
         [Fact]
@@ -98,9 +98,9 @@ namespace Tests
             get { return typeof (Item); }
         }
 
-        public ICommand FromDocumentToCommand(Document document)
+        public IItem FromDocumentToCommand(Document document)
         {
-            return new TextCommand(document.GetField("id").StringValue());
+            return new TextItem(document.GetField("id").StringValue());
         }
 
         public string ToId(Item t)

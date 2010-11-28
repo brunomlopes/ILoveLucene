@@ -6,7 +6,7 @@ using Microsoft.Win32;
 
 namespace Plugins
 {
-    [Export(typeof (ICommand))]
+    [Export(typeof (IItem))]
     public class Putty : ICommandWithAutoCompletedArguments
     {
         private readonly string[] _sessionNames;

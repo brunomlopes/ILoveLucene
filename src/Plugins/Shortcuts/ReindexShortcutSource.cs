@@ -4,8 +4,8 @@ using Core.Abstractions;
 
 namespace Plugins.Shortcuts
 {
-    [Export(typeof(ICommand))]
-    public class ReindexShortcutSource : ICommand
+    [Export(typeof(IItem))]
+    public class ReindexShortcutSource : IItem
     {
         [Import(typeof(ShortcutSource))]
         public ShortcutSource ShortcutSource { get; set; }

@@ -4,8 +4,8 @@ using Core.Abstractions;
 
 namespace ILoveLucene.Commands
 {
-    [Export(typeof (ICommand))]
-    public class ExitApplication : ICommand
+    [Export(typeof (IItem))]
+    public class ExitApplication : IItem
     {
         public string Text
         {

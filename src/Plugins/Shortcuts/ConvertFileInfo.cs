@@ -30,9 +30,9 @@ namespace Plugins.Shortcuts
             return document;
         }
 
-        public ICommand FromDocumentToCommand(Document document)
+        public IItem FromDocumentToCommand(Document document)
         {
-            return new FileInfoCommand(new FileInfo(document.GetField("filepath").StringValue()));
+            return new FileInfoItem(new FileInfo(document.GetField("filepath").StringValue()));
         }
 
         public Type ConvertedType

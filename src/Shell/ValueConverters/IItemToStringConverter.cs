@@ -6,16 +6,16 @@ using Core.Abstractions;
 
 namespace ILoveLucene.ValueConverters
 {
-    [ValueConversion(typeof (ICommand), typeof (string))]
-    public class ICommandToStringConverter : MarkupExtension, IValueConverter
+    [ValueConversion(typeof (IItem), typeof (string))]
+    public class IItemToStringConverter : MarkupExtension, IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            ICommand command = value as ICommand;
-            if (command == null) return value;
+            IItem item = value as IItem;
+            if (item == null) return value;
             else
             {
-                return command.Text;
+                return item.Text;
             }
         }
 

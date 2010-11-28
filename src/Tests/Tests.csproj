@@ -48,9 +48,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActOnItemTests.cs" />
     <Compile Include="ConfigurationPart.cs" />
     <Compile Include="ConfigurationTests.cs" />
-    <Compile Include="ConverterHostTests.cs" />
     <Compile Include="IndexerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TokenizingTests.cs" />

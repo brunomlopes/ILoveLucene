@@ -6,7 +6,7 @@ using Core.Abstractions;
 
 namespace Plugins
 {
-    [Export(typeof(ICommand))]
+    [Export(typeof(IItem))]
     public class ShowItemSources : ICommandWithAutoCompletedArguments
     {
 

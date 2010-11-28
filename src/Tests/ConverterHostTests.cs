@@ -8,8 +8,8 @@ using Xunit;
 
 namespace Tests
 {
-    [Export(typeof (ICommand))]
-    internal class SimpleCommand : ICommand
+    [Export(typeof (IItem))]
+    internal class SimpleCommand : IItem
     {
         public string Text
         {
@@ -33,7 +33,7 @@ namespace Tests
     {
         private CompositionContainer _container;
         private LuceneStorage _luceneStorage;
-        private SimpleCommand _command;
+        private SimpleCommand _item;
 
         [Fact]
         public void CanConvertAnImplementationOfICommand()
@@ -41,7 +41,7 @@ namespace Tests
             ICommandConverter[] converters = SetupCommandConverter();
 
             Assert.Equal(converters.First(), _luceneStorage.GetConverter<SimpleCommand>());
-            Assert.Equal(converters.First(), _luceneStorage.GetConverter<ICommand>());
+            Assert.Equal(converters.First(), _luceneStorage.GetConverter<IItem>());
         }
 
         [Fact]
@@ -50,17 +50,17 @@ namespace Tests
             ICommandConverter[] converters = SetupCommandConverter();
 
             var converter = converters.First();
-            var document = converter.ToDocument(_command);
+            var document = converter.ToDocument(_item);
 
-            Assert.Equal(_command, converter.FromDocumentToCommand(document));
+            Assert.Equal(_item, converter.FromDocumentToCommand(document));
         }
 
         private ICommandConverter[] SetupCommandConverter()
         {
             _container = new CompositionContainer();
             var batch = new CompositionBatch();
-            _command = new SimpleCommand();
-            batch.AddExportedValue<ICommand>(_command);
+            _item = new SimpleCommand();
+            batch.AddExportedValue<IItem>(_item);
 
             _container.Compose(batch);
 

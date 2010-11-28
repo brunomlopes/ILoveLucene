@@ -9,12 +9,12 @@ using Lucene.Net.Documents;
 namespace Plugins.Commands
 {
     [Export(typeof (IConverter))]
-    public class ICommandConverter : IConverter<ICommand>
+    public class ICommandConverter : IConverter<IItem>
     {
         private readonly CompositionContainer _mefContainer;
 
         [ImportMany(AllowRecomposition = true)]
-        public IEnumerable<ICommand> Commands { get; set; }
+        public IEnumerable<IItem> Commands { get; set; }
 
         [ImportingConstructor]
         public ICommandConverter(CompositionContainer mefContainer)
@@ -25,10 +25,10 @@ namespace Plugins.Commands
 
         public Type ConvertedType
         {
-            get { return typeof (ICommand); }
+            get { return typeof (IItem); }
         }
 
-        public ICommand FromDocumentToCommand(Document document)
+        public IItem FromDocumentToCommand(Document document)
         {
             var fullname = document.GetField("fullname").StringValue();
             var export =
@@ -39,19 +39,19 @@ namespace Plugins.Commands
             return export;
         }
 
-        public string ToId(ICommand t)
+        public string ToId(IItem t)
         {
             return t.GetType().FullName;
         }
 
-        public Document ToDocument(ICommand t)
+        public Document ToDocument(IItem t)
         {
             var document = new Document();
             document.Add(new Field("fullname", t.GetType().FullName, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
             return document;
         }
 
-        public string ToName(ICommand t)
+        public string ToName(IItem t)
         {
             return t.Text;
         }

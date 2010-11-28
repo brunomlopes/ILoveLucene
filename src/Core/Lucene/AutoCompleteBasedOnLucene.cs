@@ -77,7 +77,7 @@ namespace Core.Lucene
             {
                 return AutoCompletionResult.SingleResult(text,
                                                          new AutoCompletionResult.CommandResult(
-                                                             new TextCommand(text, "Error parsing input: " + e.Message),
+                                                             new TextItem(text, "Error parsing input: " + e.Message),
                                                              null));
             }
         }

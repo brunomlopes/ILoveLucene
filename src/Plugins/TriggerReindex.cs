@@ -5,8 +5,8 @@ using Core.Lucene;
 
 namespace Plugins
 {
-    [Export(typeof(ICommand))]
-    public class TriggerReindex : ICommand
+    [Export(typeof(IItem))]
+    public class TriggerReindex : IItem
     {
         [Import]
         public IIndexer Indexer { get; set; }

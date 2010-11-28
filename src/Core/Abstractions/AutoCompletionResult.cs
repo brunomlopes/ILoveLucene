@@ -8,11 +8,11 @@ namespace Core.Abstractions
         public class CommandResult
         {
             public object CompletionId { get; private set; }
-            public ICommand Command { get; private set; }
+            public IItem Item { get; private set; }
 
-            public CommandResult(ICommand command, object completionId)
+            public CommandResult(IItem item, object completionId)
             {
-                Command = command;
+                Item = item;
                 CompletionId = completionId;
             }
         }

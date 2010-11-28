@@ -5,7 +5,7 @@ using Core.Abstractions;
 
 namespace Plugins
 {
-    [Export(typeof (ICommand))]
+    [Export(typeof (IItem))]
     public class Browse : ICommandWithArguments
     {
         public string Text

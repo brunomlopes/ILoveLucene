@@ -47,7 +47,7 @@ namespace Plugins.IronPython
                 }
 
                 ScriptScope scope = _engine.CreateScope();
-                scope.InjectType<ICommand>()
+                scope.InjectType<IItem>()
                     .InjectType<ICommandWithArguments>()
                     .InjectType<ICommandWithAutoCompletedArguments>();
                 scope.SetVariable("clr", _engine.GetClrModule());
@@ -63,11 +63,11 @@ namespace Plugins.IronPython
 
                 var pluginClasses = scope.GetItems()
                     .Where(kvp => kvp.Value is PythonType)
-                    .Where(kvp => typeof (ICommand).IsAssignableFrom(((PythonType) kvp.Value).__clrtype__()))
+                    .Where(kvp => typeof (IItem).IsAssignableFrom(((PythonType) kvp.Value).__clrtype__()))
                     .Where(kvp => !kvp.Key.StartsWith("ICommand"));
                 var instances =
                     pluginClasses.Select<KeyValuePair<string, object>, object>(nameAndClass => _engine.Operations.Invoke(nameAndClass.Value, new object[] {}))
-                        .Cast<ICommand>();
+                        .Cast<IItem>();
 
                 var batch = new CompositionBatch();
                 foreach (var instance in instances)

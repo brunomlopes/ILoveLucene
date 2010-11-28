@@ -15,7 +15,7 @@ namespace ILoveLucene.ValueConverters
             if (result == null) return value;
             else
             {
-                return result.Command.Text;
+                return result.Item.Text;
             }
         }
 

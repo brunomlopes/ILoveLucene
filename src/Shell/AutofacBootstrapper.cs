@@ -36,7 +36,7 @@ namespace ILoveLucene
                                                    .OfType<ComposablePartCatalog>()),
                                            new DirectoryCatalog(assemblyDirectory, "Plugins.*.dll"),
                                            new DirectoryCatalog(assemblyDirectory, "Plugins.dll"),
-                                           new AssemblyCatalog(typeof (Core.Abstractions.ICommand).Assembly)
+                                           new AssemblyCatalog(typeof (Core.Abstractions.IItem).Assembly)
                     );
 
             var loadConfiguration =

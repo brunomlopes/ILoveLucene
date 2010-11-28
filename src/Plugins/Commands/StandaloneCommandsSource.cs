@@ -14,7 +14,7 @@ namespace Plugins.Commands
         private readonly CompositionContainer _mefContainer;
 
         [ImportMany(AllowRecomposition = true)] 
-        public IEnumerable<ICommand> Commands;
+        public IEnumerable<IItem> Commands;
 
         [ImportingConstructor]
         public StandaloneCommandsSource(CompositionContainer mefContainer)

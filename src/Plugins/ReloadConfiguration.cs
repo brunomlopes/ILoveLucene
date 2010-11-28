@@ -3,8 +3,8 @@ using Core.Abstractions;
 
 namespace Plugins
 {
-    [Export(typeof (ICommand))]
-    public class ReloadConfiguration : ICommand
+    [Export(typeof (IItem))]
+    public class ReloadConfiguration : IItem
     {
         [Import(AllowRecomposition = true)]
         public ILoadConfiguration LoadConfiguration { get; set; }
