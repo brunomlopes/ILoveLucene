@@ -12,8 +12,8 @@ namespace Tests
         public void CanLoadShortcutConfiguration()
         {
             var container = new CompositionContainer();
-            var configurationCatalog = new ConfigurationComposer(new DirectoryInfo(@"..\..\..\Shell\bin\Debug\Configuration"));
-            configurationCatalog.Compose(container);
+            var configurationCatalog = new LoadConfiguration(new DirectoryInfo(@"..\..\..\Shell\bin\Debug\Configuration"));
+            configurationCatalog.Load(container);
 
             var conf = container.GetExportedValue<Configuration>();
             Assert.Contains(@"%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu", conf.Directories);
@@ -23,13 +23,13 @@ namespace Tests
         public void ComposingTwiceIsNotABigDeal()
         {
             var container = new CompositionContainer();
-            var configurationCatalog = new ConfigurationComposer(new DirectoryInfo(@"..\..\..\Shell\bin\Debug\Configuration"));
-            configurationCatalog.Compose(container);
+            var configurationCatalog = new LoadConfiguration(new DirectoryInfo(@"..\..\..\Shell\bin\Debug\Configuration"));
+            configurationCatalog.Load(container);
 
             var conf = container.GetExportedValue<Configuration>();
             Assert.Contains(@"%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu", conf.Directories);
 
-            configurationCatalog.Compose(container);
+            configurationCatalog.Load(container);
             conf = container.GetExportedValue<Configuration>();
             Assert.Contains(@"%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu", conf.Directories);
         }

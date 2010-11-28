@@ -36,12 +36,15 @@ namespace ILoveLucene
                                            new AssemblyCatalog(typeof (Core.Abstractions.ICommand).Assembly)
                     );
 
+            var loadConfiguration =
+                new LoadConfiguration(new DirectoryInfo(Path.Combine(assemblyDirectory, "Configuration")));
+            loadConfiguration
+                .Load(MefContainer);
+
             var batch = new CompositionBatch();
             batch.AddExportedValue(MefContainer);
+            batch.AddExportedValue<ILoadConfiguration>(loadConfiguration);
             MefContainer.Compose(batch);
-
-            new ConfigurationComposer(new DirectoryInfo(Path.Combine(assemblyDirectory, "Configuration")))
-                .Compose(MefContainer);
 
             builder.RegisterInstance(MefContainer).AsSelf();
 

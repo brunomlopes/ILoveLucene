@@ -3,10 +3,8 @@
                             "%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu",
                             "%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Recent",
                             "%APPDATA%\\Microsoft\\Internet Explorer\\Quick Launch",
-                            "C:\\Windows\\System32",
                             "%USERPROFILE%\\Favorites",
-                            "%HOME%\\utils",
-                            "E:\\temp"],
+                            "%HOME%\\utils"],
 	Extensions : [".exe", ".bat", ".ps1", ".ipy", ".lnk", ".appref-ms"]
 
 }

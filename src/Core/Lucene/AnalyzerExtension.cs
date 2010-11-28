@@ -9,7 +9,7 @@ namespace Core.Lucene
     {
         public static IEnumerable<string> Tokenize(this Analyzer self, string text)
         {
-            var stream = self.TokenStream("test", new StringReader(text));
+            var stream = self.TokenStream("ignored field name", new StringReader(text));
 
             stream.Reset();
             var termAtt = (TermAttribute) stream.AddAttribute(typeof (TermAttribute));
