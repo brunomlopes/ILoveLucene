@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,9 +35,9 @@ namespace ILoveLucene.ViewModels
                                       {
                                           try
                                           {
-                                              if (/*CommandWithArguments != null*/ false)
+                                              if (ActionWithArguments != null)
                                               {
-                                                  //CommandWithArguments.Execute(Arguments);
+                                                  ActionWithArguments.ActOn(Result.Item, Arguments);
                                               }
                                               else
                                               {
@@ -86,10 +85,9 @@ namespace ILoveLucene.ViewModels
         {
             get
             {
-                return Visibility.Hidden;
-                //return (Item is ICommandWithArguments) && ArgumentOptions.Count > 0
-                //           ? Visibility.Visible
-                //           : Visibility.Hidden;
+                return (Item is IActOnItemWithAutoCompletedArguments) && ArgumentOptions.Count > 0
+                           ? Visibility.Visible
+                           : Visibility.Hidden;
             }
         }
 
@@ -168,6 +166,8 @@ namespace ILoveLucene.ViewModels
                                           {
                                               Result = result.AutoCompletedCommand;
                                               CommandOptions = new[] {Result}.Concat(result.OtherOptions).ToList();
+                                              Actions = new List<IActOnItem> { new RunFileInfo(), new RunFileInfoWithArguments() };
+                                              SelectedAction = Actions.FirstOrDefault();
                                               Arguments = string.Empty;
                                           }
                                           else
@@ -175,47 +175,44 @@ namespace ILoveLucene.ViewModels
                                               Result = new AutoCompletionResult.CommandResult(new TextItem(Input),
                                                                                               null);
                                               CommandOptions = new List<AutoCompletionResult.CommandResult>();
+                                              Actions = new List<IActOnItem> {  };
+
+                                              SelectedAction = Actions.FirstOrDefault();
                                               ArgumentOptions = new List<string>();
                                           }
                                       }, token)
                 .GuardForException(e => Description = e.Message);
         }
 
-        //public void AutoCompleteArgument()
-        //{
-        //    _argumentCancelationTokenSource.Cancel();
-        //    _argumentCancelationTokenSource = new CancellationTokenSource();
-
-        //    var token = _argumentCancelationTokenSource.Token;
-        //    var autoCompleteArgumentsCommand = Item as ICommandWithAutoCompletedArguments;
-        //    if (autoCompleteArgumentsCommand == null)
-        //        return;
-        //    Task.Factory.StartNew(() =>
-        //                              {
-        //                                  var result = autoCompleteArgumentsCommand.AutoCompleteArguments(Arguments);
-
-        //                                  token.ThrowIfCancellationRequested();
-        //                                  _log.Info("Got autocompletion '{0}' for '{1}' with {2} alternatives",
-        //                                            result.AutoCompletedArgument, result.OriginalText,
-        //                                            result.OtherOptions.Count());
-        //                                  if (result.HasAutoCompletion)
-        //                                  {
-        //                                      ArgumentOptions =
-        //                                          new[] {result.AutoCompletedArgument}
-        //                                              .Concat(result.OtherOptions).ToList();
-        //                                  }
-        //                                  else
-        //                                  {
-        //                                      ArgumentOptions = new List<string>();
-        //                                  }
-        //                              }, token)
-        //        .GuardForException(e => Description = e.Message);
-        //}
-
-
-        public IEnumerable<IActOnItem> Actions
+        public void AutoCompleteArgument()
         {
-            get { return new List<IActOnItem> {new RunFileInfo(), new RunFileInfoWithArguments()}; }
+            _argumentCancelationTokenSource.Cancel();
+            _argumentCancelationTokenSource = new CancellationTokenSource();
+
+            var token = _argumentCancelationTokenSource.Token;
+            var autoCompleteArgumentsCommand = SelectedAction as IActOnItemWithAutoCompletedArguments;
+            if (autoCompleteArgumentsCommand == null)
+                return;
+            Task.Factory.StartNew(() =>
+                                      {
+                                          var result = autoCompleteArgumentsCommand.AutoCompleteArguments(Item, Arguments);
+
+                                          token.ThrowIfCancellationRequested();
+                                          _log.Info("Got autocompletion '{0}' for '{1}' with {2} alternatives",
+                                                    result.AutoCompletedArgument, result.OriginalText,
+                                                    result.OtherOptions.Count());
+                                          if (result.HasAutoCompletion)
+                                          {
+                                              ArgumentOptions =
+                                                  new[] { result.AutoCompletedArgument }
+                                                      .Concat(result.OtherOptions).ToList();
+                                          }
+                                          else
+                                          {
+                                              ArgumentOptions = new List<string>();
+                                          }
+                                      }, token)
+                .GuardForException(e => Description = e.Message);
         }
 
         private string _description;
@@ -247,7 +244,17 @@ namespace ILoveLucene.ViewModels
 
                 NotifyOfPropertyChange(() => Result);
                 NotifyOfPropertyChange(() => Item);
-                //NotifyOfPropertyChange(() => ArgumentsVisible);
+            }
+        }
+
+        private IEnumerable<IActOnItem> _actions;
+        public IEnumerable<IActOnItem> Actions
+        {
+            get { return _actions; }
+            set
+            {
+                _actions = value;
+                NotifyOfPropertyChange(() => Actions);
             }
         }
 
@@ -259,13 +266,15 @@ namespace ILoveLucene.ViewModels
             {
                 _selectedAction = value;
                 NotifyOfPropertyChange(() => SelectedAction);
+                NotifyOfPropertyChange(() => ArgumentsVisible);
+                NotifyOfPropertyChange(() => CanExecute);
             }
         }
 
-        //public ICommandWithArguments CommandWithArguments
-        //{
-        //    get { return Item as ICommandWithArguments; }
-        //}
+        public IActOnItemWithArguments ActionWithArguments
+        {
+            get { return SelectedAction as IActOnItemWithArguments; }
+        }
 
         private string _arguments;
 
@@ -279,10 +288,10 @@ namespace ILoveLucene.ViewModels
             }
         }
 
-        //public Visibility ArgumentsVisible
-        //{
-        //    get { return Result != null && Item is ICommandWithArguments ? Visibility.Visible : Visibility.Hidden; }
-        //}
+        public Visibility ArgumentsVisible
+        {
+            get { return (Result != null && ActionWithArguments != null)? Visibility.Visible : Visibility.Hidden; }
+        }
 
         private string _input;
         private CancellationTokenSource _argumentCancelationTokenSource;
@@ -300,7 +309,7 @@ namespace ILoveLucene.ViewModels
 
         public bool CanExecute
         {
-            get { return !string.IsNullOrWhiteSpace(_input); }
+            get { return !string.IsNullOrWhiteSpace(_input) && SelectedAction != null; }
         }
     }
 }
