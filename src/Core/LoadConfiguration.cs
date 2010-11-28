@@ -21,7 +21,10 @@ namespace Core
         public void Load(CompositionContainer container)
         {
             Configurations =
-              _configurationDirectory.EnumerateFiles().Select(ConfigurationPart.FromFile).Where(r => r != null);
+              _configurationDirectory.EnumerateFiles()
+              .Select(ConfigurationPart.FromFile)
+              .Where(r => r != null)
+              .ToList();
 
             container.Compose(new CompositionBatch(Configurations, new ComposablePart[]{}));
         }

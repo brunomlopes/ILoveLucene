@@ -84,16 +84,16 @@ namespace Core.Lucene
 
         public void LearnInputForCommandResult(string input, AutoCompletionResult.CommandResult result)
         {
-            var writer = GetIndexWriter();
-
+            IndexWriter writer = null;
             try
             {
+                writer = GetIndexWriter();
                 var host = new LuceneStorage(Converters);
                 host.LearnCommandForInput(writer, result.CompletionId, input);
             }
             finally
             {
-                writer.Close();
+                if (writer != null) writer.Close();
             }
         }
     }

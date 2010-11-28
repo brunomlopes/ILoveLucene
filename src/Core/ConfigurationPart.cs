@@ -89,7 +89,9 @@ namespace Core
             var text = File.ReadAllText(_fileInfo.FullName);
             try
             {
-                JsonConvert.PopulateObject(text, ConfigurationInstance);
+                var settings = new JsonSerializerSettings();
+                settings.ObjectCreationHandling = ObjectCreationHandling.Replace;
+                JsonConvert.PopulateObject(text, ConfigurationInstance, settings);
             }
             catch (Exception e)
             {

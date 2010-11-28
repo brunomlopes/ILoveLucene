@@ -4,6 +4,7 @@ using Core.Abstractions;
 
 namespace Plugins.Shortcuts
 {
+    [Export(typeof(ICommand))]
     public class ReindexShortcutSource : ICommand
     {
         [Import(typeof(ShortcutSource))]

@@ -71,9 +71,10 @@ namespace Core.Lucene
 
         public void IndexItems(IItemSource source, IEnumerable<object> items, LuceneStorage host)
         {
-            var indexWriter = GetIndexWriter();
+            IndexWriter indexWriter = null;
             try
             {
+                indexWriter = GetIndexWriter();
                 var conf = host.GetObject<Configuration>(indexWriter, "IndexerConfiguration");
                 if (conf == null) conf = new Configuration();
                 var newTag = conf.SetNewTagForSourceId(host.SourceId(source));
@@ -90,7 +91,7 @@ namespace Core.Lucene
             }
             finally
             {
-                indexWriter.Close();
+                if (indexWriter != null) indexWriter.Close();
             }
         }
 

@@ -2,9 +2,11 @@ using System;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Caliburn.Micro;
@@ -13,6 +15,7 @@ using Core.Abstractions;
 using Core.Lucene;
 using ILoveLucene.Modules;
 using ILoveLucene.ViewModels;
+using Core.Extensions;
 
 namespace ILoveLucene
 {
@@ -58,14 +61,20 @@ namespace ILoveLucene
 
             builder.RegisterType<Indexer>().As<IIndexer>();
             builder.RegisterType<TaskExecuter>().AsSelf();
-
-            
         }
 
         protected override void Configure()
         {
             base.Configure();
-            Task.Factory.StartNew(() => Container.Resolve<TaskExecuter>().Start());
+            Task.Factory
+                .StartNew(() =>
+                              {
+                                  // yeah, this is a hack to ensure all the rest loads
+                                  // when I pull quartz.net to do the scheduling this won't be needed
+                                  Thread.Sleep(TimeSpan.FromSeconds(1));
+                                  Container.Resolve<TaskExecuter>().Start();
+                              })
+                .GuardForException(e => Debug.WriteLine("Error running tasks:"+e));
         }
     }
 }
