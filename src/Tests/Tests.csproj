@@ -48,6 +48,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigurationPart.cs" />
+    <Compile Include="ConfigurationTests.cs" />
     <Compile Include="ConverterHostTests.cs" />
     <Compile Include="IndexerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

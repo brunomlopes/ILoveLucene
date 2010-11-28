@@ -17,22 +17,13 @@ namespace Plugins.Shortcuts
         private HashSet<FileInfo> _shortcutPaths;
         private static readonly object _shortcutPathsLock = new object();
         public static string[] _extensions = new[] {".exe", ".bat", ".ps1", ".ipy", ".lnk", ".appref-ms"};
-        private readonly List<string> _dirs;
+
+        [Import(typeof(Configuration))]
+        public Configuration Conf { get; set; }
 
         public ShortcutSource()
         {
             _shortcutPaths = new HashSet<FileInfo>();
-            _dirs = new[]
-                        {
-                            @"%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu",
-                            @"%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu",
-                            @"%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Recent",
-                            @"%APPDATA%\Microsoft\Internet Explorer\Quick Launch",
-                            @"C:\Windows\System32",
-                            @"%USERPROFILE%\Favorites",
-                            @"%HOME%\utils",
-                            @"E:\temp"
-                        }.Select(Environment.ExpandEnvironmentVariables).ToList();
             NeedsReindexing = true;
         }
 
@@ -44,7 +35,7 @@ namespace Plugins.Shortcuts
             {
                 var fileInfos = currentDir
                     .GetFiles("*.*", SearchOption.TopDirectoryOnly)
-                    .Where(f => _extensions.Contains(f.Extension)).ToList();
+                    .Where(f => Conf.Extensions.Contains(f.Extension)).ToList();
                 Debug.WriteLine("Found {0} files in {1}", fileInfos.Count(), currentDir);
                 lock (_shortcutPathsLock)
                 {
@@ -76,7 +67,9 @@ namespace Plugins.Shortcuts
             return Task.Factory.StartNew(() =>
                                              {
                                                  _shortcutPaths = new HashSet<FileInfo>();
-                                                 _dirs.ForEach(ScanDirectoryForShortcuts);
+                                                 Conf.Directories
+                                                     .Select(Environment.ExpandEnvironmentVariables).ToList()
+                                                     .ForEach(ScanDirectoryForShortcuts);
                                                  return _shortcutPaths.Cast<object>();
                                              })
                 .GuardForException(e => Debug.WriteLine("Exception on task:" + e));

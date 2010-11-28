@@ -6,7 +6,6 @@ using Core.Abstractions;
 using Core.Lucene;
 using Lucene.Net.Documents;
 using Lucene.Net.Store;
-using Moq;
 using Xunit;
 
 namespace Tests

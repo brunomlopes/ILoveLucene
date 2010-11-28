@@ -51,10 +51,14 @@
     <Compile Include="Abstractions\AutoCompletionResult.cs" />
     <Compile Include="Abstractions\IAutoCompleteText.cs" />
     <Compile Include="Abstractions\ICommand.cs" />
+    <Compile Include="Abstractions\IConfiguration.cs" />
     <Compile Include="Abstractions\IConverter.cs" />
     <Compile Include="Abstractions\IIndexer.cs" />
     <Compile Include="Abstractions\IItemSource.cs" />
     <Compile Include="Abstractions\IBackgroundStartTask.cs" />
+    <Compile Include="Abstractions\ImportConfiguration.cs" />
+    <Compile Include="ConfigurationComposer.cs" />
+    <Compile Include="ConfigurationPart.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Lucene\AnalyzerExtension.cs" />
     <Compile Include="Lucene\AutoCompleteBasedOnLucene.cs" />

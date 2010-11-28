@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Caliburn.Micro;
+using Core;
 using Core.Abstractions;
 using Core.Lucene;
 using ILoveLucene.Modules;
@@ -38,6 +39,9 @@ namespace ILoveLucene
             var batch = new CompositionBatch();
             batch.AddExportedValue(MefContainer);
             MefContainer.Compose(batch);
+
+            new ConfigurationComposer(new DirectoryInfo(Path.Combine(assemblyDirectory, "Configuration")))
+                .Compose(MefContainer);
 
             builder.RegisterInstance(MefContainer).AsSelf();
 
