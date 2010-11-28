@@ -5,28 +5,13 @@ using Core.Abstractions;
 
 namespace Plugins
 {
-    [Export(typeof (IItem))]
-    public class Browse : ICommandWithArguments
+    [Export(typeof (IActOnItem))]
+    public class Browse : BaseActOnTypedItem<string>, ICanActOnTypedItem<string>
     {
-        public string Text
-        {
-            get { return "Browse"; }
-        }
-
-        public string Description
-        {
-            get { return "Launch a browser"; }
-        }
-
-        public void Execute()
-        {
-            // NO-OP
-        }
-
-        public void Execute(string arguments)
+        public override void ActOn(ITypedItem<string> item)
         {
             Uri uri;
-            if (Uri.TryCreate(arguments, UriKind.Absolute, out uri))
+            if (Uri.TryCreate(item.Item, UriKind.Absolute, out uri))
             {
                 Process.Start(uri.ToString());
             }
@@ -34,6 +19,17 @@ namespace Plugins
             {
                 throw new InvalidOperationException("'{0}' doesn't seem like an url");
             }
+        }
+
+        public override string Text
+        {
+            get { return "Browse"; }
+        }
+
+        public bool CanActOn(ITypedItem<string> item)
+        {
+            Uri uri;
+            return Uri.TryCreate(item.Item, UriKind.Absolute, out uri);
         }
     }
 }
