@@ -50,6 +50,7 @@
     <Compile Include="Abstractions\ArgumentAutoCompletionResult.cs" />
     <Compile Include="Abstractions\AutoCompletionResult.cs" />
     <Compile Include="Abstractions\IActOnItem.cs" />
+    <Compile Include="Abstractions\IActOnItemExtension.cs" />
     <Compile Include="Abstractions\IAutoCompleteText.cs" />
     <Compile Include="Abstractions\IGetActionsForItem.cs" />
     <Compile Include="Abstractions\IItem.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Abstractions\IBackgroundStartTask.cs" />
     <Compile Include="Abstractions\ILoadConfiguration.cs" />
     <Compile Include="Abstractions\ImportConfiguration.cs" />
+    <Compile Include="Abstractions\TextItem.cs" />
     <Compile Include="GetActionsForItem.cs" />
     <Compile Include="LoadConfiguration.cs" />
     <Compile Include="ConfigurationPart.cs" />
