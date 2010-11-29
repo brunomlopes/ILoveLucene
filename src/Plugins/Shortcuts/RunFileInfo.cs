@@ -36,5 +36,25 @@ namespace Plugins.Shortcuts
         {
             get { return this.GetTypedItemType(); }
         }
+    } 
+    
+    [Export(typeof(IActOnItem))]
+    public class RunFileInfoElevated : IActOnTypedItem<FileInfo>
+    {
+        public void ActOn(ITypedItem<FileInfo> item)
+        {
+            var arguments = new ProcessStartInfo(item.Item.FullName);
+            arguments.Verb = "runas";
+            Process.Start(arguments);
+        }
+
+        public string Text
+        {
+            get { return "Run elevated"; }
+        }
+        public Type TypedItemType
+        {
+            get { return this.GetTypedItemType(); }
+        }
     }
 }
