@@ -51,6 +51,12 @@ namespace ILoveLucene.Views
             }
         }
 
+        public void HideWindow()
+        {
+            ClearInputBoxes();
+            HideThisWindow();
+        }
+
         private void HideThisWindow()
         {
             Visibility = Visibility.Hidden;

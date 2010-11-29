@@ -48,7 +48,7 @@ namespace ILoveLucene.ViewModels
                                               }
 
                                               // HACK
-                                              Caliburn.Micro.Execute.OnUIThread(() => ((MainWindowView)Window.GetWindow(source)).Toggle());
+                                              Caliburn.Micro.Execute.OnUIThread(() => ((MainWindowView)Window.GetWindow(source)).HideWindow());
                                           }
                                           catch (Exception e)
                                           {
