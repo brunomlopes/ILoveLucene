@@ -20,9 +20,7 @@
                 <ComboBox Name="Actions" FontSize="22">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Text}" />
-                            </StackPanel>
+                            <TextBlock Text="{Binding Text}" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
