@@ -45,7 +45,7 @@ namespace Core.Lucene
             var searcher = new IndexSearcher(Directory, true);
             try
             {
-                var textWithFuzzy = text.Trim().Replace(" ", "~ ").Trim() + "~";
+                var textWithFuzzy = text.Trim().Replace(" ", "*~ ").Trim() + "*~";
                 var queryParser = new MultiFieldQueryParser(Version.LUCENE_29,
                                                             new[] {SpecialFields.Name, SpecialFields.Learnings},
                                                             new StandardAnalyzer(Version.LUCENE_29));

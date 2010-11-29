@@ -32,6 +32,27 @@ namespace Tests
             Assert.Equal(results.AutoCompletedCommand.Item.Text, "simple");
         }
         
+        
+        [Fact]
+        public void CanFindItemBasedOnSubstring()
+        {
+            var directory = new RAMDirectory();
+            var indexer = new Indexer(directory);
+            indexer.Converters = new[] { new Converter() };
+
+            var source = new Source();
+
+            source.Items = new[] {new Item {Id = "EmacsClient.lnk"}};
+            indexer.IndexItems(source, source.Items, new LuceneStorage(indexer.Converters));
+
+            var searcher = AutoCompleteBasedOnLucene.WithDirectory(directory);
+            searcher.Converters = new[] {new Converter()};
+
+            var results = searcher.Autocomplete("emac");
+            Assert.True(results.HasAutoCompletion);
+            Assert.Equal(results.AutoCompletedCommand.Item.Text, "EmacsClient.lnk");
+        }
+        
         [Fact]
         public void CannotFindItemWhenItIsRemovedAfterBeingIndexed()
         {
