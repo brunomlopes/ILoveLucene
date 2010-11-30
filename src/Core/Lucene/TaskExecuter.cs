@@ -10,6 +10,7 @@ using Core.Extensions;
 
 namespace Core.Lucene
 {
+    // TODO: remove this if no longer needed for indexer
     public class TaskExecuter : IPartImportsSatisfiedNotification
     {
         private readonly CompositionContainer _mefContainer;

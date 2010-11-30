@@ -11,7 +11,6 @@ using Version = Lucene.Net.Util.Version;
 
 namespace Core.Lucene
 {
-    [Export(typeof(IBackgroundStartTask))]
     [Export(typeof(IIndexer))]
     public class Indexer : LuceneBase, IBackgroundStartTask, IIndexer
     {
