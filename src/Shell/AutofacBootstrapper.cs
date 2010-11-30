@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
@@ -71,6 +72,11 @@ namespace ILoveLucene
             Task.Factory
                 .StartNew(() => Container.Resolve<Scheduler>().Start())
                 .GuardForException(e => Debug.WriteLine("Error running tasks:"+e));
+        }
+
+        protected override void OnExit(object sender, EventArgs e)
+        {
+            Container.Resolve<Scheduler>().Shutdown();
         }
     }
 }

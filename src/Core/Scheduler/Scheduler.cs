@@ -34,5 +34,10 @@ namespace Core.Scheduler
 
             _scheduler.ScheduleJob(jobDetail, trigger);
         }
+
+        public void Shutdown()
+        {
+            _scheduler.Shutdown(false); // TODO: show we wait for the jobs to finish?
+        }
     }
 }
