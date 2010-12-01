@@ -68,7 +68,7 @@
     <Compile Include="Abstractions\IItemSource.cs" />
     <Compile Include="Abstractions\IBackgroundStartTask.cs" />
     <Compile Include="Abstractions\ILoadConfiguration.cs" />
-    <Compile Include="Abstractions\ImportConfiguration.cs" />
+    <Compile Include="Abstractions\PluginConfigurationAttribute.cs" />
     <Compile Include="Abstractions\TextItem.cs" />
     <Compile Include="GetActionsForItem.cs" />
     <Compile Include="LoadConfiguration.cs" />
