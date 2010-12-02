@@ -51,10 +51,10 @@ namespace Core.Lucene
                 var jobDetail = new JobDetail("IndexerFor"+itemSource, null, typeof(Indexer));
                 jobDetail.JobDataMap["source"] = itemSource;
 
-                var trigger = TriggerUtils.MakeMinutelyTrigger(frequency);
+                var trigger = TriggerUtils.MakeSecondlyTrigger(frequency);
 
-                trigger.StartTimeUtc = TriggerUtils.GetEvenMinuteDate(DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)));
-                trigger.Name = "Each"+frequency+"MinutesFor"+itemSource;
+                trigger.StartTimeUtc = TriggerUtils.GetEvenMinuteDate(DateTime.UtcNow.Add(TimeSpan.FromMinutes(1)));
+                trigger.Name = "Each"+frequency+"SecondsFor"+itemSource;
                 trigger.MisfireInstruction = MisfireInstruction.SimpleTrigger.RescheduleNextWithRemainingCount;
 
                 Scheduler.ScheduleJob(jobDetail, trigger);

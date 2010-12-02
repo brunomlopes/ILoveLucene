@@ -12,7 +12,7 @@ namespace Core.Lucene
         public IndexerConfiguration()
         {
             IndexingFrequencyForPlugin = new Dictionary<string, int>();
-            DefaultFrequency = 10;
+            DefaultFrequency = 10*60;
         }
 
         public int GetFrequencyForItemSource(IItemSource source)

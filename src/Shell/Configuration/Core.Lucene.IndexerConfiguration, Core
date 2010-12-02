@@ -1,4 +1,4 @@
 ﻿{
-	IndexingFrequencyForPlugin : {"Plugins.Shortcuts.ShortcutSource, Plugins":30 , "Plugins.Commands.StandaloneCommandsSource, Plugins":20},
-	DefaultFrequency : 15
+	IndexingFrequencyForPlugin : {"Plugins.Shortcuts.ShortcutSource, Plugins":1800 , "Plugins.Commands.StandaloneCommandsSource, Plugins":1200},
+	DefaultFrequency : 900
 }
