@@ -112,6 +112,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="Configuration\Core.Lucene.IndexerConfiguration, Core">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Configuration\Plugins.Shortcuts.Configuration, Plugins">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

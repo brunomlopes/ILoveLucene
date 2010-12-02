@@ -7,11 +7,12 @@ namespace Core.Lucene
     public class IndexerConfiguration
     {
         public Dictionary<string, int> IndexingFrequencyForPlugin { get; set; }
-        private const int DefaultFrequency = 15;
+        public int DefaultFrequency { get; set; }
 
         public IndexerConfiguration()
         {
             IndexingFrequencyForPlugin = new Dictionary<string, int>();
+            DefaultFrequency = 10;
         }
 
         public int GetFrequencyForItemSource(IItemSource source)
@@ -19,7 +20,16 @@ namespace Core.Lucene
             var name = source.GetType().AssemblyQualifiedName;
             if (!IndexingFrequencyForPlugin.ContainsKey(name))
             {
-                IndexingFrequencyForPlugin[name] = DefaultFrequency;
+                var alternateName = string.Format("{0}, {1}", source.GetType().FullName,
+                                                  source.GetType().Assembly.GetName().Name);
+                if (!IndexingFrequencyForPlugin.ContainsKey(alternateName))
+                {
+                    IndexingFrequencyForPlugin[name] = DefaultFrequency;
+                }
+                else
+                {
+                    return IndexingFrequencyForPlugin[alternateName];
+                }
             }
             return IndexingFrequencyForPlugin[name];
         }
