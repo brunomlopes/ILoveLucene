@@ -80,7 +80,6 @@ namespace Tests
     class MockCommand : BaseCommand<MockCommand>
     {
         public bool Acted;
-        public MockCommand Command;
 
         public override void ActOn(ITypedItem<MockCommand> item)
         {
@@ -105,7 +104,6 @@ namespace Tests
 
     class MockActOnFileInfo: BaseActOnTypedItem<FileInfo>, IActOnTypedItemWithArguments<FileInfo>
     {
-        private readonly bool _canAct;
         public bool Acted;
         public FileInfo Info;
         public string Arguments;

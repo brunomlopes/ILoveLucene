@@ -14,7 +14,6 @@ namespace Plugins
         private double? _lastResult;
         private ScriptEngine _engine;
         private ScriptScope _scope;
-        private ScriptRuntime _runtime;
 
         public Calculator()
         {
@@ -44,7 +43,7 @@ namespace Plugins
                     PropertyChanged(this, new PropertyChangedEventArgs("Text"));
                 return _lastResult != null;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
