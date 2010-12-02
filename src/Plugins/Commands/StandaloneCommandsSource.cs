@@ -23,18 +23,14 @@ namespace Plugins.Commands
             _mefContainer.SatisfyImportsOnce(this);
         }
 
-        public bool NeedsReindexing { get; private set; }
-
         public Task<IEnumerable<object>> GetItems()
         {
-            NeedsReindexing = false;
             var commands = Commands; //FIXME:  this can be recomposed mid-iteration. we don't want that for now
             return Task.Factory.StartNew(() => commands.Cast<Object>());
         }
 
         public void OnImportsSatisfied()
         {
-            NeedsReindexing = true;
         }
     }
 }

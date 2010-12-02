@@ -74,10 +74,8 @@
     <Compile Include="Shortcuts\Configuration.cs" />
     <Compile Include="Shortcuts\ConvertFileInfo.cs" />
     <Compile Include="Shortcuts\FileInfoItem.cs" />
-    <Compile Include="Shortcuts\ReindexShortcutSource.cs" />
     <Compile Include="Shortcuts\RunFileInfo.cs" />
     <Compile Include="Shortcuts\ShortcutSource.cs" />
-    <Compile Include="TriggerReindex.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

@@ -24,7 +24,6 @@ namespace Plugins.Shortcuts
         public ShortcutSource()
         {
             _shortcutPaths = new HashSet<FileInfo>();
-            NeedsReindexing = true;
         }
 
         private void ScanDirectoryForShortcuts(string s)
@@ -59,11 +58,8 @@ namespace Plugins.Shortcuts
             directoryInfos.ForEach(d => ScanDirectoryForShortcuts(d.FullName));
         }
 
-        public bool NeedsReindexing { get; set; }
-
         public Task<IEnumerable<object>> GetItems()
         {
-            NeedsReindexing = false;
             return Task.Factory.StartNew(() =>
                                              {
                                                  _shortcutPaths = new HashSet<FileInfo>();

@@ -104,7 +104,6 @@ namespace Tests
     class Source : IItemSource
     {
         public IEnumerable<Item> Items { get; set; }
-        public bool NeedsReindexing { get; set; }
 
         public Task<IEnumerable<object>> GetItems()
         {

@@ -2,23 +2,30 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.Linq;
 using Core.Abstractions;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
 using Lucene.Net.Store;
+using Quartz;
 using Version = Lucene.Net.Util.Version;
 
 namespace Core.Lucene
 {
-    [Export(typeof(IIndexer))]
-    public class Indexer : LuceneBase, IBackgroundStartTask, IIndexer
+    [Export(typeof(IStartupTask))]
+    public class Indexer : LuceneBase, IStartupTask, IStatefulJob
     {
         [ImportMany]
         public IEnumerable<IConverter> Converters { get; set; }
 
         [ImportMany]
         public IEnumerable<IItemSource> Sources { get; set; }
+
+        [Import]
+        public IScheduler Scheduler { get; set; }
+
+        [Import]
+        public IndexerConfiguration Configuration { get; set; }
+
 
         public Indexer()
         {
@@ -35,29 +42,30 @@ namespace Core.Lucene
             Sources = new IItemSource[] {};
         }
 
-        public bool Executed { get; private set; }
-
-        public void Execute()
+        void IStartupTask.Execute()
         {
-            Index();
+            foreach (var itemSource in Sources)
+            {
+                var frequency = Configuration.GetFrequencyForItemSource(itemSource);
+
+                var jobDetail = new JobDetail("IndexerFor"+itemSource, null, typeof(Indexer));
+                jobDetail.JobDataMap["source"] = itemSource;
+
+                var trigger = TriggerUtils.MakeMinutelyTrigger(frequency);
+
+                trigger.StartTimeUtc = TriggerUtils.GetEvenMinuteDate(DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)));
+                trigger.Name = "Each"+frequency+"MinutesFor"+itemSource;
+                trigger.MisfireInstruction = MisfireInstruction.SimpleTrigger.RescheduleNextWithRemainingCount;
+
+                Scheduler.ScheduleJob(jobDetail, trigger);
+            }
         }
 
-        public void Index()
+        void IJob.Execute(JobExecutionContext context)
         {
-            var host = new LuceneStorage(Converters);
-
-            Sources
-                .AsParallel()
-                .Where(s => s.NeedsReindexing)
-                .ForAll(s => s.GetItems()
-                                 .ContinueWith(task =>
-                                                   {
-                                                       var items = task.Result;
-
-                                                       IndexItems(s, items, host);
-                                                   }));
-
-            Executed = true;
+            var source = (IItemSource) context.MergedJobDataMap["source"];
+            Debug.WriteLine("Indexing item source " + source);
+            source.GetItems().ContinueWith(task => IndexItems(source, task.Result, new LuceneStorage(Converters)));
         }
 
         private void EnsureIndexExists()
@@ -74,9 +82,7 @@ namespace Core.Lucene
             try
             {
                 indexWriter = GetIndexWriter();
-                var conf = host.GetObject<Configuration>(indexWriter, "IndexerConfiguration");
-                if (conf == null) conf = new Configuration();
-                var newTag = conf.SetNewTagForSourceId(host.SourceId(source));
+                var newTag = Guid.NewGuid().ToString();
 
                 foreach (var item in items)
                 {
@@ -85,24 +91,11 @@ namespace Core.Lucene
 
                 host.DeleteDocumentsForSourceWithoutTag(indexWriter, source, newTag);
 
-                host.StoreObject(indexWriter, "IndexerConfiguration", conf);
                 indexWriter.Commit();
             }
             finally
             {
                 if (indexWriter != null) indexWriter.Close();
-            }
-        }
-
-        class Configuration
-        {
-            public Dictionary<string, Guid> Tags = new Dictionary<string, Guid>();
-
-            public string SetNewTagForSourceId(string sourceId)
-            {
-                var newGuid = Guid.NewGuid();
-                Debug.WriteLine(string.Format("New tag '{0}' for source id '{1}'", newGuid, sourceId));
-                return (Tags[sourceId] = newGuid).ToString();
             }
         }
     }

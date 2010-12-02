@@ -2,11 +2,10 @@ using System;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+using System.Windows;
 using Autofac;
 using Caliburn.Micro;
 using Core;
@@ -15,7 +14,9 @@ using Core.Lucene;
 using Core.Scheduler;
 using ILoveLucene.Modules;
 using ILoveLucene.ViewModels;
-using Core.Extensions;
+using Quartz;
+using Quartz.Impl;
+using Quartz.Simpl;
 
 namespace ILoveLucene
 {
@@ -44,9 +45,13 @@ namespace ILoveLucene
             loadConfiguration
                 .Load(MefContainer);
 
+            var scheduler = new StdSchedulerFactory().GetScheduler();
+            scheduler.JobFactory = new MefJobFactory(new SimpleJobFactory(), MefContainer);
+
             var batch = new CompositionBatch();
             batch.AddExportedValue(MefContainer);
             batch.AddExportedValue<ILoadConfiguration>(loadConfiguration);
+            batch.AddExportedValue(scheduler);
             MefContainer.Compose(batch);
 
             builder.RegisterInstance(MefContainer).AsSelf();
@@ -60,23 +65,19 @@ namespace ILoveLucene
             builder.RegisterType<AutoCompleteBasedOnLucene>().As<IAutoCompleteText>();
             builder.RegisterType<GetActionsForItem>().As<IGetActionsForItem>();
 
-            builder.RegisterType<Indexer>().As<IIndexer>();
-            builder.RegisterType<TaskExecuter>().AsSelf();
-
-            builder.RegisterType<Scheduler>().AsSelf();
         }
 
-        protected override void Configure()
+        protected override void OnStartup(object sender, StartupEventArgs e)
         {
-            base.Configure();
-            Task.Factory
-                .StartNew(() => Container.Resolve<Scheduler>().Start())
-                .GuardForException(e => Debug.WriteLine("Error running tasks:"+e));
+            base.OnStartup(sender, e);
+            MefContainer.GetExportedValues<IStartupTask>().AsParallel().ForAll(t => t.Execute());
+            MefContainer.GetExportedValue<IScheduler>().StartDelayed(TimeSpan.FromMinutes(1));
         }
 
         protected override void OnExit(object sender, EventArgs e)
         {
-            Container.Resolve<Scheduler>().Shutdown();
+            MefContainer.GetExportedValue<IScheduler>().Shutdown();
+            base.OnExit(sender, e);
         }
     }
 }
