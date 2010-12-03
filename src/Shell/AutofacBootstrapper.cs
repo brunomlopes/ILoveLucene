@@ -70,8 +70,8 @@ namespace ILoveLucene
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
             base.OnStartup(sender, e);
+            MefContainer.GetExportedValue<IScheduler>().Start();
             MefContainer.GetExportedValues<IStartupTask>().AsParallel().ForAll(t => t.Execute());
-            MefContainer.GetExportedValue<IScheduler>().StartDelayed(TimeSpan.FromMinutes(1));
         }
 
         protected override void OnExit(object sender, EventArgs e)

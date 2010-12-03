@@ -44,8 +44,11 @@ namespace ILoveLucene.ViewModels
                                               else
                                               {
                                                   SelectedAction.ActOn(Result.Item);
-                                                  _autoCompleteText.LearnInputForCommandResult(Input, Result);
                                               }
+                                              _autoCompleteText.LearnInputForCommandResult(Input, Result);
+
+                                              Input = string.Empty;
+                                              Arguments = string.Empty;
 
                                               // HACK
                                               Caliburn.Micro.Execute.OnUIThread(() => ((MainWindowView)Window.GetWindow(source)).HideWindow());
@@ -184,6 +187,7 @@ namespace ILoveLucene.ViewModels
                                                                                               null);
                                               CommandOptions = new List<AutoCompletionResult.CommandResult>();
                                               ArgumentOptions = new List<string>();
+                                              Arguments = string.Empty;
                                           }
                                           SetActionsForResult(Result);
                                       }, token)

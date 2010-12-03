@@ -7,6 +7,16 @@ namespace Core.Abstractions
         string Text { get; }
         Type TypedItemType { get; }
     }
+
+    /// <summary>
+    /// Represents an action that is invalid
+    /// </summary>
+    public class InvalidActionException : ApplicationException
+    {
+        public InvalidActionException(string message) : base(message)
+        {
+        }
+    }
     
     public interface ICanActOnItem
     {

@@ -8,12 +8,16 @@ using Lucene.Net.Index;
 using Lucene.Net.Store;
 using Quartz;
 using Version = Lucene.Net.Util.Version;
+using Core.Extensions;
 
 namespace Core.Lucene
 {
     [Export(typeof(IStartupTask))]
     public class Indexer : LuceneBase, IStartupTask, IStatefulJob
     {
+        [Export("IIndexer.JobGroup")]
+        public const string JobGroup = "Indexers";
+
         [ImportMany]
         public IEnumerable<IConverter> Converters { get; set; }
 
@@ -48,12 +52,13 @@ namespace Core.Lucene
             {
                 var frequency = Configuration.GetFrequencyForItemSource(itemSource);
 
-                var jobDetail = new JobDetail("IndexerFor"+itemSource, null, typeof(Indexer));
+                var jobDetail = new JobDetail("IndexerFor" + itemSource, JobGroup, typeof(Indexer));
                 jobDetail.JobDataMap["source"] = itemSource;
 
                 var trigger = TriggerUtils.MakeSecondlyTrigger(frequency);
 
-                trigger.StartTimeUtc = TriggerUtils.GetEvenMinuteDate(DateTime.UtcNow.Add(TimeSpan.FromMinutes(1)));
+                // add 2 seconds to "try" and ensure the first time gets executed always
+                trigger.StartTimeUtc = TriggerUtils.GetEvenMinuteDate(DateTime.UtcNow.AddSeconds(2));
                 trigger.Name = "Each"+frequency+"SecondsFor"+itemSource;
                 trigger.MisfireInstruction = MisfireInstruction.SimpleTrigger.RescheduleNextWithRemainingCount;
 
@@ -65,7 +70,9 @@ namespace Core.Lucene
         {
             var source = (IItemSource) context.MergedJobDataMap["source"];
             Debug.WriteLine("Indexing item source " + source);
-            source.GetItems().ContinueWith(task => IndexItems(source, task.Result, new LuceneStorage(Converters)));
+            source.GetItems()
+                .ContinueWith(task => IndexItems(source, task.Result, new LuceneStorage(Converters)))
+                .GuardForException(e => Debug.WriteLine("Exception while indexing {0}:{1}", source, e));
         }
 
         private void EnsureIndexExists()
