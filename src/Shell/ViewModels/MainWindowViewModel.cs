@@ -190,6 +190,7 @@ namespace ILoveLucene.ViewModels
                                               Arguments = string.Empty;
                                           }
                                           SetActionsForResult(Result);
+                                          AutoCompleteArgument();
                                       }, token)
                 .GuardForException(SetError);
         }
