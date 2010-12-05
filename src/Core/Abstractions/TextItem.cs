@@ -1,4 +1,6 @@
-﻿namespace Core.Abstractions
+﻿using System;
+
+namespace Core.Abstractions
 {
     public class TextItem : ITypedItem<string>
     {
@@ -21,7 +23,13 @@
         {
         }
 
-        public string Item
+        public object Item
+        {
+            get { return TypedItem; }
+        }
+
+
+        public string TypedItem
         {
             get { return Text; }
         }

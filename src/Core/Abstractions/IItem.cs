@@ -10,10 +10,12 @@ namespace Core.Abstractions
         string Text { get; }
 
         string Description { get; }
+
+        object Item { get; }
     }
 
     public interface ITypedItem<out T> : IItem
     {
-        T Item { get; }
+        T TypedItem { get; }
     }
 }

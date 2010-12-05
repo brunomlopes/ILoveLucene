@@ -22,12 +22,12 @@ namespace Plugins
             else _sessionNames = sessionsKey.GetSubKeyNames();
         }
 
-        public override void ActOn(ITypedItem<FileInfo> item)
+        public override void ActOn(FileInfo item)
         {
-            Process.Start(item.Item.FullName);
+            Process.Start(item.FullName);
         }
 
-        public ArgumentAutoCompletionResult AutoCompleteArguments(ITypedItem<FileInfo> item, string arguments)
+        public ArgumentAutoCompletionResult AutoCompleteArguments(FileInfo item, string arguments)
         {
             if (string.IsNullOrWhiteSpace(arguments))
             {
@@ -37,7 +37,7 @@ namespace Plugins
                                                               _sessionNames.Where(s => s.Contains(arguments)));
         }
 
-        public void ActOn(ITypedItem<FileInfo> item, string arguments)
+        public void ActOn(FileInfo item, string arguments)
         {
             if (_sessionNames.Contains(arguments))
             {
@@ -56,9 +56,9 @@ namespace Plugins
             get { return "Putty launcher"; }
         }
 
-        public bool CanActOn(ITypedItem<FileInfo> item)
+        public bool CanActOn(FileInfo item)
         {
-            return Path.GetFileNameWithoutExtension(item.Item.Name)
+            return Path.GetFileNameWithoutExtension(item.Name)
                 .Equals("putty", StringComparison.InvariantCultureIgnoreCase);
         }
     }

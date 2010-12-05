@@ -10,7 +10,7 @@ namespace Core.Abstractions
             UnwrapTargetInvocationException(() => 
                 self.GetType()
                     .GetMethod("ActOn", BindingFlags.Instance | BindingFlags.Public, null, new []{self.TypedItemType}, null)
-                    .Invoke(self, new[] {item})
+                    .Invoke(self, new[] {item.Item})
             );
             
         }
@@ -20,14 +20,14 @@ namespace Core.Abstractions
             UnwrapTargetInvocationException(() =>
                 self.GetType()
                 .GetMethod("ActOn", BindingFlags.Instance | BindingFlags.Public, null, new[] { self.TypedItemType, typeof(string) }, null)
-                .Invoke(self, new object[] { item, arguments }));
+                .Invoke(self, new object[] { item.Item, arguments }));
         }
 
         public static ArgumentAutoCompletionResult AutoCompleteArguments(this IActOnItemWithAutoCompletedArguments self, IItem item, string arguments)
         {
             return UnwrapTargetInvocationException(() => (ArgumentAutoCompletionResult)self.GetType()
                                                      .GetMethod("AutoCompleteArguments", BindingFlags.Instance | BindingFlags.Public, null, new[] { self.TypedItemType, typeof(string) }, null)
-                                                     .Invoke(self, new object[] {item, arguments}));
+                                                     .Invoke(self, new object[] {item.Item, arguments}));
         }
         
         public static bool CanActOn(this IActOnItem self, IItem item)
@@ -37,7 +37,7 @@ namespace Core.Abstractions
 
             return (bool)self.GetType()
                              .GetMethod("CanActOn", BindingFlags.Instance | BindingFlags.Public, null, new[] { self.TypedItemType}, null)
-                             .Invoke(self, new object[] {item});
+                             .Invoke(self, new object[] {item.Item});
         }
 
         private static void UnwrapTargetInvocationException(Action action)
@@ -66,12 +66,12 @@ namespace Core.Abstractions
 
         public static Type GetTypedItemType<T>(this IActOnTypedItem<T> self)
         {
-            return typeof (ITypedItem<T>);
+            return typeof (T);
         }
 
         public static Type GetTypedItemType<T>(this IActOnTypedItemWithArguments<T> self)
         {
-            return typeof (ITypedItem<T>);
+            return typeof (T);
         }
     }
 }

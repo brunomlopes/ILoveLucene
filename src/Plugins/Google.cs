@@ -8,9 +8,9 @@ namespace Plugins
     [Export(typeof (IActOnItem))]
     public class Google : BaseActOnTypedItem<string>
     {
-        public override void ActOn(ITypedItem<string> item)
+        public override void ActOn(string item)
         {
-            var uri = new Uri("http://www.google.com/search?q=" + Uri.EscapeDataString(item.Item), UriKind.Absolute);
+            var uri = new Uri("http://www.google.com/search?q=" + Uri.EscapeDataString(item), UriKind.Absolute);
             Process.Start(uri.ToString());
         }
 

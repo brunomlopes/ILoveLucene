@@ -7,19 +7,20 @@ namespace Plugins.Shortcuts
     {
         public FileInfoItem(FileInfo shortcut)
         {
-            Item = shortcut;
+            TypedItem = shortcut;
         }
 
         public string Text
         {
-            get { return Item.Name; }
+            get { return TypedItem.Name; }
         }
 
         public string Description
         {
-            get { return Item.FullName; }
+            get { return TypedItem.FullName; }
         }
+        public object Item { get { return TypedItem; } }
 
-        public FileInfo Item { get; private set; }
+        public FileInfo TypedItem { get; private set; }
     }
 }

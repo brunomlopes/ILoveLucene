@@ -11,7 +11,7 @@ namespace Plugins
         [Import(AllowRecomposition = true)]
         public ILoadConfiguration LoadConfiguration { get; set; }
 
-        public override void ActOn(ITypedItem<ReloadConfiguration> item)
+        public override void ActOn(ReloadConfiguration item)
         {
             LoadConfiguration.Reload();
         }
@@ -26,7 +26,7 @@ namespace Plugins
             get { return "Reload configuration from disk"; }
         }
 
-        public override ReloadConfiguration Item
+        public override ReloadConfiguration TypedItem
         {
             get { return this; }
         }

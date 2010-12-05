@@ -9,9 +9,9 @@ namespace Plugins.Shortcuts
     [Export(typeof(IActOnItem))]
     public class RunFileInfo : BaseActOnTypedItem<FileInfo>
     {
-        public override void ActOn(ITypedItem<FileInfo> item)
+        public override void ActOn(FileInfo item)
         {
-            Process.Start(item.Item.FullName);
+            Process.Start(item.FullName);
         }
 
         public override string Text
@@ -23,9 +23,9 @@ namespace Plugins.Shortcuts
     [Export(typeof(IActOnItem))]
     public class RunFileInfoWithArguments : IActOnTypedItemWithArguments<FileInfo>
     {
-        public void ActOn(ITypedItem<FileInfo> item, string arguments)
+        public void ActOn(FileInfo item, string arguments)
         {
-            Process.Start(item.Item.FullName, arguments);
+            Process.Start(item.FullName, arguments);
         }
 
         public string Text
@@ -41,9 +41,9 @@ namespace Plugins.Shortcuts
     [Export(typeof(IActOnItem))]
     public class RunFileInfoElevated : IActOnTypedItem<FileInfo>
     {
-        public void ActOn(ITypedItem<FileInfo> item)
+        public void ActOn(FileInfo item)
         {
-            var arguments = new ProcessStartInfo(item.Item.FullName);
+            var arguments = new ProcessStartInfo(item.FullName);
             arguments.Verb = "runas";
             Process.Start(arguments);
         }

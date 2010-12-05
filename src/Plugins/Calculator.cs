@@ -22,7 +22,7 @@ namespace Plugins
             _scope = _engine.CreateScope();
         }
 
-        public override void ActOn(ITypedItem<string> item)
+        public override void ActOn(string item)
         {
             // TODO: is this the best way to show the result?
             // my quick usability check says it is (using it for a while)
@@ -34,11 +34,11 @@ namespace Plugins
             get { return _lastResult != null ? _lastResult.ToString() : "Calculator"; }
         }
 
-        public bool CanActOn(ITypedItem<string> item)
+        public bool CanActOn(string item)
         {
             try
             {
-                _lastResult = Calculate(item.Item);
+                _lastResult = Calculate(item);
                 if(PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Text"));
                 return _lastResult != null;

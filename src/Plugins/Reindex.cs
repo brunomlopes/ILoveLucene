@@ -18,12 +18,12 @@ namespace Plugins
         public string JobGroup { get; set; }
 
 
-        public override void ActOn(ITypedItem<Reindex> item)
+        public override void ActOn(Reindex item)
         {
             throw new InvalidActionException("Need a index to be triggered");
         }
 
-        public ArgumentAutoCompletionResult AutoCompleteArguments(ITypedItem<Reindex> item, string arguments)
+        public ArgumentAutoCompletionResult AutoCompleteArguments(Reindex item, string arguments)
         {
             arguments = arguments.ToLowerInvariant();
             return ArgumentAutoCompletionResult
@@ -32,7 +32,7 @@ namespace Plugins
                                    .Where(j => j.ToLowerInvariant().Contains(arguments)));
         }
 
-        public void ActOn(ITypedItem<Reindex> item, string arguments)
+        public void ActOn(Reindex item, string arguments)
         {
             Scheduler.TriggerJobWithVolatileTrigger(arguments, JobGroup);
         }
@@ -47,7 +47,7 @@ namespace Plugins
             get { return "Triggers a reindex of a source"; }
         }
 
-        public override Reindex Item
+        public override Reindex TypedItem
         {
             get { return this; }
         }

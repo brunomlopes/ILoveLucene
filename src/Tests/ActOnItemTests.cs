@@ -18,7 +18,7 @@ namespace Tests
 
             act.ActOn((IItem)info);
             Assert.True(act.Acted);
-            Assert.Equal(act.Info, info.Item);
+            Assert.Equal(act.Info, info.TypedItem);
         }
         
         [Fact]
@@ -29,7 +29,7 @@ namespace Tests
 
             act.ActOn((IItem)info, "argument");
             Assert.True(act.Acted);
-            Assert.Equal(act.Info, info.Item);
+            Assert.Equal(act.Info, info.TypedItem);
             Assert.Equal("argument", act.Arguments);
         }
         
@@ -81,7 +81,7 @@ namespace Tests
     {
         public bool Acted;
 
-        public override void ActOn(ITypedItem<MockCommand> item)
+        public override void ActOn(MockCommand item)
         {
             Acted = true;
         }
@@ -96,7 +96,7 @@ namespace Tests
             get { return "description"; }
         }
 
-        public override MockCommand Item
+        public override MockCommand TypedItem
         {
             get { return this; }
         }
@@ -108,16 +108,16 @@ namespace Tests
         public FileInfo Info;
         public string Arguments;
 
-        public override void ActOn(ITypedItem<FileInfo> item)
+        public override void ActOn(FileInfo item)
         {
             Acted = true;
-            Info = item.Item;
+            Info = item;
         }
 
-        public void ActOn(ITypedItem<FileInfo> item, string arguments)
+        public void ActOn(FileInfo item, string arguments)
         {
             Acted = true;
-            Info = item.Item;
+            Info = item;
             Arguments = arguments;
         }
 
@@ -140,21 +140,21 @@ namespace Tests
             _canAct = canAct;
         }
        
-        public bool CanActOn(ITypedItem<FileInfo> fileInfo)
+        public bool CanActOn(FileInfo fileInfo)
         {
             return _canAct;
         }
 
-        public override void ActOn(ITypedItem<FileInfo> item)
+        public override void ActOn(FileInfo item)
         {
             Acted = true;
-            Info = item.Item;
+            Info = item;
         }
 
-        public void ActOn(ITypedItem<FileInfo> item, string arguments)
+        public void ActOn(FileInfo item, string arguments)
         {
             Acted = true;
-            Info = item.Item;
+            Info = item;
             Arguments = arguments;
         }
 

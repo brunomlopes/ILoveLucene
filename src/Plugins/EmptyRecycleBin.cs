@@ -19,7 +19,7 @@ namespace Plugins
         [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
         static extern uint SHEmptyRecycleBin(IntPtr hwnd, string pszRootPath, RecycleFlags dwFlags);
 
-        public override void ActOn(ITypedItem<EmptyRecycleBin> item)
+        public override void ActOn(EmptyRecycleBin item)
         {
             SHEmptyRecycleBin(IntPtr.Zero, null, 0);
         }
@@ -34,7 +34,7 @@ namespace Plugins
             get { return Text; }
         }
 
-        public override EmptyRecycleBin Item
+        public override EmptyRecycleBin TypedItem
         {
             get { return this; }
         }

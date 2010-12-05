@@ -8,10 +8,10 @@ namespace Plugins
     [Export(typeof (IActOnItem))]
     public class Browse : BaseActOnTypedItem<string>, ICanActOnTypedItem<string>
     {
-        public override void ActOn(ITypedItem<string> item)
+        public override void ActOn(string item)
         {
             Uri uri;
-            if (Uri.TryCreate(item.Item, UriKind.Absolute, out uri))
+            if (Uri.TryCreate(item, UriKind.Absolute, out uri))
             {
                 Process.Start(uri.ToString());
             }
@@ -26,10 +26,10 @@ namespace Plugins
             get { return "Browse"; }
         }
 
-        public bool CanActOn(ITypedItem<string> item)
+        public bool CanActOn(string item)
         {
             Uri uri;
-            return Uri.TryCreate(item.Item, UriKind.Absolute, out uri);
+            return Uri.TryCreate(item, UriKind.Absolute, out uri);
         }
     }
 }
