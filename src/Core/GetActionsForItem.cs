@@ -23,7 +23,7 @@ namespace Core
 
         public IEnumerable<IActOnItem> ActionsForItem(IItem item)
         {
-            return Actions.Where(a => a.TypedItemType.IsInstanceOfType(item.Item) && a.CanActOn(item)).ToList();
+            return Actions.Where(a => a.TypedItemType.IsInstanceOfType(item.Item) && a.CanActOn(item)).OrderBy(c => c.Text).ToList();
         }
     }
 }

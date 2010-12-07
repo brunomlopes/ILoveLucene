@@ -204,6 +204,7 @@ namespace ILoveLucene.ViewModels
         {
             _argumentCancelationTokenSource.Cancel();
             _argumentCancelationTokenSource = new CancellationTokenSource();
+            ArgumentOptions = new List<string>();
 
             var token = _argumentCancelationTokenSource.Token;
             var autoCompleteArgumentsCommand = SelectedAction as IActOnItemWithAutoCompletedArguments;
