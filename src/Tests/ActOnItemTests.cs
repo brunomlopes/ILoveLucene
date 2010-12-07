@@ -75,6 +75,13 @@ namespace Tests
             command.ActOn(command);
             Assert.True(command.Acted);
         }
+
+        [Fact]
+        public void DefaultTextIsCamelCaseOfClassNameWithSpaces()
+        {
+            var command = new MockActWithoutText();
+            Assert.Equal("Mock Act Without Text", command.Text);
+        }
     }
 
     class MockCommand : BaseCommand<MockCommand>
@@ -99,6 +106,14 @@ namespace Tests
         public override MockCommand TypedItem
         {
             get { return this; }
+        }
+    }
+
+    class MockActWithoutText : BaseActOnTypedItem<string>
+    {
+        public override void ActOn(string item)
+        {
+            // NO-OP
         }
     }
 

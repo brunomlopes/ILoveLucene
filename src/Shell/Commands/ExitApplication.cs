@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.Composition;
 using System.Windows;
 using Core.Abstractions;
@@ -12,11 +11,6 @@ namespace ILoveLucene.Commands
         public override void ActOn(ExitApplication item)
         {
             Caliburn.Micro.Execute.OnUIThread(() => Application.Current.Shutdown());
-        }
-
-        public override string Text
-        {
-            get { return "Exit"; }
         }
 
         public override string Description

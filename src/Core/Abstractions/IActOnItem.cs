@@ -44,7 +44,14 @@ namespace Core.Abstractions
     {
         public abstract void ActOn(T item);
 
-        public abstract string Text { get; }
+        public virtual string Text
+        {
+            get
+            {
+                var name = this.GetType().Name;
+                return System.Text.RegularExpressions.Regex.Replace(name, "(?<l>[A-Z])", " ${l}").Trim();
+            }
+        }
 
         public Type TypedItemType
         {

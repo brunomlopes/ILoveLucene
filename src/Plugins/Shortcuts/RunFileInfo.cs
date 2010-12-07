@@ -7,21 +7,16 @@ using Core.Abstractions;
 namespace Plugins.Shortcuts
 {
     [Export(typeof(IActOnItem))]
-    public class RunFileInfo : BaseActOnTypedItem<FileInfo>
+    public class Run : BaseActOnTypedItem<FileInfo>
     {
         public override void ActOn(FileInfo item)
         {
             Process.Start(item.FullName);
         }
-
-        public override string Text
-        {
-            get { return "Run"; }
-        }
     } 
     
     [Export(typeof(IActOnItem))]
-    public class RunFileInfoWithArguments : IActOnTypedItemWithArguments<FileInfo>
+    public class RunWithArguments : IActOnTypedItemWithArguments<FileInfo>
     {
         public void ActOn(FileInfo item, string arguments)
         {
@@ -30,7 +25,7 @@ namespace Plugins.Shortcuts
 
         public string Text
         {
-            get { return "Run with arguments"; }
+            get { return "Run With arguments"; }
         }
         public Type TypedItemType
         {
@@ -39,22 +34,13 @@ namespace Plugins.Shortcuts
     } 
     
     [Export(typeof(IActOnItem))]
-    public class RunFileInfoElevated : IActOnTypedItem<FileInfo>
+    public class RunElevated : BaseActOnTypedItem<FileInfo>
     {
-        public void ActOn(FileInfo item)
+        public override void ActOn(FileInfo item)
         {
             var arguments = new ProcessStartInfo(item.FullName);
             arguments.Verb = "runas";
             Process.Start(arguments);
-        }
-
-        public string Text
-        {
-            get { return "Run elevated"; }
-        }
-        public Type TypedItemType
-        {
-            get { return this.GetTypedItemType(); }
         }
     }
 }
