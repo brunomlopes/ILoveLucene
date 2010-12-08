@@ -45,15 +45,25 @@ namespace Core.Lucene
             var searcher = new IndexSearcher(Directory, true);
             try
             {
-                var textWithFuzzy = text.Trim().Replace(" ", "*~ ").Trim() + "*~";
+                var converterHost = new LuceneStorage(Converters);
+
                 var queryParser = new MultiFieldQueryParser(Version.LUCENE_29,
                                                             new[] {SpecialFields.Name, SpecialFields.Learnings},
                                                             new StandardAnalyzer(Version.LUCENE_29));
-                var converterHost = new LuceneStorage(Converters);
                 queryParser.SetFuzzyMinSim((float) 0.8);
                 queryParser.SetDefaultOperator(QueryParser.Operator.AND);
 
-                var results = searcher.Search(queryParser.Parse(textWithFuzzy), 10);
+                var textWithSubString = text.Trim().Replace(" ", "* ").Trim() + "*";
+                var textWithFuzzy = text.Trim().Replace(" ", "~ ").Trim() + "~";
+
+                Query substringQuery = queryParser.Parse(textWithSubString);
+                Query fuzzyQuery = queryParser.Parse(textWithFuzzy);
+
+                var query = new BooleanQuery();
+                query.Add(fuzzyQuery, BooleanClause.Occur.SHOULD);
+                query.Add(substringQuery, BooleanClause.Occur.SHOULD);
+
+                var results = searcher.Search(query, 10);
                 var commands = results.scoreDocs
                     .Select(d =>
                                 {
