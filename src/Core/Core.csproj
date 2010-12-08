@@ -76,6 +76,7 @@
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Lucene\AnalyzerExtension.cs" />
     <Compile Include="Lucene\AutoCompleteBasedOnLucene.cs" />
+    <Compile Include="Lucene\AutoCompleteConfiguration.cs" />
     <Compile Include="Lucene\Indexer.cs" />
     <Compile Include="Lucene\IndexerConfiguration.cs" />
     <Compile Include="Lucene\LuceneBase.cs" />

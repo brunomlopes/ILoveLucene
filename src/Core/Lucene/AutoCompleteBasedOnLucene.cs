@@ -21,6 +21,9 @@ namespace Core.Lucene
         [ImportMany]
         public IEnumerable<IConverter> Converters { get; set; }
 
+        [Import(AllowRecomposition = true)]
+        public AutoCompleteConfiguration Configuration { get; set; }
+
         public AutoCompleteBasedOnLucene(CompositionContainer mefContainer)
         {
             _mefContainer = mefContainer;
@@ -50,7 +53,7 @@ namespace Core.Lucene
                 var queryParser = new MultiFieldQueryParser(Version.LUCENE_29,
                                                             new[] {SpecialFields.Name, SpecialFields.Learnings},
                                                             new StandardAnalyzer(Version.LUCENE_29));
-                queryParser.SetFuzzyMinSim((float) 0.8);
+                queryParser.SetFuzzyMinSim((float)Configuration.FuzzySimilarity);
                 queryParser.SetDefaultOperator(QueryParser.Operator.AND);
 
                 var textWithSubString = text.Trim().Replace(" ", "* ").Trim() + "*";
