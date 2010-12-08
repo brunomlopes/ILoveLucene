@@ -155,7 +155,6 @@ namespace Core.Lucene
                 learnings = field.StringValue() + " " + learnings;
                 document.RemoveField(SpecialFields.Learnings);
             }
-            learnings = string.Join(" ", new HashSet<string>(writer.GetAnalyzer().Tokenize(learnings)));
             var newField = new Field(SpecialFields.Learnings, learnings, Field.Store.YES, Field.Index.ANALYZED);
 
             document.Add(newField);
