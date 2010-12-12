@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -14,6 +15,45 @@ namespace Core.Lucene
 {
     public class LuceneStorage
     {
+        class LearningStorage
+        {
+            public static LearningStorage FromFile(FileInfo input)
+            {
+                if (!input.Exists) return new LearningStorage();
+                return JsonConvert.DeserializeObject<LearningStorage>(File.ReadAllText(input.FullName));
+            }
+
+            public void Save(FileInfo output)
+            {
+                File.WriteAllText(output.FullName, JsonConvert.SerializeObject(this));
+            }
+
+            public Dictionary<DocumentId, string> Learnings;
+
+            public LearningStorage()
+            {
+                Learnings = new Dictionary<DocumentId, string>();
+            }
+
+            public string LearningsFor(DocumentId id)
+            {
+                if (Learnings.ContainsKey(id))
+                {
+                    return Learnings[id];
+                }
+                return string.Empty;
+            }
+
+            public string LearnFor(string learning, DocumentId id)
+            {
+                if(!Learnings.ContainsKey(id))
+                    Learnings[id] = learning;
+                else
+                    Learnings[id] += " " + learning;
+                return Learnings[id];
+            }
+        }
+
         private class DocumentId
         {
             public string Namespace { get; private set; }
@@ -49,10 +89,13 @@ namespace Core.Lucene
         }
 
         private readonly Dictionary<string, IConverter> _convertersForNamespaces;
+        private LearningStorage _learningStorage;
 
         public LuceneStorage(IEnumerable<IConverter> converters)
         {
             _convertersForNamespaces = converters.ToDictionary(c => c.GetNamespaceForItems());
+
+            _learningStorage = new LearningStorage();
         }
 
         public IConverter<T> GetConverter<T>()
@@ -78,16 +121,14 @@ namespace Core.Lucene
             var nspace = converter.GetNamespaceForItems();
             var id = converter.ToId(item);
 
-            var sha1 = new DocumentId(nspace, id).GetSha1();
+            var documentId = new DocumentId(nspace, id);
+            var sha1 = documentId.GetSha1();
 
-            var oldDocument = PopDocument(writer, sha1);
-            var learnings = string.Empty;
-            if (oldDocument != null)
-            {
-                learnings = (oldDocument.GetField(SpecialFields.Learnings) ??
-                             new Field(SpecialFields.Learnings, string.Empty, Field.Store.YES, Field.Index.ANALYZED)).
-                    StringValue();
-            }
+
+            var oldDocument = PopDocument(writer, sha1); //deleting the old version of the doc
+
+
+            var learnings = _learningStorage.LearningsFor(documentId);
 
             var name = converter.ToName(item);
             var document = converter.ToDocument(item);
@@ -148,15 +189,15 @@ namespace Core.Lucene
             if (document == null)
                 throw new InvalidOperationException(string.Format("Didn't find command {0}", commandId));
 
+            var learnings = _learningStorage.LearnFor(input, commandId);
+
             var field = document.GetField(SpecialFields.Learnings);
-            var learnings = input;
             if (field != null)
             {
-                learnings = field.StringValue() + " " + learnings;
                 document.RemoveField(SpecialFields.Learnings);
             }
             var newField = new Field(SpecialFields.Learnings, learnings, Field.Store.YES, Field.Index.ANALYZED);
-
+                
             document.Add(newField);
 
             writer.AddDocument(document);
