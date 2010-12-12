@@ -38,6 +38,23 @@ namespace Tests
             Assert.True(results.HasAutoCompletion);
             Assert.Equal(results.AutoCompletedCommand.Item.Text, "Firefox");
         }
+        
+        [Fact]
+        public void CanLearnItem()
+        {
+            var item = new Item {Id = "Firewall"};
+            var directory = IndexItemIntoDirectory(new Item {Id = "Firefox"}, item);
+
+            var searcher = GetAutocompleter(directory);
+
+            var results = searcher.Autocomplete("Fire");
+            searcher.LearnInputForCommandResult("fire", results.OtherOptions.First());
+
+            results = searcher.Autocomplete("Fire");
+
+            Assert.True(results.HasAutoCompletion);
+            Assert.Equal(results.AutoCompletedCommand.Item.Text, "Firewall");
+        }
 
         [Fact]
         public void CanFindItemBasedOnSubstring()
@@ -113,14 +130,14 @@ namespace Tests
             return searcher;
         }
 
-        private RAMDirectory IndexItemIntoDirectory(Item item)
+        private RAMDirectory IndexItemIntoDirectory(params Item[] items)
         {
             var directory = new RAMDirectory();
             var indexer = new Indexer(directory);
             indexer.Converters = new[] { new Converter() };
             var source = new Source();
 
-            source.Items = new[] {item};
+            source.Items = items;
             indexer.IndexItems(source, source.Items, new LuceneStorage(indexer.Converters));
             return directory;
         }
