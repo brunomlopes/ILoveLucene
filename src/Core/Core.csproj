@@ -81,6 +81,7 @@
     <Compile Include="Lucene\IndexerConfiguration.cs" />
     <Compile Include="Lucene\LuceneBase.cs" />
     <Compile Include="Lucene\LuceneStorage.cs" />
+    <Compile Include="Lucene\ScheduleIndexJobs.cs" />
     <Compile Include="Lucene\SpecialFields.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scheduler\MefJobFactory.cs" />
