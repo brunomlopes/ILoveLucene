@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.IO;
 using Core.Abstractions;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
@@ -9,23 +10,21 @@ using Lucene.Net.Store;
 using Quartz;
 using Version = Lucene.Net.Util.Version;
 using Core.Extensions;
+using Directory = Lucene.Net.Store.Directory;
 
 namespace Core.Lucene
 {
     
     public class Indexer : LuceneBase, IStatefulJob
     {
-        [ImportMany]
-        public IEnumerable<IConverter> Converters { get; set; }
-
         public Indexer()
         {
             EnsureIndexExists();
             Converters = new IConverter[] { };
         }
-        
-        public Indexer(Directory directory)
-            :base(directory)
+
+        public Indexer(Directory directory, DirectoryInfo learningStorageLocation)
+            :base(directory, learningStorageLocation)
         {
             EnsureIndexExists();
             Converters = new IConverter[] {};
@@ -37,7 +36,7 @@ namespace Core.Lucene
             var source = (IItemSource) context.MergedJobDataMap["source"];
             Debug.WriteLine("Indexing item source " + source);
             source.GetItems()
-                .ContinueWith(task => IndexItems(source, task.Result, new LuceneStorage(Converters)))
+                .ContinueWith(task => IndexItems(source, task.Result))
                 .GuardForException(e => Debug.WriteLine("Exception while indexing {0}:{1}", source, e));
         }
 
@@ -49,7 +48,7 @@ namespace Core.Lucene
                                 IndexWriter.MaxFieldLength.UNLIMITED).Close();
         }
 
-        public void IndexItems(IItemSource source, IEnumerable<object> items, LuceneStorage host)
+        public void IndexItems(IItemSource source, IEnumerable<object> items)
         {
             IndexWriter indexWriter = null;
             try
@@ -59,10 +58,10 @@ namespace Core.Lucene
 
                 foreach (var item in items)
                 {
-                    host.UpdateDocumentForObject(indexWriter, source, newTag, item);
+                    Storage.UpdateDocumentForObject(indexWriter, source, newTag, item);
                 }
 
-                host.DeleteDocumentsForSourceWithoutTag(indexWriter, source, newTag);
+                Storage.DeleteDocumentsForSourceWithoutTag(indexWriter, source, newTag);
 
                 indexWriter.Commit();
             }

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Abstractions;
@@ -12,6 +14,18 @@ namespace Tests
 {
     public class IndexerTests
     {
+        private DirectoryInfo _storageLocation;
+
+        public IndexerTests()
+        {
+            _storageLocation = new DirectoryInfo("learning");
+            if (_storageLocation.Exists)
+            {
+                _storageLocation.Delete(true);
+                _storageLocation.Refresh();
+            }
+        }
+
         [Fact]
         public void CanFindItemWhenItIsIndexed()
         {
@@ -85,16 +99,18 @@ namespace Tests
         [Fact]
         public void CannotFindItemWhenItIsRemovedAfterBeingIndexed()
         {
+            
             var directory = new RAMDirectory();
-            var indexer = new Indexer(directory);
+            var indexer = new Indexer(directory, _storageLocation);
             indexer.Converters = new[] { new Converter() };
 
             var source = new Source();
 
             source.Items = new[] {new Item {Id = "simple"}};
-            indexer.IndexItems(source, source.Items, new LuceneStorage(indexer.Converters));
+            var luceneStorage = new LuceneStorage(indexer.Converters, _storageLocation);
+            indexer.IndexItems(source, source.Items);
             source.Items = new Item[] {};
-            indexer.IndexItems(source, source.Items, new LuceneStorage(indexer.Converters));
+            indexer.IndexItems(source, source.Items);
 
             var searcher = GetAutocompleter(directory);
 
@@ -107,13 +123,13 @@ namespace Tests
         public void CannotFindItemWhenIndexIsEmpty()
         {
             var directory = new RAMDirectory();
-            var indexer = new Indexer(directory);
+            var indexer = new Indexer(directory, _storageLocation);
             indexer.Converters = new[] { new Converter() };
 
             var source = new Source();
 
             source.Items = new Item[] {};
-            indexer.IndexItems(source, source.Items, new LuceneStorage(indexer.Converters));
+            indexer.IndexItems(source, source.Items);
 
             var searcher = GetAutocompleter(directory);
 
@@ -124,7 +140,7 @@ namespace Tests
 
         private AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory)
         {
-            var searcher = AutoCompleteBasedOnLucene.WithDirectory(directory);
+            var searcher = AutoCompleteBasedOnLucene.WithDirectory(directory, _storageLocation);
             searcher.Configuration = new AutoCompleteConfiguration();
             searcher.Converters = new[] {new Converter()};
             return searcher;
@@ -133,12 +149,12 @@ namespace Tests
         private RAMDirectory IndexItemIntoDirectory(params Item[] items)
         {
             var directory = new RAMDirectory();
-            var indexer = new Indexer(directory);
+            var indexer = new Indexer(directory, _storageLocation);
             indexer.Converters = new[] { new Converter() };
             var source = new Source();
 
             source.Items = items;
-            indexer.IndexItems(source, source.Items, new LuceneStorage(indexer.Converters));
+            indexer.IndexItems(source, source.Items);
             return directory;
         }
     }
