@@ -11,7 +11,7 @@ namespace Core.Lucene
 {
     public class LuceneBase
     {
-        protected Directory Directory;
+        public Directory Directory { get; private set; }
 
         public LuceneBase()
         {
@@ -26,10 +26,20 @@ namespace Core.Lucene
             Directory = directory;
         }
 
-        protected IndexWriter GetIndexWriter()
+        public IndexWriter GetIndexWriter()
         {
             return new IndexWriter(Directory, new StandardAnalyzer(Version.LUCENE_29),
                                    IndexWriter.MaxFieldLength.UNLIMITED);
+        }
+        
+        public IndexReader GetIndexReader()
+        {
+            return IndexReader.Open(Directory, false);
+        }
+        
+        public IndexReader GetReadOnlyIndexReader()
+        {
+            return IndexReader.Open(Directory, true);
         }
     }
 }
