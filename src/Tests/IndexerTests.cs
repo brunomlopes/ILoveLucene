@@ -67,6 +67,19 @@ namespace Tests
             var results = searcher.Autocomplete("emac");
             Assert.True(results.HasAutoCompletion);
             Assert.Equal(results.AutoCompletedCommand.Item.Text, "EmacsClient.lnk");
+        } 
+        
+        [Fact]
+        public void CanFindItemBasedOnSubstringOnTheEnd()
+        {
+            var item = new Item {Id = "SQLyog.lnk"};
+            var directory = IndexItemIntoDirectory(item);
+
+            var searcher = GetAutocompleter(directory);
+
+            var results = searcher.Autocomplete("yog");
+            Assert.True(results.HasAutoCompletion);
+            Assert.Equal(results.AutoCompletedCommand.Item.Text, "SQLyog.lnk");
         }
 
         [Fact]

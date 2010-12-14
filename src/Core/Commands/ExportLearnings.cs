@@ -34,8 +34,6 @@ namespace Core.Commands
                     if(string.IsNullOrWhiteSpace(docLearnings.StringValue()))
                         continue;
 
-
-
                     learnings[sha1.StringValue()] = new
                                                         {
                                                             Id = doc.GetField(SpecialFields.Id).StringValue(),

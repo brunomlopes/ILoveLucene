@@ -56,12 +56,15 @@ namespace Core.Lucene
                 queryParser.SetFuzzyMinSim((float)Configuration.FuzzySimilarity);
                 queryParser.SetDefaultOperator(QueryParser.Operator.AND);
 
-                var textWithSubString = text.Trim().Replace(" ", "* ").Trim() + "*";
+                var textWithSubString = "*"+text.Trim().Replace(" ", "* *").Trim() + "*";
                 var textWithFuzzy = text.Trim().Replace(" ", "~ ").Trim() + "~";
+
+                queryParser.SetAllowLeadingWildcard(true);
 
                 Query substringQuery = queryParser.Parse(textWithSubString);
                 Query fuzzyQuery = queryParser.Parse(textWithFuzzy);
 
+                
                 var query = new BooleanQuery();
                 query.Add(fuzzyQuery, BooleanClause.Occur.SHOULD);
                 query.Add(substringQuery, BooleanClause.Occur.SHOULD);
