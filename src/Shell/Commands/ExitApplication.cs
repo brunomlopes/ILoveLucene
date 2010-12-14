@@ -8,7 +8,7 @@ namespace ILoveLucene.Commands
     [Export(typeof (IActOnItem))]
     public class ExitApplication : BaseCommand<ExitApplication>
     {
-        public override void ActOn(ExitApplication item)
+        public override void Act()
         {
             Caliburn.Micro.Execute.OnUIThread(() => Application.Current.Shutdown());
         }

@@ -88,7 +88,7 @@ namespace Tests
     {
         public bool Acted;
 
-        public override void ActOn(MockCommand item)
+        public override void Act()
         {
             Acted = true;
         }

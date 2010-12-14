@@ -11,7 +11,7 @@ namespace Plugins
         [Import(AllowRecomposition = true)]
         public ILoadConfiguration LoadConfiguration { get; set; }
 
-        public override void ActOn(ReloadConfiguration item)
+        public override void Act()
         {
             LoadConfiguration.Reload();
         }

@@ -18,7 +18,8 @@ namespace Plugins
         public string JobGroup { get; set; }
 
 
-        public override void ActOn(Reindex item)
+        // FIXME: this looks fugly :(
+        public override void Act()
         {
             throw new InvalidActionException("Need a index to be triggered");
         }

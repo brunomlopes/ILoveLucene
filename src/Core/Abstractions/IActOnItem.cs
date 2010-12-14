@@ -60,6 +60,12 @@ namespace Core.Abstractions
     }
     public abstract class BaseCommand<T> : BaseActOnTypedItem<T>,ITypedItem<T>
     {
+        public override void ActOn(T item)
+        {
+            Act();
+        }
+
+        public abstract void Act();
         public abstract string Description { get; }
         public abstract T TypedItem { get; }
         public object Item { get { return TypedItem; } }
