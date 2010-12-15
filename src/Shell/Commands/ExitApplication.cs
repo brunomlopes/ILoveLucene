@@ -1,26 +1,15 @@
 using System.ComponentModel.Composition;
 using System.Windows;
-using Core.Abstractions;
+using Plugins.Commands;
 
 namespace ILoveLucene.Commands
 {
-    [Export(typeof (IItem))]
-    [Export(typeof (IActOnItem))]
-    public class ExitApplication : BaseCommand<ExitApplication>
+    [Export(typeof (ICommand))]
+    public class ExitApplication : BaseCommand
     {
         public override void Act()
         {
             Caliburn.Micro.Execute.OnUIThread(() => Application.Current.Shutdown());
-        }
-
-        public override string Description
-        {
-            get { return "Exit application"; }
-        }
-
-        public override ExitApplication TypedItem
-        {
-            get { return this; }
         }
     }
 }

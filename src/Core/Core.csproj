@@ -70,7 +70,7 @@
     <Compile Include="Abstractions\IStartupTask.cs" />
     <Compile Include="Abstractions\PluginConfigurationAttribute.cs" />
     <Compile Include="Abstractions\TextItem.cs" />
-    <Compile Include="Commands\ExportLearnings.cs" />
+    <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="GetActionsForItem.cs" />
     <Compile Include="LoadConfiguration.cs" />
     <Compile Include="ConfigurationPart.cs" />

@@ -1,18 +1,15 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Text;
-using Core.Abstractions;
 using Core.Lucene;
-using Lucene.Net.Index;
 using Newtonsoft.Json;
+using Plugins.Commands;
 
-namespace Core.Commands
+namespace Plugins
 {
-    [Export(typeof(IItem))]
-    [Export(typeof(IActOnItem))]
-    public class ExportLearnings : BaseCommand<ExportLearnings>
+    [Export(typeof(ICommand))]
+    public class ExportLearnings : BaseCommand
     {
         public override void Act()
         {
@@ -50,11 +47,6 @@ namespace Core.Commands
         public override string Description
         {
             get { return "Exports all learnings to a file named 'learnings.json'"; }
-        }
-
-        public override ExportLearnings TypedItem
-        {
-            get { return this; }
         }
     }
 }

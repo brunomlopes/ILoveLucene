@@ -1,13 +1,12 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Runtime.InteropServices;
-using Core.Abstractions;
+using Plugins.Commands;
 
 namespace Plugins
 {
-    [Export(typeof(IItem))]
-    [Export(typeof(IActOnItem))]
-    public class EmptyRecycleBin : BaseCommand<EmptyRecycleBin>
+    [Export(typeof(ICommand))]
+    public class EmptyRecycleBin : BaseCommand
     {
         enum RecycleFlags : uint
         {
@@ -22,21 +21,6 @@ namespace Plugins
         public override void Act()
         {
             SHEmptyRecycleBin(IntPtr.Zero, null, 0);
-        }
-
-        public override string Text
-        {
-            get { return "Empty recycle bin"; }
-        }
-
-        public override string Description
-        {
-            get { return Text; }
-        }
-
-        public override EmptyRecycleBin TypedItem
-        {
-            get { return this; }
         }
     }
 }

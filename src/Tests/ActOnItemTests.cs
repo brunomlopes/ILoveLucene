@@ -62,17 +62,17 @@ namespace Tests
         }
         
         [Fact]
-        public void CommandCanActOnItself()
+        public void ExecuteCanActOnCommand()
         {
             var command = new MockCommand();
+            var action = new ExecuteCommand();
+            var getItems = new GetActionsForItem(new IActOnItem[] {action});
 
-            var getItems = new GetActionsForItem(new IActOnItem[] {command});
-
-            var actionsForItem = getItems.ActionsForItem(command);
+            var actionsForItem = getItems.ActionsForItem(new CommandItem(command));
             Assert.NotEmpty(actionsForItem);
-            Assert.Contains(command, actionsForItem);
+            Assert.Contains(action, actionsForItem);
 
-            command.ActOn(command);
+            action.ActOn(command);
             Assert.True(command.Acted);
         }
 
@@ -84,28 +84,23 @@ namespace Tests
         }
     }
 
-    class MockCommand : BaseCommand<MockCommand>
+    class MockCommand : ICommand
     {
         public bool Acted;
 
-        public override void Act()
+        public void Act()
         {
             Acted = true;
         }
 
-        public override string Text
+        public string Text
         {
             get { return "not relevant"; }
         }
 
-        public override string Description
+        public string Description
         {
             get { return "description"; }
-        }
-
-        public override MockCommand TypedItem
-        {
-            get { return this; }
         }
     }
 

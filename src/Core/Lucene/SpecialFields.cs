@@ -1,6 +1,6 @@
 ﻿namespace Core.Lucene
 {
-    internal static class SpecialFields
+    public static class SpecialFields
     {
         public const string Object = "_object";
         public const string Id = "_id";

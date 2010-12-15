@@ -1,12 +1,11 @@
-﻿using System;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
 using Core.Abstractions;
+using Plugins.Commands;
 
 namespace Plugins
 {
-    [Export(typeof (IItem))]
-    [Export(typeof (IActOnItem))]
-    public class ReloadConfiguration : BaseCommand<ReloadConfiguration>
+    [Export(typeof (ICommand))]
+    public class ReloadConfiguration : BaseCommand
     {
         [Import(AllowRecomposition = true)]
         public ILoadConfiguration LoadConfiguration { get; set; }
@@ -16,19 +15,9 @@ namespace Plugins
             LoadConfiguration.Reload();
         }
 
-        public override string Text
-        {
-            get { return "Reload configuration"; }
-        }
-
         public override string Description
         {
             get { return "Reload configuration from disk"; }
-        }
-
-        public override ReloadConfiguration TypedItem
-        {
-            get { return this; }
         }
     }
 }

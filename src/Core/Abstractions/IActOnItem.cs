@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Extensions;
 
 namespace Core.Abstractions
 {
@@ -46,11 +47,7 @@ namespace Core.Abstractions
 
         public virtual string Text
         {
-            get
-            {
-                var name = this.GetType().Name;
-                return System.Text.RegularExpressions.Regex.Replace(name, "(?<l>[A-Z])", " ${l}").Trim();
-            }
+            get { return this.FriendlyTypeName(); }
         }
 
         public Type TypedItemType
@@ -58,18 +55,7 @@ namespace Core.Abstractions
             get { return this.GetTypedItemType(); }
         }
     }
-    public abstract class BaseCommand<T> : BaseActOnTypedItem<T>,ITypedItem<T>
-    {
-        public override void ActOn(T item)
-        {
-            Act();
-        }
-
-        public abstract void Act();
-        public abstract string Description { get; }
-        public abstract T TypedItem { get; }
-        public object Item { get { return TypedItem; } }
-    }
+   
 
     public interface IActOnTypedItemWithArguments<in T> : IActOnItemWithArguments
     {
