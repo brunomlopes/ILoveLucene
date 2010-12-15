@@ -54,6 +54,20 @@ namespace Tests
         }
         
         [Fact]
+        public void CanFindSubItemWithItemConverter()
+        {
+            var item = new SubItem {Id = "Firefox"};
+
+            var directory = IndexItemIntoDirectory(item);
+
+            var searcher = GetAutocompleter(directory);
+
+            var results = searcher.Autocomplete("FireFox");
+            Assert.True(results.HasAutoCompletion);
+            Assert.Equal(results.AutoCompletedCommand.Item.Text, "Firefox");
+        }
+        
+        [Fact]
         public void CanLearnItem()
         {
             var item = new Item {Id = "Firewall"};
@@ -175,6 +189,11 @@ namespace Tests
     class Item
     {
         public string Id;
+    }
+
+    class SubItem : Item
+    {
+        public string Name;
     }
 
     class Source : IItemSource

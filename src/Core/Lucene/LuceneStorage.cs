@@ -16,9 +16,45 @@ namespace Core.Lucene
     {
         class LearningStorage
         {
-            public void SaveAll(DirectoryInfo output)
+            public LearningStorage(DirectoryInfo input)
             {
-                foreach (var learning in Learnings)
+                _rootDirectory = input;
+                if(!input.Exists)
+                {
+                    input.Create();
+                    input.Refresh();
+                }
+
+                var dirs = input.EnumerateDirectories("??");
+                _learnings = dirs
+                    .SelectMany(d =>d.EnumerateFiles().Select(f => new {f.Name, Text = File.ReadAllText(f.FullName).Trim()}))
+                    .ToDictionary(t => t.Name, t => t.Text);
+            }
+
+            public string LearningsFor(DocumentId id)
+            {
+                var sha1 = id.GetSha1();
+                if (_learnings.ContainsKey(sha1))
+                {
+                    return _learnings[sha1];
+                }
+                return string.Empty;
+            }
+
+            public string LearnFor(string learning, DocumentId id)
+            {
+                var sha1 = id.GetSha1();
+                if(!_learnings.ContainsKey(sha1))
+                    _learnings[sha1] = learning;
+                else
+                    _learnings[sha1] += " " + learning;
+                WriteLearning(sha1, _learnings[sha1]);
+                return _learnings[sha1];
+            }
+
+            public void SaveAll()
+            {
+                foreach (var learning in _learnings)
                 {
                     var sha1 = learning.Key;
                     var learningValue = learning.Value;
@@ -41,44 +77,9 @@ namespace Core.Lucene
                 return sha1.Substring(0, 1);
             }
 
-            public Dictionary<string, string> Learnings;
-            private DirectoryInfo _rootDirectory;
+            private readonly Dictionary<string, string> _learnings;
 
-            public LearningStorage(DirectoryInfo input)
-            {
-                _rootDirectory = input;
-                if(!input.Exists)
-                {
-                    input.Create();
-                    input.Refresh();
-                }
-
-                var dirs = input.EnumerateDirectories("??");
-                Learnings = dirs
-                    .SelectMany(d =>d.EnumerateFiles().Select(f => new {f.Name, Text = File.ReadAllText(f.FullName).Trim()}))
-                    .ToDictionary(t => t.Name, t => t.Text);
-            }
-
-            public string LearningsFor(DocumentId id)
-            {
-                var sha1 = id.GetSha1();
-                if (Learnings.ContainsKey(sha1))
-                {
-                    return Learnings[sha1];
-                }
-                return string.Empty;
-            }
-
-            public string LearnFor(string learning, DocumentId id)
-            {
-                var sha1 = id.GetSha1();
-                if(!Learnings.ContainsKey(sha1))
-                    Learnings[sha1] = learning;
-                else
-                    Learnings[sha1] += " " + learning;
-                WriteLearning(sha1, Learnings[sha1]);
-                return Learnings[sha1];
-            }
+            private readonly DirectoryInfo _rootDirectory;
         }
 
         private class DocumentId
@@ -122,16 +123,6 @@ namespace Core.Lucene
         {
             SetConverters(converters);
             _learningStorage = new LearningStorage(storageLocation);
-        }
-
-        public IConverter<T> GetConverter<T>()
-        {
-            foreach (var converter in _convertersForNamespaces.Select(kvp => kvp.Value))
-            {
-                if (converter is IConverter<T>)
-                    return (IConverter<T>) converter;
-            }
-            throw new NotImplementedException(string.Format("No converter for {0} found ", typeof (T)));
         }
 
         public void UpdateDocumentForObject(IndexWriter writer, IItemSource source, string tag, object item)
@@ -229,6 +220,26 @@ namespace Core.Lucene
             writer.AddDocument(document);
         }
 
+        public void DeleteDocumentsForSourceWithoutTag(IndexWriter indexWriter, IItemSource source, string tag)
+        {
+            var query = new BooleanQuery();
+            query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.SourceId, SourceId(source))),
+                                        BooleanClause.Occur.MUST));
+            query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.Tag, tag)),
+                                        BooleanClause.Occur.MUST_NOT));
+            indexWriter.DeleteDocuments(query);
+        }
+
+        private IConverter<T> GetConverter<T>()
+        {
+            var converter = _convertersForNamespaces.Select(kvp => kvp.Value).OfType<IConverter<T>>().FirstOrDefault();
+            if (converter == null)
+            {
+                throw new NotImplementedException(string.Format("No converter for {0} found ", typeof (T)));
+            }
+            return converter;
+        }
+
         private Document PopDocument(IndexWriter writer, string sha1)
         {
             var searcher = new IndexSearcher(writer.GetDirectory(), false);
@@ -249,16 +260,6 @@ namespace Core.Lucene
             {
                 searcher.Close();
             }
-        }
-
-        public void DeleteDocumentsForSourceWithoutTag(IndexWriter indexWriter, IItemSource source, string tag)
-        {
-            var query = new BooleanQuery();
-            query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.SourceId, SourceId(source))),
-                                        BooleanClause.Occur.MUST));
-            query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.Tag, tag)),
-                                        BooleanClause.Occur.MUST_NOT));
-            indexWriter.DeleteDocuments(query);
         }
 
         public void SetConverters(IEnumerable<IConverter> converters)
