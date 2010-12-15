@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Core.Abstractions;
 using Lucene.Net.Analysis.Standard;
@@ -18,8 +19,7 @@ namespace Core.Lucene
     {
         private readonly CompositionContainer _mefContainer;
 
-        [ImportMany]
-        public IEnumerable<IConverter> Converters { get; set; }
+        
 
         [Import(AllowRecomposition = true)]
         public AutoCompleteConfiguration Configuration { get; set; }
@@ -30,15 +30,14 @@ namespace Core.Lucene
             _mefContainer.SatisfyImportsOnce(this);
         }
 
-        private AutoCompleteBasedOnLucene(Directory directory)
-            : base(directory)
+        private AutoCompleteBasedOnLucene(Directory directory, DirectoryInfo learningStorageLocation)
+            : base(directory, learningStorageLocation)
         {
-            
         }
 
-        public static AutoCompleteBasedOnLucene WithDirectory(Directory directory)
+        public static AutoCompleteBasedOnLucene WithDirectory(Directory directory, DirectoryInfo storageLocation)
         {
-            return new AutoCompleteBasedOnLucene(directory);
+            return new AutoCompleteBasedOnLucene(directory, storageLocation);
         }
 
         public AutoCompletionResult Autocomplete(string text)
@@ -48,8 +47,6 @@ namespace Core.Lucene
             var searcher = new IndexSearcher(Directory, true);
             try
             {
-                var converterHost = new LuceneStorage(Converters);
-
                 var queryParser = new MultiFieldQueryParser(Version.LUCENE_29,
                                                             new[] {SpecialFields.Name, SpecialFields.Learnings},
                                                             new StandardAnalyzer(Version.LUCENE_29));
@@ -75,7 +72,7 @@ namespace Core.Lucene
                                 {
                                     try
                                     {
-                                        return converterHost.GetCommandResultForDocument(searcher.Doc(d.doc));
+                                        return Storage.GetCommandResultForDocument(searcher.Doc(d.doc));
                                     }
                                     catch (Exception e)
                                     {
@@ -99,8 +96,7 @@ namespace Core.Lucene
             try
             {
                 writer = GetIndexWriter();
-                var host = new LuceneStorage(Converters);
-                host.LearnCommandForInput(writer, result.CompletionId, input);
+                Storage.LearnCommandForInput(writer, result.CompletionId, input);
             }
             finally
             {
