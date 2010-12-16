@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.Lucene;
 
 namespace Core.Abstractions
 {
@@ -7,10 +8,10 @@ namespace Core.Abstractions
     {
         public class CommandResult
         {
-            public object CompletionId { get; private set; }
+            public DocumentId CompletionId { get; private set; }
             public IItem Item { get; private set; }
 
-            public CommandResult(IItem item, object completionId)
+            public CommandResult(IItem item, DocumentId completionId)
             {
                 Item = item;
                 CompletionId = completionId;
