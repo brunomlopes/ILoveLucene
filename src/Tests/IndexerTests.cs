@@ -193,7 +193,6 @@ namespace Tests
 
     class SubItem : Item
     {
-        public string Name;
     }
 
     class Source : IItemSource

@@ -80,6 +80,7 @@
     <Compile Include="Lucene\AutoCompleteConfiguration.cs" />
     <Compile Include="Lucene\Indexer.cs" />
     <Compile Include="Lucene\IndexerConfiguration.cs" />
+    <Compile Include="Lucene\LearningStorage.cs" />
     <Compile Include="Lucene\LuceneBase.cs" />
     <Compile Include="Lucene\LuceneStorage.cs" />
     <Compile Include="Lucene\ScheduleIndexJobs.cs" />
