@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
@@ -17,6 +19,7 @@ using ILoveLucene.ViewModels;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Simpl;
+using Autofac.Integration.Mef;
 
 namespace ILoveLucene
 {
@@ -29,16 +32,19 @@ namespace ILoveLucene
             base.ConfigureContainer(builder);
 
             var assemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
+            var catalogs = new ComposablePartCatalog[]
+                               {
+                                   new AggregateCatalog(
+                                       AssemblySource.Instance.Select(x => new AssemblyCatalog(x))
+                                           .OfType<ComposablePartCatalog>()),
+                                   new DirectoryCatalog(assemblyDirectory, "Plugins.*.dll"),
+                                   new DirectoryCatalog(assemblyDirectory, "Plugins.dll"),
+                                   new AssemblyCatalog(typeof (IItem).Assembly)
+                               };
 
             MefContainer =
-                CompositionHost.Initialize(new AggregateCatalog(
-                                               AssemblySource.Instance.Select(x => new AssemblyCatalog(x))
-                                                   .OfType<ComposablePartCatalog>()),
-                                           new DirectoryCatalog(assemblyDirectory, "Plugins.*.dll"),
-                                           new DirectoryCatalog(assemblyDirectory, "Plugins.dll"),
-                                           new AssemblyCatalog(typeof (Core.Abstractions.IItem).Assembly)
-                    );
+                CompositionHost.Initialize(catalogs);
+
 
             var loadConfiguration =
                 new LoadConfiguration(new DirectoryInfo(Path.Combine(assemblyDirectory, "Configuration")));
@@ -51,11 +57,12 @@ namespace ILoveLucene
             var batch = new CompositionBatch();
             batch.AddExportedValue(MefContainer);
             batch.AddExportedValue<ILoadConfiguration>(loadConfiguration);
-            batch.AddExportedValue(scheduler);
+
             MefContainer.Compose(batch);
 
             builder.RegisterInstance(MefContainer).AsSelf();
 
+            builder.RegisterInstance(scheduler).As<IScheduler>();
             builder.RegisterInstance<IWindowManager>(new WindowManager());
             builder.RegisterInstance<IEventAggregator>(new EventAggregator());
 
@@ -65,18 +72,29 @@ namespace ILoveLucene
             builder.RegisterType<AutoCompleteBasedOnLucene>().As<IAutoCompleteText>();
             builder.RegisterType<GetActionsForItem>().As<IGetActionsForItem>();
 
+            var root = new FileInfo(Assembly.GetCallingAssembly().Location).DirectoryName;
+            var learningStorageLocation = new DirectoryInfo(Path.Combine(root, "learnings"));
+            var indexStorageLocation = new DirectoryInfo(Path.Combine(root, "index"));
+
+            builder.RegisterType<LuceneStorage>().As<LuceneStorage>();
+
+            builder.RegisterType<LearningStorage>().As<ILearningStorage>().WithParameter("input", learningStorageLocation);
+            builder.RegisterType<ScheduleIndexJobs>().As<IStartupTask>();
+
+            builder.RegisterType<FsStaticDirectoryFactory>().As<IDirectoryFactory>().WithParameter("root", indexStorageLocation);
         }
 
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
             base.OnStartup(sender, e);
-            MefContainer.GetExportedValue<IScheduler>().Start();
-            MefContainer.GetExportedValues<IStartupTask>().AsParallel().ForAll(t => t.Execute());
+            
+            Container.Resolve<IScheduler>().Start();
+            Container.Resolve<IEnumerable<IStartupTask>>().AsParallel().ForAll(t => t.Execute());
         }
 
         protected override void OnExit(object sender, EventArgs e)
         {
-            MefContainer.GetExportedValue<IScheduler>().Shutdown();
+            Container.Resolve<IScheduler>().Shutdown();
             base.OnExit(sender, e);
         }
     }

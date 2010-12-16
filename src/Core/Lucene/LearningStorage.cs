@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Core.Lucene
 {
-    class LearningStorage
+    public class LearningStorage : ILearningStorage
     {
         public LearningStorage(DirectoryInfo input)
         {

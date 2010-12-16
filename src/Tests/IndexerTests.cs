@@ -15,6 +15,7 @@ namespace Tests
     public class IndexerTests
     {
         private DirectoryInfo _storageLocation;
+        private LearningStorage _learningStorage;
 
         public IndexerTests()
         {
@@ -24,6 +25,8 @@ namespace Tests
                 _storageLocation.Delete(true);
                 _storageLocation.Refresh();
             }
+
+            _learningStorage = new LearningStorage(_storageLocation);
         }
 
         [Fact]
@@ -126,20 +129,20 @@ namespace Tests
         [Fact]
         public void CannotFindItemWhenItIsRemovedAfterBeingIndexed()
         {
-            
+            var converters = new[] { new Converter() };
+
+            var storage = new LuceneStorage(converters, _learningStorage);            
             var directory = new RAMDirectory();
-            var indexer = new Indexer(directory, _storageLocation);
-            indexer.Converters = new[] { new Converter() };
+            var indexer = new Indexer(directory, storage);
 
             var source = new Source();
 
             source.Items = new[] {new Item {Id = "simple"}};
-            var luceneStorage = new LuceneStorage(indexer.Converters, _storageLocation);
             indexer.IndexItems(source, source.Items);
             source.Items = new Item[] {};
             indexer.IndexItems(source, source.Items);
 
-            var searcher = GetAutocompleter(directory);
+            var searcher = GetAutocompleter(directory, storage);
 
             var results = searcher.Autocomplete("simple");
             Assert.False(results.HasAutoCompletion);
@@ -149,16 +152,17 @@ namespace Tests
         [Fact]
         public void CannotFindItemWhenIndexIsEmpty()
         {
+            var converters = new[] { new Converter() };
             var directory = new RAMDirectory();
-            var indexer = new Indexer(directory, _storageLocation);
-            indexer.Converters = new[] { new Converter() };
+            var storage = new LuceneStorage(converters, _learningStorage);
+            var indexer = new Indexer(directory, storage);
 
             var source = new Source();
 
             source.Items = new Item[] {};
             indexer.IndexItems(source, source.Items);
 
-            var searcher = GetAutocompleter(directory);
+            var searcher = GetAutocompleter(directory, storage);
 
             var results = searcher.Autocomplete("simple");
             Assert.False(results.HasAutoCompletion);
@@ -167,7 +171,13 @@ namespace Tests
 
         private AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory)
         {
-            var searcher = AutoCompleteBasedOnLucene.WithDirectory(directory, _storageLocation);
+            var converters = new[] { new Converter() };
+            return GetAutocompleter(directory, new LuceneStorage(converters, _learningStorage));
+        }
+
+        private AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory, LuceneStorage storage)
+        {
+            var searcher = AutoCompleteBasedOnLucene.WithDirectory(new StaticDirectoryFactory(directory), storage);
             searcher.Configuration = new AutoCompleteConfiguration();
             searcher.Converters = new[] {new Converter()};
             return searcher;
@@ -175,9 +185,11 @@ namespace Tests
 
         private RAMDirectory IndexItemIntoDirectory(params Item[] items)
         {
+            var converters = new[] { new Converter() };
+            var storage = new LuceneStorage(converters, _learningStorage);
+
             var directory = new RAMDirectory();
-            var indexer = new Indexer(directory, _storageLocation);
-            indexer.Converters = new[] { new Converter() };
+            var indexer = new Indexer(directory, storage);
             var source = new Source();
 
             source.Items = items;
@@ -195,11 +207,11 @@ namespace Tests
     {
     }
 
-    class Source : IItemSource
+    class Source : BaseItemSource
     {
         public IEnumerable<Item> Items { get; set; }
 
-        public Task<IEnumerable<object>> GetItems()
+        public override Task<IEnumerable<object>> GetItems()
         {
             return Task.Factory.StartNew(() => Items.Cast<object>());
         }

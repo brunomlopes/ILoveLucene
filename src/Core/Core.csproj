@@ -79,7 +79,9 @@
     <Compile Include="Lucene\AnalyzerExtension.cs" />
     <Compile Include="Lucene\AutoCompleteBasedOnLucene.cs" />
     <Compile Include="Lucene\AutoCompleteConfiguration.cs" />
+    <Compile Include="Lucene\ILearningStorage.cs" />
     <Compile Include="Lucene\Indexer.cs" />
+    <Compile Include="Lucene\IndexerJob.cs" />
     <Compile Include="Lucene\IndexerConfiguration.cs" />
     <Compile Include="Lucene\LearningStorage.cs" />
     <Compile Include="Lucene\LuceneBase.cs" />

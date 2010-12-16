@@ -12,7 +12,7 @@ namespace Plugins.Shortcuts
 {
     [Export(typeof (ShortcutSource))]
     [Export(typeof (IItemSource))]
-    public class ShortcutSource : IItemSource
+    public class ShortcutSource : BaseItemSource
     {
         private HashSet<FileInfo> _shortcutPaths;
         private static readonly object _shortcutPathsLock = new object();
@@ -58,7 +58,7 @@ namespace Plugins.Shortcuts
             directoryInfos.ForEach(d => ScanDirectoryForShortcuts(d.FullName));
         }
 
-        public Task<IEnumerable<object>> GetItems()
+        public override Task<IEnumerable<object>> GetItems()
         {
             return Task.Factory.StartNew(() =>
                                              {

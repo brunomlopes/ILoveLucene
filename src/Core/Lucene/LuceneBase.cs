@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Reflection;
@@ -13,6 +14,7 @@ namespace Core.Lucene
 {
     public class LuceneBase  
     {
+        protected readonly IDirectoryFactory DirectoryFactory;
         public Directory Directory { get; private set; }
         protected DirectoryInfo LearningStorageLocation;
         protected LuceneStorage Storage;
@@ -30,23 +32,10 @@ namespace Core.Lucene
             }
         }
 
-        public LuceneBase()
+        public LuceneBase(IDirectoryFactory directoryFactory, LuceneStorage storage)
         {
-            var root = new FileInfo(Assembly.GetCallingAssembly().Location).DirectoryName;
-            var indexDirectory =
-                new DirectoryInfo(Path.Combine(root,
-                                               "index"));
-            Directory = new SimpleFSDirectory(indexDirectory);
-            LearningStorageLocation = new DirectoryInfo(Path.Combine(root, "learnings"));
-            Storage = new LuceneStorage(new IConverter[]{}, LearningStorageLocation);
-
-        }
-
-        protected LuceneBase(Directory directory, DirectoryInfo learningStorageLocation)
-        {
-            Directory = directory;
-            LearningStorageLocation = learningStorageLocation;
-            Storage = new LuceneStorage(new IConverter[] { }, LearningStorageLocation);
+            DirectoryFactory = directoryFactory;
+            Storage = storage;
 
         }
 
@@ -65,5 +54,37 @@ namespace Core.Lucene
         {
             return IndexReader.Open(Directory, true);
         }
+    }
+
+    public interface IDirectoryFactory
+    {
+        Directory DirectoryFor(string name, bool persistent = false);
+    }
+
+    /// <summary>
+    /// returns always the same directory
+    /// </summary>
+    public class StaticDirectoryFactory : IDirectoryFactory
+    {
+        private readonly Directory _directory;
+
+        public StaticDirectoryFactory(Directory directory)
+        {
+            _directory = directory;
+        }
+
+        public Directory DirectoryFor(string name, bool persistent = false)
+        {
+            return _directory;
+        }
+    }
+
+    public class FsStaticDirectoryFactory : StaticDirectoryFactory
+    {
+        public FsStaticDirectoryFactory(DirectoryInfo root)
+            : base(new SimpleFSDirectory(root))
+        {
+        }
+
     }
 }

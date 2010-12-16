@@ -19,25 +19,24 @@ namespace Core.Lucene
     {
         private readonly CompositionContainer _mefContainer;
 
-        
-
         [Import(AllowRecomposition = true)]
         public AutoCompleteConfiguration Configuration { get; set; }
 
-        public AutoCompleteBasedOnLucene(CompositionContainer mefContainer)
+        public AutoCompleteBasedOnLucene(CompositionContainer mefContainer, IDirectoryFactory directoryFactory, LuceneStorage learningStorage)
+            : base(directoryFactory, learningStorage)
         {
             _mefContainer = mefContainer;
             _mefContainer.SatisfyImportsOnce(this);
         }
 
-        private AutoCompleteBasedOnLucene(Directory directory, DirectoryInfo learningStorageLocation)
-            : base(directory, learningStorageLocation)
+        private AutoCompleteBasedOnLucene(IDirectoryFactory directoryFactory, LuceneStorage learningStorage)
+            : base(directoryFactory, learningStorage)
         {
         }
 
-        public static AutoCompleteBasedOnLucene WithDirectory(Directory directory, DirectoryInfo storageLocation)
+        public static AutoCompleteBasedOnLucene WithDirectory(IDirectoryFactory directoryFactory, LuceneStorage learningStorage)
         {
-            return new AutoCompleteBasedOnLucene(directory, storageLocation);
+            return new AutoCompleteBasedOnLucene(directoryFactory, learningStorage);
         }
 
         public AutoCompletionResult Autocomplete(string text)

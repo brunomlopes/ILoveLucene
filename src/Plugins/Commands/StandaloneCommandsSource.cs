@@ -9,12 +9,12 @@ using Core.Abstractions;
 namespace Plugins.Commands
 {
     [Export(typeof (IItemSource))]
-    public class StandaloneCommandsSource : IItemSource
+    public class StandaloneCommandsSource : BaseItemSource
     {
         [ImportMany(AllowRecomposition = true)] 
         public IEnumerable<ICommand> Commands;
 
-        public Task<IEnumerable<object>> GetItems()
+        public override Task<IEnumerable<object>> GetItems()
         {
             var commands = Commands; //FIXME:  this can be recomposed mid-iteration. we don't want that for now
             return Task.Factory.StartNew(() => commands.Cast<Object>());

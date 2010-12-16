@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using Core.Abstractions;
 using Lucene.Net.Documents;
@@ -13,12 +12,12 @@ namespace Core.Lucene
     public class LuceneStorage
     {
         private Dictionary<string, IConverter> _convertersForNamespaces;
-        private LearningStorage _learningStorage;
+        private readonly ILearningStorage _learningStorage;
 
-        public LuceneStorage(IEnumerable<IConverter> converters, DirectoryInfo storageLocation)
+        public LuceneStorage(IEnumerable<IConverter> converters, ILearningStorage learningStorage)
         {
             SetConverters(converters);
-            _learningStorage = new LearningStorage(storageLocation);
+            _learningStorage = learningStorage;
         }
 
         public void UpdateDocumentForObject(IndexWriter writer, IItemSource source, string tag, object item)

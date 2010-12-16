@@ -46,6 +46,7 @@ namespace ILoveLucene.ViewModels
                                                   SelectedAction.ActOn(Result.Item);
                                               }
                                               _autoCompleteText.LearnInputForCommandResult(Input, Result);
+                                              //_getActionsForItem.LearnActionForCommandResult(Input, SelectedAction, Result);
 
                                               Input = string.Empty;
                                               Arguments = string.Empty;
