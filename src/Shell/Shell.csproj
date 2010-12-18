@@ -79,6 +79,7 @@
     <Compile Include="AutofacBootstrapper.cs" />
     <Compile Include="Commands\XCopyPathToClipboard.cs" />
     <Compile Include="Modules\LoggingModule.cs" />
+    <Compile Include="Modules\SatisfyMefImports.cs" />
     <Compile Include="TypedAutofacBootStrapper.cs" />
     <Compile Include="Commands\ExitApplication.cs" />
     <Compile Include="DebugLogger.cs" />

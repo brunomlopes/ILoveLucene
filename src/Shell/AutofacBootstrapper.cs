@@ -45,7 +45,6 @@ namespace ILoveLucene
             MefContainer =
                 CompositionHost.Initialize(catalogs);
 
-
             var loadConfiguration =
                 new LoadConfiguration(new DirectoryInfo(Path.Combine(assemblyDirectory, "Configuration")));
             loadConfiguration
@@ -67,6 +66,7 @@ namespace ILoveLucene
             builder.RegisterInstance<IEventAggregator>(new EventAggregator());
 
             builder.RegisterModule(new LoggingModule());
+            builder.RegisterModule(new SatisfyMefImports(MefContainer));
 
             builder.RegisterType<MainWindowViewModel>().As<IShell>();
             builder.RegisterType<AutoCompleteBasedOnLucene>().As<IAutoCompleteText>();
