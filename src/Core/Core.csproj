@@ -71,12 +71,12 @@
     <Compile Include="Abstractions\IStartupTask.cs" />
     <Compile Include="Abstractions\PluginConfigurationAttribute.cs" />
     <Compile Include="Abstractions\TextItem.cs" />
+    <Compile Include="Extensions\AnalyzerExtension.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="GetActionsForItem.cs" />
     <Compile Include="LoadConfiguration.cs" />
     <Compile Include="ConfigurationPart.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />
-    <Compile Include="Lucene\AnalyzerExtension.cs" />
     <Compile Include="Lucene\AutoCompleteBasedOnLucene.cs" />
     <Compile Include="Lucene\AutoCompleteConfiguration.cs" />
     <Compile Include="Lucene\ILearningStorage.cs" />

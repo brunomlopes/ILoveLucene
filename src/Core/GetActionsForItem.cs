@@ -11,9 +11,8 @@ namespace Core
         [ImportMany(typeof(IActOnItem), AllowRecomposition = true)]
         public IEnumerable<IActOnItem> Actions { get; set; }
 
-        public GetActionsForItem(CompositionContainer container)
+        public GetActionsForItem()
         {
-            container.SatisfyImportsOnce(this);
         }
         
         public GetActionsForItem(IEnumerable<IActOnItem> actions)

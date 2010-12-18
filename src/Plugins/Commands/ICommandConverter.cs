@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using Core.Abstractions;
 using Lucene.Net.Documents;
@@ -11,17 +10,8 @@ namespace Plugins.Commands
     [Export(typeof (IConverter))]
     public class ICommandConverter : IConverter<ICommand>
     {
-        private readonly CompositionContainer _mefContainer;
-
         [ImportMany(AllowRecomposition = true)]
         public IEnumerable<ICommand> Commands { get; set; }
-
-        [ImportingConstructor]
-        public ICommandConverter(CompositionContainer mefContainer)
-        {
-            _mefContainer = mefContainer;
-            _mefContainer.SatisfyImportsOnce(this);
-        }
 
         public Type ConvertedType
         {

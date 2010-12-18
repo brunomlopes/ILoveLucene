@@ -56,7 +56,6 @@ namespace ILoveLucene
             var batch = new CompositionBatch();
             batch.AddExportedValue(MefContainer);
             batch.AddExportedValue<ILoadConfiguration>(loadConfiguration);
-
             MefContainer.Compose(batch);
 
             builder.RegisterInstance(MefContainer).AsSelf();

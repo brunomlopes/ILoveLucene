@@ -3,7 +3,7 @@ using System.IO;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Tokenattributes;
 
-namespace Core.Lucene
+namespace Core.Extensions
 {
     public static class AnalyzerExtension
     {

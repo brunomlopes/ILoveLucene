@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
 using Core.Abstractions;
@@ -14,9 +15,21 @@ namespace Core.Lucene
         private Dictionary<string, IConverter> _convertersForNamespaces;
         private readonly ILearningStorage _learningStorage;
 
-        public LuceneStorage(IEnumerable<IConverter> converters, ILearningStorage learningStorage)
+        private IEnumerable<IConverter> _converters;
+
+        [ImportMany(typeof(IConverter))]
+        public IEnumerable<IConverter> Converters
         {
-            SetConverters(converters);
+            get { return _converters; }
+            set
+            {
+                _converters = value;
+                _convertersForNamespaces = _converters.ToDictionary(c => c.GetNamespaceForItems());
+            }
+        }
+
+        public LuceneStorage(ILearningStorage learningStorage)
+        {
             _learningStorage = learningStorage;
         }
 
@@ -149,11 +162,6 @@ namespace Core.Lucene
             {
                 searcher.Close();
             }
-        }
-
-        public void SetConverters(IEnumerable<IConverter> converters)
-        {
-            _convertersForNamespaces = converters.ToDictionary(c => c.GetNamespaceForItems());
         }
     }
 }

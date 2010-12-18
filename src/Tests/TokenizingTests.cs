@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Core.Lucene;
+using Core.Extensions;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Util;
 using Xunit;

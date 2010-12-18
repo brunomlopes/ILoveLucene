@@ -19,18 +19,8 @@ namespace Core.Lucene
         protected DirectoryInfo LearningStorageLocation;
         protected LuceneStorage Storage;
 
-        private IEnumerable<IConverter> _converters;
-
         [ImportMany]
-        public IEnumerable<IConverter> Converters
-        {
-            get { return _converters; }
-            set
-            {
-                _converters = value;
-                Storage.SetConverters(Converters);
-            }
-        }
+        public IEnumerable<IConverter> Converters { get; set; }
 
         public LuceneBase(IDirectoryFactory directoryFactory, LuceneStorage storage)
         {
@@ -59,6 +49,7 @@ namespace Core.Lucene
     public interface IDirectoryFactory
     {
         Directory DirectoryFor(string name, bool persistent = false);
+        IEnumerable<Directory> GetAllDirectories();
     }
 
     /// <summary>
@@ -76,6 +67,11 @@ namespace Core.Lucene
         public Directory DirectoryFor(string name, bool persistent = false)
         {
             return _directory;
+        }
+
+        public IEnumerable<Directory> GetAllDirectories()
+        {
+            return new[] {_directory};
         }
     }
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -17,33 +16,19 @@ namespace Core.Lucene
 {
     public class AutoCompleteBasedOnLucene : LuceneBase, IAutoCompleteText
     {
-        private readonly CompositionContainer _mefContainer;
-
         [Import(AllowRecomposition = true)]
         public AutoCompleteConfiguration Configuration { get; set; }
 
-        public AutoCompleteBasedOnLucene(CompositionContainer mefContainer, IDirectoryFactory directoryFactory, LuceneStorage learningStorage)
+        public AutoCompleteBasedOnLucene(IDirectoryFactory directoryFactory, LuceneStorage learningStorage)
             : base(directoryFactory, learningStorage)
-        {
-            _mefContainer = mefContainer;
-            _mefContainer.SatisfyImportsOnce(this);
-        }
-
-        private AutoCompleteBasedOnLucene(IDirectoryFactory directoryFactory, LuceneStorage learningStorage)
-            : base(directoryFactory, learningStorage)
-        {
-        }
-
-        public static AutoCompleteBasedOnLucene WithDirectory(IDirectoryFactory directoryFactory, LuceneStorage learningStorage)
-        {
-            return new AutoCompleteBasedOnLucene(directoryFactory, learningStorage);
-        }
+        {}
 
         public AutoCompletionResult Autocomplete(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return AutoCompletionResult.NoResult(text);
 
-            var searcher = new IndexSearcher(Directory, true);
+            var searchers = DirectoryFactory.GetAllDirectories().Select(d => new IndexSearcher(d, true)).ToArray();
+            var searcher = new MultiSearcher(searchers);
             try
             {
                 var queryParser = new MultiFieldQueryParser(Version.LUCENE_29,

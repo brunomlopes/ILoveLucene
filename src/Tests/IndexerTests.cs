@@ -131,7 +131,7 @@ namespace Tests
         {
             var converters = new[] { new Converter() };
 
-            var storage = new LuceneStorage(converters, _learningStorage);            
+            var storage = new LuceneStorage(_learningStorage);            
             var directory = new RAMDirectory();
             var indexer = new Indexer(directory, storage);
 
@@ -154,7 +154,7 @@ namespace Tests
         {
             var converters = new[] { new Converter() };
             var directory = new RAMDirectory();
-            var storage = new LuceneStorage(converters, _learningStorage);
+            var storage = new LuceneStorage(_learningStorage);
             var indexer = new Indexer(directory, storage);
 
             var source = new Source();
@@ -172,12 +172,12 @@ namespace Tests
         private AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory)
         {
             var converters = new[] { new Converter() };
-            return GetAutocompleter(directory, new LuceneStorage(converters, _learningStorage));
+            return GetAutocompleter(directory, new LuceneStorage(_learningStorage));
         }
 
-        private AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory, LuceneStorage storage)
+        private static AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory, LuceneStorage storage)
         {
-            var searcher = AutoCompleteBasedOnLucene.WithDirectory(new StaticDirectoryFactory(directory), storage);
+            var searcher = new AutoCompleteBasedOnLucene(new StaticDirectoryFactory(directory), storage);
             searcher.Configuration = new AutoCompleteConfiguration();
             searcher.Converters = new[] {new Converter()};
             return searcher;
@@ -186,7 +186,7 @@ namespace Tests
         private RAMDirectory IndexItemIntoDirectory(params Item[] items)
         {
             var converters = new[] { new Converter() };
-            var storage = new LuceneStorage(converters, _learningStorage);
+            var storage = new LuceneStorage(_learningStorage);
 
             var directory = new RAMDirectory();
             var indexer = new Indexer(directory, storage);

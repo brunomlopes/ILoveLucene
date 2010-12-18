@@ -27,14 +27,13 @@ namespace Core.Lucene
         [Export("IIndexer.JobGroup")]
         public const string JobGroup = "Indexers";
 
-        public ScheduleIndexJobs(LuceneStorage luceneStorage, IDirectoryFactory directoryFactory, IScheduler scheduler, CompositionContainer container)
+        public ScheduleIndexJobs(LuceneStorage luceneStorage, IDirectoryFactory directoryFactory, IScheduler scheduler)
         {
             _luceneStorage = luceneStorage;
             _directoryFactory = directoryFactory;
             _scheduler = scheduler;
             Sources = new IItemSource[] { };
             Converters = new IConverter[] { };
-            container.SatisfyImportsOnce(this);
         }
 
         public void Execute()
