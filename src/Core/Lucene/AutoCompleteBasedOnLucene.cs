@@ -38,12 +38,12 @@ namespace Core.Lucene
             try
             {
                 var queryParser = new MultiFieldQueryParser(Version.LUCENE_29,
-                                                            new[] {SpecialFields.Name, SpecialFields.Learnings},
+                                                            new[] { SpecialFields.Name, SpecialFields.Learnings },
                                                             new StandardAnalyzer(Version.LUCENE_29));
                 queryParser.SetFuzzyMinSim((float)Configuration.FuzzySimilarity);
                 queryParser.SetDefaultOperator(QueryParser.Operator.AND);
 
-                var textWithSubString = "*"+text.Trim().Replace(" ", "* *").Trim() + "*";
+                var textWithSubString = "*" + text.Trim().Replace(" ", "* *").Trim() + "*";
                 var textWithFuzzy = text.Trim().Replace(" ", "~ ").Trim() + "~";
 
                 queryParser.SetAllowLeadingWildcard(true);
@@ -51,7 +51,7 @@ namespace Core.Lucene
                 Query substringQuery = queryParser.Parse(textWithSubString);
                 Query fuzzyQuery = queryParser.Parse(textWithFuzzy);
 
-                
+
                 var query = new BooleanQuery();
                 query.Add(fuzzyQuery, BooleanClause.Occur.SHOULD);
                 query.Add(substringQuery, BooleanClause.Occur.SHOULD);
@@ -81,21 +81,17 @@ namespace Core.Lucene
                 _log.Error(e, "Error parsing '{0}'", text);
                 return AutoCompletionResult.NoResult(text);
             }
+            finally
+            {
+                searcher.Close();
+            }
         }
 
         public void LearnInputForCommandResult(string input, AutoCompletionResult.CommandResult result)
         {
-            IndexWriter writer = null;
-            try
-            {
-                var storage = _sourceStorageFactory.SourceStorageFor(result.CompletionId.SourceId);
+            var storage = _sourceStorageFactory.SourceStorageFor(result.CompletionId.SourceId);
 
-                storage.LearnCommandForInput(result.CompletionId, input);
-            }
-            finally
-            {
-                if (writer != null) writer.Close();
-            }
+            storage.LearnCommandForInput(result.CompletionId, input);
         }
     }
 }

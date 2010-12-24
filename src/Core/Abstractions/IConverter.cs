@@ -20,7 +20,7 @@ namespace Core.Abstractions
     {
         public static string GetId(this IConverter self)
         {
-            return self.ConvertedType.FullName;
+            return self.GetType().FullName;
         }
     }
 }

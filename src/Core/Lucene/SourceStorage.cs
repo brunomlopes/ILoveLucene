@@ -77,7 +77,15 @@ namespace Core.Lucene
 
         public void LearnCommandForInput(DocumentId completionId, string input)
         {
-            _storage.LearnCommandForInput(GetIndexWriter(), completionId, input);
+            var indexWriter = GetIndexWriter();
+            try
+            {
+                _storage.LearnCommandForInput(indexWriter, completionId, input);
+            }
+            finally
+            {
+                indexWriter.Close();
+            }
         }
     }
 }
