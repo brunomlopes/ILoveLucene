@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Caliburn.Micro">
+      <HintPath>..\..\lib\caliburn_micro\Caliburn.Micro.dll</HintPath>
+    </Reference>
     <Reference Include="Lucene.Net, Version=2.9.2.2, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.ComponentModel.Composition.Initialization.Desktop">
       <HintPath>..\..\lib\composition.initialization.desktop\Microsoft.ComponentModel.Composition.Initialization.Desktop.dll</HintPath>
@@ -74,6 +77,10 @@
     <ProjectReference Include="..\Plugins\Plugins.csproj">
       <Project>{133FD5D5-7C29-4A09-9DD3-A8E1506767C7}</Project>
       <Name>Plugins</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shell\Shell.csproj">
+      <Project>{F296D053-4820-4CC9-9A4F-BFD0517BE7A5}</Project>
+      <Name>Shell</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

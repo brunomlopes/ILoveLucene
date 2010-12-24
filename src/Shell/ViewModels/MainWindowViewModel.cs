@@ -10,6 +10,7 @@ using Core.Abstractions;
 using Core.Extensions;
 using ILoveLucene.Views;
 using Plugins.Shortcuts;
+using ILog = Caliburn.Micro.ILog;
 
 namespace ILoveLucene.ViewModels
 {
@@ -17,13 +18,14 @@ namespace ILoveLucene.ViewModels
     {
         private readonly IAutoCompleteText _autoCompleteText;
         private readonly IGetActionsForItem _getActionsForItem;
-        private readonly ILog _log = LogManager.GetLog(typeof (MainWindowViewModel));
+        private readonly ILog _log;
         private CancellationTokenSource _cancelationTokenSource;
 
-        public MainWindowViewModel(IAutoCompleteText autoCompleteText, IGetActionsForItem getActionsForItem)
+        public MainWindowViewModel(IAutoCompleteText autoCompleteText, IGetActionsForItem getActionsForItem, ILog log)
         {
             _autoCompleteText = autoCompleteText;
             _getActionsForItem = getActionsForItem;
+            _log = log;
             _cancelationTokenSource = new CancellationTokenSource();
             _argumentCancelationTokenSource = new CancellationTokenSource();
             CommandOptions = new List<AutoCompletionResult.CommandResult>();

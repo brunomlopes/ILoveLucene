@@ -68,6 +68,7 @@
     <Compile Include="Abstractions\IConverter.cs" />
     <Compile Include="Abstractions\IItemSource.cs" />
     <Compile Include="Abstractions\ILoadConfiguration.cs" />
+    <Compile Include="Abstractions\ILog.cs" />
     <Compile Include="Abstractions\IStartupTask.cs" />
     <Compile Include="Abstractions\PluginConfigurationAttribute.cs" />
     <Compile Include="Abstractions\TextItem.cs" />

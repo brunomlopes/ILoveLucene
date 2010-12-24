@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Abstractions;
 using Core.Lucene;
+using ILoveLucene;
 using Lucene.Net.Documents;
 using Lucene.Net.Store;
 using Xunit;
@@ -171,13 +172,12 @@ namespace Tests
 
         private AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory)
         {
-            var converters = new[] { new Converter() };
             return GetAutocompleter(directory, new LuceneStorage(_learningStorage));
         }
 
         private static AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory, LuceneStorage storage)
         {
-            var searcher = new AutoCompleteBasedOnLucene(new StaticDirectoryFactory(directory), storage);
+            var searcher = new AutoCompleteBasedOnLucene(new StaticDirectoryFactory(directory), storage, new DebugLogger());
             searcher.Configuration = new AutoCompleteConfiguration();
             searcher.Converters = new[] {new Converter()};
             return searcher;

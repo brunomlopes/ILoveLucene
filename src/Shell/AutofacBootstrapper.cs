@@ -64,16 +64,20 @@ namespace ILoveLucene
             builder.RegisterInstance<IWindowManager>(new WindowManager());
             builder.RegisterInstance<IEventAggregator>(new EventAggregator());
 
-            builder.RegisterModule(new LoggingModule());
+            var root = new FileInfo(Assembly.GetCallingAssembly().Location).DirectoryName;
+            var learningStorageLocation = new DirectoryInfo(Path.Combine(root, "learnings"));
+            var indexStorageLocation = new DirectoryInfo(Path.Combine(root, "index"));
+            var logFileLocation = new FileInfo(Path.Combine(root, "log.txt"));
+
+
+            builder.RegisterModule(new LoggingModule(t => new FileLogger(logFileLocation, t.Name)));
             builder.RegisterModule(new SatisfyMefImports(MefContainer));
 
             builder.RegisterType<MainWindowViewModel>().As<IShell>();
             builder.RegisterType<AutoCompleteBasedOnLucene>().As<IAutoCompleteText>();
             builder.RegisterType<GetActionsForItem>().As<IGetActionsForItem>();
 
-            var root = new FileInfo(Assembly.GetCallingAssembly().Location).DirectoryName;
-            var learningStorageLocation = new DirectoryInfo(Path.Combine(root, "learnings"));
-            var indexStorageLocation = new DirectoryInfo(Path.Combine(root, "index"));
+            
 
             builder.RegisterType<LuceneStorage>().As<LuceneStorage>();
 

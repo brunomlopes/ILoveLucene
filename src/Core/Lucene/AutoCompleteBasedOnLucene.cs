@@ -16,12 +16,16 @@ namespace Core.Lucene
 {
     public class AutoCompleteBasedOnLucene : LuceneBase, IAutoCompleteText
     {
+        private readonly ILog _log;
+
         [Import(AllowRecomposition = true)]
         public AutoCompleteConfiguration Configuration { get; set; }
 
-        public AutoCompleteBasedOnLucene(IDirectoryFactory directoryFactory, LuceneStorage learningStorage)
+        public AutoCompleteBasedOnLucene(IDirectoryFactory directoryFactory, LuceneStorage learningStorage, ILog log)
             : base(directoryFactory, learningStorage)
-        {}
+        {
+            _log = log;
+        }
 
         public AutoCompletionResult Autocomplete(string text)
         {
@@ -54,13 +58,16 @@ namespace Core.Lucene
                 var commands = results.scoreDocs
                     .Select(d =>
                                 {
+                                    var document = searcher.Doc(d.doc);
                                     try
                                     {
-                                        return Storage.GetCommandResultForDocument(searcher.Doc(d.doc));
+                                        return Storage.GetCommandResultForDocument(document);
                                     }
                                     catch (Exception e)
                                     {
-                                        Debug.WriteLine("Error getting command result for document:" + e);
+                                        _log.Error(e, "Error getting command result for document {0}:{1}",
+                                                   document.GetField(SpecialFields.Namespace).StringValue(),
+                                                   document.GetField(SpecialFields.Id).StringValue());
                                         return null;
                                     }
                                 })
@@ -69,7 +76,7 @@ namespace Core.Lucene
             }
             catch (ParseException e)
             {
-                Debug.WriteLine("Error parsing: "+e);
+                _log.Error(e, "Error parsing '{0}'", text);
                 return AutoCompletionResult.NoResult(text);
             }
         }
