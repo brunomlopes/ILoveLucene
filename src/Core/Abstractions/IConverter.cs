@@ -18,7 +18,7 @@ namespace Core.Abstractions
 
     public static class IConverterExtensions
     {
-        public static string GetNamespaceForItems(this IConverter self)
+        public static string GetId(this IConverter self)
         {
             return self.ConvertedType.FullName;
         }

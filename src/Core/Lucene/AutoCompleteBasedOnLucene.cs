@@ -16,14 +16,16 @@ namespace Core.Lucene
 {
     public class AutoCompleteBasedOnLucene : LuceneBase, IAutoCompleteText
     {
+        private readonly SourceStorageFactory _sourceStorageFactory;
         private readonly ILog _log;
 
         [Import(AllowRecomposition = true)]
         public AutoCompleteConfiguration Configuration { get; set; }
 
-        public AutoCompleteBasedOnLucene(IDirectoryFactory directoryFactory, LuceneStorage learningStorage, ILog log)
-            : base(directoryFactory, learningStorage)
+        public AutoCompleteBasedOnLucene(IDirectoryFactory directoryFactory, LuceneStorage luceneStorage, SourceStorageFactory sourceStorageFactory, ILog log)
+            : base(directoryFactory, luceneStorage)
         {
+            _sourceStorageFactory = sourceStorageFactory;
             _log = log;
         }
 
@@ -66,7 +68,7 @@ namespace Core.Lucene
                                     catch (Exception e)
                                     {
                                         _log.Error(e, "Error getting command result for document {0}:{1}",
-                                                   document.GetField(SpecialFields.Namespace).StringValue(),
+                                                   document.GetField(SpecialFields.ConverterId).StringValue(),
                                                    document.GetField(SpecialFields.Id).StringValue());
                                         return null;
                                     }
@@ -86,8 +88,9 @@ namespace Core.Lucene
             IndexWriter writer = null;
             try
             {
-                writer = GetIndexWriter();
-                Storage.LearnCommandForInput(writer, result.CompletionId, input);
+                var storage = _sourceStorageFactory.SourceStorageFor(result.CompletionId.SourceId);
+
+                storage.LearnCommandForInput(result.CompletionId, input);
             }
             finally
             {

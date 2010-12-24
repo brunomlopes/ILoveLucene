@@ -24,7 +24,7 @@ namespace Core.Lucene
             set
             {
                 _converters = value;
-                _convertersForNamespaces = _converters.ToDictionary(c => c.GetNamespaceForItems());
+                _convertersForNamespaces = _converters.ToDictionary(c => c.GetId());
             }
         }
 
@@ -43,10 +43,10 @@ namespace Core.Lucene
         public void UpdateDocumentForItem<T>(IndexWriter writer, IItemSource source, string tag, T item)
         {
             var converter = GetConverter<T>();
-            var nspace = converter.GetNamespaceForItems();
+            var converterId = converter.GetId();
             var id = converter.ToId(item);
 
-            var documentId = new DocumentId(nspace, id);
+            var documentId = new DocumentId(converterId, id, source.Id);
             var hash = documentId.GetSha1();
 
             PopDocument(writer, hash); //deleting the old version of the doc
@@ -66,7 +66,7 @@ namespace Core.Lucene
             document.Add(new Field(SpecialFields.Learnings, learnings, Field.Store.YES,
                                    Field.Index.ANALYZED,
                                    Field.TermVector.WITH_POSITIONS_OFFSETS));
-            document.Add(new Field(SpecialFields.Namespace, nspace, Field.Store.YES,
+            document.Add(new Field(SpecialFields.ConverterId, converterId, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
             document.Add(new Field(SpecialFields.SourceId, sourceId, Field.Store.YES,
@@ -87,7 +87,7 @@ namespace Core.Lucene
 
         public AutoCompletionResult.CommandResult GetCommandResultForDocument(Document document)
         {
-            var nspace = document.GetField(SpecialFields.Namespace).StringValue();
+            var nspace = document.GetField(SpecialFields.ConverterId).StringValue();
             if (!_convertersForNamespaces.ContainsKey(nspace))
             {
                 throw new NotImplementedException(string.Format("No converter for namespace {0} found", nspace));

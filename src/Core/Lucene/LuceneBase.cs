@@ -48,7 +48,7 @@ namespace Core.Lucene
 
     public interface IDirectoryFactory
     {
-        Directory DirectoryFor(string name, bool persistent = false);
+        Directory DirectoryFor(string id, bool persistent = false);
         IEnumerable<Directory> GetAllDirectories();
     }
 
@@ -64,7 +64,7 @@ namespace Core.Lucene
             _directory = directory;
         }
 
-        public Directory DirectoryFor(string name, bool persistent = false)
+        public Directory DirectoryFor(string id, bool persistent = false)
         {
             return _directory;
         }
@@ -80,6 +80,7 @@ namespace Core.Lucene
         public FsStaticDirectoryFactory(DirectoryInfo root)
             : base(new SimpleFSDirectory(root))
         {
+
         }
 
     }

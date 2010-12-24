@@ -34,7 +34,7 @@ namespace Plugins
     //                learnings[sha1.StringValue()] = new
     //                                                    {
     //                                                        Id = doc.GetField(SpecialFields.Id).StringValue(),
-    //                                                        Namespace = doc.GetField(SpecialFields.Namespace).StringValue(),
+    //                                                        ConverterId = doc.GetField(SpecialFields.ConverterId).StringValue(),
     //                                                        Name = doc.GetField(SpecialFields.Name).StringValue(),
     //                                                        Learnings = docLearnings.StringValue(),
     //                                                    };

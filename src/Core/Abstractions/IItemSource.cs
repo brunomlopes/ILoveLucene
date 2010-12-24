@@ -8,7 +8,7 @@ namespace Core.Abstractions
     public interface IItemSource
     {
         Task<IEnumerable<object>> GetItems();
-        string Name { get; }
+        string Id { get; }
         /// <summary>
         /// If an itemsource is persistent, then we use a filesystem directory to store the index results.
         /// Otherwise we use an in memory directory
@@ -20,7 +20,7 @@ namespace Core.Abstractions
     {
         public abstract Task<IEnumerable<object>> GetItems();
 
-        public virtual string Name
+        public virtual string Id
         {
             get { return GetType().FullName; }
         }

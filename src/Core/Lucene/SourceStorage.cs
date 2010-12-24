@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Core.Abstractions;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
@@ -8,17 +9,33 @@ using Version = Lucene.Net.Util.Version;
 
 namespace Core.Lucene
 {
-    public class Indexer
+    public class SourceStorage
     {
+        private readonly IItemSource _source;
         private readonly Directory _indexDirectory;
         private readonly LuceneStorage _storage;
 
-        public Indexer(Directory indexDirectory, LuceneStorage storage)
+        public SourceStorage(IItemSource source, Directory indexDirectory, LuceneStorage storage)
         {
+            _source = source;
             _indexDirectory = indexDirectory;
             _storage = storage;
 
             EnsureIndexExists();
+        }
+
+        public IItemSource Source
+        {
+            // TODO: remove this 
+            get {
+                return _source;
+            }
+        }
+
+        public Task IndexItems()
+        {
+            return _source.GetItems()
+                .ContinueWith(task => IndexItems(_source, task.Result));
         }
 
         private void EnsureIndexExists()
@@ -29,7 +46,7 @@ namespace Core.Lucene
                                 IndexWriter.MaxFieldLength.UNLIMITED).Close();
         }
 
-        public void IndexItems(IItemSource source, IEnumerable<object> items)
+        private void IndexItems(IItemSource source, IEnumerable<object> items)
         {
             IndexWriter indexWriter = null;
             try
@@ -56,6 +73,11 @@ namespace Core.Lucene
         {
             return new IndexWriter(_indexDirectory, new StandardAnalyzer(Version.LUCENE_29),
                                    IndexWriter.MaxFieldLength.UNLIMITED);
+        }
+
+        public void LearnCommandForInput(DocumentId completionId, string input)
+        {
+            _storage.LearnCommandForInput(GetIndexWriter(), completionId, input);
         }
     }
 }

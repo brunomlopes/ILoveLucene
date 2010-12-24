@@ -74,18 +74,21 @@ namespace Tests
         [Fact]
         public void CanLearnItem()
         {
-            var item = new Item {Id = "Firewall"};
-            var directory = IndexItemIntoDirectory(new Item {Id = "Firefox"}, item);
+            var firewall = new Item {Id = "Firewall"};
+            var firefox = new Item {Id = "Firefox"};
+            var directory = IndexItemIntoDirectory(firefox, firewall);
 
-            var searcher = GetAutocompleter(directory);
+            var searcher = GetAutocompleter(directory, firefox, firewall);
 
             var results = searcher.Autocomplete("Fire");
+            Assert.Equal("Firefox", results.AutoCompletedCommand.Item.Text);
+
             searcher.LearnInputForCommandResult("fire", results.OtherOptions.First());
 
             results = searcher.Autocomplete("Fire");
 
             Assert.True(results.HasAutoCompletion);
-            Assert.Equal(results.AutoCompletedCommand.Item.Text, "Firewall");
+            Assert.Equal("Firewall", results.AutoCompletedCommand.Item.Text);
         }
 
         [Fact]
@@ -99,8 +102,8 @@ namespace Tests
             var results = searcher.Autocomplete("emac");
             Assert.True(results.HasAutoCompletion);
             Assert.Equal(results.AutoCompletedCommand.Item.Text, "EmacsClient.lnk");
-        } 
-        
+        }
+
         [Fact]
         public void CanFindItemBasedOnSubstringOnTheEnd()
         {
@@ -130,18 +133,16 @@ namespace Tests
         [Fact]
         public void CannotFindItemWhenItIsRemovedAfterBeingIndexed()
         {
-            var converters = new[] { new Converter() };
-
-            var storage = new LuceneStorage(_learningStorage);            
+            var storage = new LuceneStorage(_learningStorage){Converters = new[] { new Converter() }};            
             var directory = new RAMDirectory();
-            var indexer = new Indexer(directory, storage);
 
             var source = new Source();
+            var indexer = new SourceStorage(source, directory, storage);
 
             source.Items = new[] {new Item {Id = "simple"}};
-            indexer.IndexItems(source, source.Items);
+            indexer.IndexItems().Wait();
             source.Items = new Item[] {};
-            indexer.IndexItems(source, source.Items);
+            indexer.IndexItems().Wait();
 
             var searcher = GetAutocompleter(directory, storage);
 
@@ -153,15 +154,14 @@ namespace Tests
         [Fact]
         public void CannotFindItemWhenIndexIsEmpty()
         {
-            var converters = new[] { new Converter() };
             var directory = new RAMDirectory();
             var storage = new LuceneStorage(_learningStorage);
-            var indexer = new Indexer(directory, storage);
 
             var source = new Source();
+            var indexer = new SourceStorage(source, directory, storage);
 
             source.Items = new Item[] {};
-            indexer.IndexItems(source, source.Items);
+            indexer.IndexItems().Wait();
 
             var searcher = GetAutocompleter(directory, storage);
 
@@ -172,12 +172,22 @@ namespace Tests
 
         private AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory)
         {
-            return GetAutocompleter(directory, new LuceneStorage(_learningStorage));
+            return GetAutocompleter(directory, new LuceneStorage(_learningStorage) { Converters = new[] { new Converter() } });
         }
 
-        private static AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory, LuceneStorage storage)
+        private AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory, params Item[] items)
         {
-            var searcher = new AutoCompleteBasedOnLucene(new StaticDirectoryFactory(directory), storage, new DebugLogger());
+            return GetAutocompleter(directory, new LuceneStorage(_learningStorage) { Converters = new[] { new Converter() } }, items);
+        }
+
+        private static AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory, LuceneStorage storage, IEnumerable<Item> items = null)
+        {
+            if (items == null) items = new Item[] {};
+
+            var directoryFactory = new StaticDirectoryFactory(directory);
+            var sourceStorage = new SourceStorageFactory(storage, directoryFactory)
+                                    {Sources = new[] {new Source() {Items = items}}};
+            var searcher = new AutoCompleteBasedOnLucene(directoryFactory, storage, sourceStorage, new DebugLogger());
             searcher.Configuration = new AutoCompleteConfiguration();
             searcher.Converters = new[] {new Converter()};
             return searcher;
@@ -185,15 +195,14 @@ namespace Tests
 
         private RAMDirectory IndexItemIntoDirectory(params Item[] items)
         {
-            var converters = new[] { new Converter() };
-            var storage = new LuceneStorage(_learningStorage);
+            var storage = new LuceneStorage(_learningStorage) { Converters = new[] { new Converter() } };
 
             var directory = new RAMDirectory();
-            var indexer = new Indexer(directory, storage);
             var source = new Source();
 
             source.Items = items;
-            indexer.IndexItems(source, source.Items);
+            var indexer = new SourceStorage(source, directory, storage);
+            indexer.IndexItems().Wait();
             return directory;
         }
     }
