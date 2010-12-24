@@ -10,6 +10,7 @@ using ILoveLucene;
 using Lucene.Net.Documents;
 using Lucene.Net.Store;
 using Xunit;
+using Directory = Lucene.Net.Store.Directory;
 
 namespace Tests
 {
@@ -17,6 +18,7 @@ namespace Tests
     {
         private DirectoryInfo _storageLocation;
         private LearningStorage _learningStorage;
+        private Directory _directory;
 
         public IndexerTests()
         {
@@ -28,29 +30,44 @@ namespace Tests
             }
 
             _learningStorage = new LearningStorage(_storageLocation);
+
+            _directory = new RAMDirectory();
         }
 
         [Fact]
         public void CanFindItemWhenItIsIndexed()
         {
-            var item = new Item {Id = "simple"};
-            var directory = IndexItemIntoDirectory(item);
+            var item = new TextItem("simple");
+            IndexItemIntoDirectory(item);
 
-            var searcher = GetAutocompleter(directory);
+            var searcher = GetAutocompleter();
 
             var results = searcher.Autocomplete("simple");
             Assert.True(results.HasAutoCompletion);
             Assert.Equal(results.AutoCompletedCommand.Item.Text, "simple");
         }
+        
+        [Fact]
+        public void ConvertsToCorrectItemType()
+        {
+            var item = new TextItem ("simple");
+            IndexItemIntoDirectory(item);
+
+            var searcher = GetAutocompleter();
+
+            var results = searcher.Autocomplete("simple");
+            Assert.True(results.HasAutoCompletion);
+            Assert.Equal(item.GetType(), results.AutoCompletedCommand.Item.GetType());
+        }
 
         [Fact]
         public void CanFindItemWithBadSpelling()
         {
-            var item = new Item {Id = "Firefox"};
+            var item = new TextItem("Firefox");
 
-            var directory = IndexItemIntoDirectory(item);
+            IndexItemIntoDirectory(item);
 
-            var searcher = GetAutocompleter(directory);
+            var searcher = GetAutocompleter();
 
             var results = searcher.Autocomplete("Firafox");
             Assert.True(results.HasAutoCompletion);
@@ -60,11 +77,11 @@ namespace Tests
         [Fact]
         public void CanFindSubItemWithItemConverter()
         {
-            var item = new SubItem {Id = "Firefox"};
+            var item = new SubItem ("Firefox");
 
-            var directory = IndexItemIntoDirectory(item);
+            IndexItemIntoDirectory(item);
 
-            var searcher = GetAutocompleter(directory);
+            var searcher = GetAutocompleter();
 
             var results = searcher.Autocomplete("FireFox");
             Assert.True(results.HasAutoCompletion);
@@ -74,11 +91,12 @@ namespace Tests
         [Fact]
         public void CanLearnItem()
         {
-            var firewall = new Item {Id = "Firewall"};
-            var firefox = new Item {Id = "Firefox"};
-            var directory = IndexItemIntoDirectory(firefox, firewall);
+            var firewall = new TextItem ("Firewall");
+            var firefox = new TextItem ("Firefox");
 
-            var searcher = GetAutocompleter(directory, firefox, firewall);
+            IndexItemIntoDirectory(firefox, firewall);
+
+            var searcher = GetAutocompleter(firefox, firewall);
 
             var results = searcher.Autocomplete("Fire");
             Assert.Equal("Firefox", results.AutoCompletedCommand.Item.Text);
@@ -88,16 +106,17 @@ namespace Tests
             results = searcher.Autocomplete("Fire");
 
             Assert.True(results.HasAutoCompletion);
+            Assert.Equal(1, results.OtherOptions.Count());
             Assert.Equal("Firewall", results.AutoCompletedCommand.Item.Text);
         }
 
         [Fact]
         public void CanFindItemBasedOnSubstring()
         {
-            var item = new Item {Id = "EmacsClient.lnk"};
-            var directory = IndexItemIntoDirectory(item);
+            var item = new TextItem ("EmacsClient.lnk");
+            IndexItemIntoDirectory(item);
 
-            var searcher = GetAutocompleter(directory);
+            var searcher = GetAutocompleter();
 
             var results = searcher.Autocomplete("emac");
             Assert.True(results.HasAutoCompletion);
@@ -107,10 +126,10 @@ namespace Tests
         [Fact]
         public void CanFindItemBasedOnSubstringOnTheEnd()
         {
-            var item = new Item {Id = "SQLyog.lnk"};
-            var directory = IndexItemIntoDirectory(item);
+            var item = new TextItem ("SQLyog.lnk");
+            IndexItemIntoDirectory(item);
 
-            var searcher = GetAutocompleter(directory);
+            var searcher = GetAutocompleter();
 
             var results = searcher.Autocomplete("yog");
             Assert.True(results.HasAutoCompletion);
@@ -120,11 +139,11 @@ namespace Tests
         [Fact]
         public void CannotFindItemWhenItHasNothingToDoWithTheQuery()
         {
-            var item = new Item {Id = "EmacsClient.lnk"};
+            var item = new TextItem ("EmacsClient.lnk");
 
-            var directory = IndexItemIntoDirectory(item);
+            IndexItemIntoDirectory(item);
 
-            var searcher = GetAutocompleter(directory);
+            var searcher = GetAutocompleter();
 
             var results = searcher.Autocomplete("Firefox");
             Assert.False(results.HasAutoCompletion);
@@ -134,17 +153,16 @@ namespace Tests
         public void CannotFindItemWhenItIsRemovedAfterBeingIndexed()
         {
             var storage = new LuceneStorage(_learningStorage){Converters = new[] { new Converter() }};            
-            var directory = new RAMDirectory();
 
             var source = new Source();
-            var indexer = new SourceStorage(source, directory, storage);
+            var indexer = new SourceStorage(source, _directory, storage);
 
-            source.Items = new[] {new Item {Id = "simple"}};
+            source.Items = new[] {new TextItem ("simple")};
             indexer.IndexItems().Wait();
-            source.Items = new Item[] {};
+            source.Items = new TextItem[] {};
             indexer.IndexItems().Wait();
 
-            var searcher = GetAutocompleter(directory, storage);
+            var searcher = GetAutocompleter(storage);
 
             var results = searcher.Autocomplete("simple");
             Assert.False(results.HasAutoCompletion);
@@ -154,71 +172,71 @@ namespace Tests
         [Fact]
         public void CannotFindItemWhenIndexIsEmpty()
         {
-            var directory = new RAMDirectory();
             var storage = new LuceneStorage(_learningStorage);
 
             var source = new Source();
-            var indexer = new SourceStorage(source, directory, storage);
+            var indexer = new SourceStorage(source, _directory, storage);
 
-            source.Items = new Item[] {};
+            source.Items = new TextItem[] {};
             indexer.IndexItems().Wait();
 
-            var searcher = GetAutocompleter(directory, storage);
+            var searcher = GetAutocompleter(storage);
 
             var results = searcher.Autocomplete("simple");
             Assert.False(results.HasAutoCompletion);
             Assert.Null(results.AutoCompletedCommand);
         }
 
-        private AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory)
+        private AutoCompleteBasedOnLucene GetAutocompleter()
         {
-            return GetAutocompleter(directory, new LuceneStorage(_learningStorage) { Converters = new[] { new Converter() } });
+            return GetAutocompleter(new LuceneStorage(_learningStorage) { Converters = new[] { new Converter() } });
         }
 
-        private AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory, params Item[] items)
+        private AutoCompleteBasedOnLucene GetAutocompleter(params TextItem[] items)
         {
-            return GetAutocompleter(directory, new LuceneStorage(_learningStorage) { Converters = new[] { new Converter() } }, items);
+            return GetAutocompleter(new LuceneStorage(_learningStorage) { Converters = new[] { new Converter() } }, items);
         }
 
-        private static AutoCompleteBasedOnLucene GetAutocompleter(RAMDirectory directory, LuceneStorage storage, IEnumerable<Item> items = null)
+        private AutoCompleteBasedOnLucene GetAutocompleter(LuceneStorage storage, IEnumerable<IItem> items = null)
         {
-            if (items == null) items = new Item[] {};
+            if (items == null) items = new TextItem[] {};
 
-            var directoryFactory = new StaticDirectoryFactory(directory);
+            var directoryFactory = new StaticDirectoryFactory(_directory);
+            var source = new Source {Items = items};
             var sourceStorage = new SourceStorageFactory(storage, directoryFactory)
-                                    {Sources = new[] {new Source() {Items = items}}};
+                                    {Sources = new[] {source}};
+
             var searcher = new AutoCompleteBasedOnLucene(directoryFactory, storage, sourceStorage, new DebugLogger());
             searcher.Configuration = new AutoCompleteConfiguration();
             searcher.Converters = new[] {new Converter()};
             return searcher;
         }
 
-        private RAMDirectory IndexItemIntoDirectory(params Item[] items)
+        private void IndexItemIntoDirectory(params IItem[] items)
         {
             var storage = new LuceneStorage(_learningStorage) { Converters = new[] { new Converter() } };
+            var source = new Source {Items = items};
 
-            var directory = new RAMDirectory();
-            var source = new Source();
-
-            source.Items = items;
-            var indexer = new SourceStorage(source, directory, storage);
+            var indexer = new SourceStorage(source, _directory, storage);
             indexer.IndexItems().Wait();
-            return directory;
         }
     }
 
-    class Item
-    {
-        public string Id;
-    }
 
-    class SubItem : Item
+    class SubItem : TextItem
     {
+        public SubItem(string input) : base(input)
+        {
+        }
+
+        public SubItem(string input, string description) : base(input, description)
+        {
+        }
     }
 
     class Source : BaseItemSource
     {
-        public IEnumerable<Item> Items { get; set; }
+        public IEnumerable<IItem> Items { get; set; }
 
         public override Task<IEnumerable<object>> GetItems()
         {
@@ -226,11 +244,11 @@ namespace Tests
         }
     }
 
-    class Converter : IConverter<Item>
+    class Converter : IConverter<TextItem>
     {
         public Type ConvertedType
         {
-            get { return typeof (Item); }
+            get { return typeof (TextItem); }
         }
 
         public IItem FromDocumentToItem(Document document)
@@ -238,21 +256,21 @@ namespace Tests
             return new TextItem(document.GetField("id").StringValue());
         }
 
-        public string ToId(Item t)
+        public string ToId(TextItem t)
         {
-            return t.Id;
+            return t.Text;
         }
 
-        public Document ToDocument(Item t)
+        public Document ToDocument(TextItem t)
         {
             var document = new Document();
-            document.Add(new Field("id", t.Id, Field.Store.YES, Field.Index.NO));
+            document.Add(new Field("id", t.Text, Field.Store.YES, Field.Index.NO));
             return document;
         }
 
-        public string ToName(Item t)
+        public string ToName(TextItem t)
         {
-            return t.Id;
+            return t.Text;
         }
     }
 }
