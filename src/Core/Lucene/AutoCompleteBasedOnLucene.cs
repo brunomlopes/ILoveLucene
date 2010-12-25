@@ -39,24 +39,7 @@ namespace Core.Lucene
             var searcher = new MultiSearcher(searchers);
             try
             {
-                var queryParser = new MultiFieldQueryParser(Version.LUCENE_29,
-                                                            new[] { SpecialFields.Name, SpecialFields.Learnings },
-                                                            new StandardAnalyzer(Version.LUCENE_29));
-                queryParser.SetFuzzyMinSim((float)Configuration.FuzzySimilarity);
-                queryParser.SetDefaultOperator(QueryParser.Operator.AND);
-
-                var textWithSubString = "*" + text.Trim().Replace(" ", "* *").Trim() + "*";
-                var textWithFuzzy = text.Trim().Replace(" ", "~ ").Trim() + "~";
-
-                queryParser.SetAllowLeadingWildcard(true);
-
-                Query substringQuery = queryParser.Parse(textWithSubString);
-                Query fuzzyQuery = queryParser.Parse(textWithFuzzy);
-
-
-                var query = new BooleanQuery();
-                query.Add(fuzzyQuery, BooleanClause.Occur.SHOULD);
-                query.Add(substringQuery, BooleanClause.Occur.SHOULD);
+                BooleanQuery query = GetQueryForText(text);
 
                 var results = searcher.Search(query, 10);
                 var commands = results.scoreDocs
@@ -94,6 +77,28 @@ namespace Core.Lucene
             var storage = _sourceStorageFactory.SourceStorageFor(result.CompletionId.SourceId);
 
             storage.LearnCommandForInput(result.CompletionId, input);
+        }
+
+        private BooleanQuery GetQueryForText(string text)
+        {
+            var queryParser = new MultiFieldQueryParser(Version.LUCENE_29,
+                                                        new[] { SpecialFields.Name, SpecialFields.Learnings },
+                                                        new StandardAnalyzer(Version.LUCENE_29));
+            queryParser.SetFuzzyMinSim((float)Configuration.FuzzySimilarity);
+            queryParser.SetDefaultOperator(QueryParser.Operator.AND);
+
+            var textWithSubString = "*" + text.Trim().Replace(" ", "* *").Trim() + "*";
+            var textWithFuzzy = text.Trim().Replace(" ", "~ ").Trim() + "~";
+
+            queryParser.SetAllowLeadingWildcard(true);
+
+            Query substringQuery = queryParser.Parse(textWithSubString);
+            Query fuzzyQuery = queryParser.Parse(textWithFuzzy);
+
+            var query = new BooleanQuery();
+            query.Add(fuzzyQuery, BooleanClause.Occur.SHOULD);
+            query.Add(substringQuery, BooleanClause.Occur.SHOULD);
+            return query;
         }
     }
 }

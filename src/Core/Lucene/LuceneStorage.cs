@@ -36,7 +36,8 @@ namespace Core.Lucene
         public void UpdateDocumentForObject(IndexWriter writer, IItemSource source, string tag, object item)
         {
             var type = item.GetType();
-            GetType().GetMethod("UpdateDocumentForItem").MakeGenericMethod(type)
+            GetType().GetMethod("UpdateDocumentForItem")
+                .MakeGenericMethod(type)
                 .Invoke(this, new[] {writer, source, tag, item});
         }
 
@@ -45,17 +46,17 @@ namespace Core.Lucene
             var converter = GetConverter<T>();
             var converterId = converter.GetId();
             var id = converter.ToId(item);
+            var name = converter.ToName(item);
+            var document = converter.ToDocument(item);
 
-            var documentId = new DocumentId(converterId, id, source.Id);
+            var sourceId = source.Id;
+
+            var documentId = new DocumentId(converterId, id, sourceId);
             var hash = documentId.GetSha1();
 
             PopDocument(writer, hash); //deleting the old version of the doc
 
             var learnings = _learningStorage.LearningsFor(hash);
-
-            var name = converter.ToName(item);
-            var document = converter.ToDocument(item);
-            var sourceId = SourceId(source);
 
             document.Add(new Field(SpecialFields.Id, id, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
@@ -78,11 +79,6 @@ namespace Core.Lucene
             document.Add(new Field(SpecialFields.Sha1, hash, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
             writer.AddDocument(document);
-        }
-
-        public string SourceId(IItemSource source)
-        {
-            return source.GetType().FullName;
         }
 
         public AutoCompletionResult.CommandResult GetCommandResultForDocument(Document document)
@@ -125,7 +121,7 @@ namespace Core.Lucene
         public void DeleteDocumentsForSourceWithoutTag(IndexWriter indexWriter, IItemSource source, string tag)
         {
             var query = new BooleanQuery();
-            query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.SourceId, SourceId(source))),
+            query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.SourceId, source.Id)),
                                         BooleanClause.Occur.MUST));
             query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.Tag, tag)),
                                         BooleanClause.Occur.MUST_NOT));
