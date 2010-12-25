@@ -8,21 +8,21 @@ namespace Core.Lucene
     /// </summary>
     public class StaticDirectoryFactory : IDirectoryFactory
     {
-        private readonly Directory _directory;
+        protected readonly Directory Directory;
 
         public StaticDirectoryFactory(Directory directory)
         {
-            _directory = directory;
+            Directory = directory;
         }
 
         public Directory DirectoryFor(string id, bool persistent = false)
         {
-            return _directory;
+            return Directory;
         }
 
         public IEnumerable<Directory> GetAllDirectories()
         {
-            return new[] {_directory};
+            return new[] {Directory};
         }
     }
 }

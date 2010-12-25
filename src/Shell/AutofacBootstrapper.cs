@@ -77,9 +77,10 @@ namespace ILoveLucene
             builder.RegisterType<AutoCompleteBasedOnLucene>().As<IAutoCompleteText>();
             builder.RegisterType<GetActionsForItem>().As<IGetActionsForItem>();
 
-            
+            builder.RegisterType<ConverterRepository>().As<IConverterRepository>();
 
-            builder.RegisterType<LuceneStorage>().As<LuceneStorage>();
+            builder.RegisterType<LuceneStorage>().AsSelf();
+            builder.RegisterType<SourceStorageFactory>().AsSelf();
 
             builder.RegisterType<FileSystemLearningRepository>().As<ILearningRepository>().WithParameter("input", learningStorageLocation);
             builder.RegisterType<ScheduleIndexJobs>().As<IStartupTask>();

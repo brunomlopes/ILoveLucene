@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
 using System.IO;
 using Core.Abstractions;
 using Lucene.Net.Documents;
@@ -33,11 +32,6 @@ namespace Plugins.Shortcuts
         public IItem FromDocumentToItem(Document document)
         {
             return new FileInfoItem(new FileInfo(document.GetField("filepath").StringValue()));
-        }
-
-        public Type ConvertedType
-        {
-            get { return typeof (FileInfo); }
         }
     }
 }

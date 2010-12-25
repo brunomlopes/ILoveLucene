@@ -1,11 +1,9 @@
-﻿using System;
-using Lucene.Net.Documents;
+﻿using Lucene.Net.Documents;
 
 namespace Core.Abstractions
 {
     public interface IConverter
     {
-        Type ConvertedType { get; }
         IItem FromDocumentToItem(Document document);
     }
 

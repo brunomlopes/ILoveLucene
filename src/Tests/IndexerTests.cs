@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -245,11 +244,6 @@ namespace Tests
 
     class Converter : IConverter<TextItem>
     {
-        public Type ConvertedType
-        {
-            get { return typeof (TextItem); }
-        }
-
         public IItem FromDocumentToItem(Document document)
         {
             return new TextItem(document.GetField("id").StringValue());

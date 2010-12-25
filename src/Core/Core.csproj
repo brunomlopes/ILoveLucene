@@ -80,7 +80,9 @@
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Lucene\AutoCompleteBasedOnLucene.cs" />
     <Compile Include="Lucene\AutoCompleteConfiguration.cs" />
+    <Compile Include="Lucene\ConverterRepository.cs" />
     <Compile Include="Lucene\FsStaticDirectoryFactory.cs" />
+    <Compile Include="Lucene\IConverterRepository.cs" />
     <Compile Include="Lucene\IDirectoryFactory.cs" />
     <Compile Include="Lucene\ILearningRepository.cs" />
     <Compile Include="Lucene\SourceStorage.cs" />
@@ -89,6 +91,7 @@
     <Compile Include="Lucene\FileSystemLearningRepository.cs" />
     <Compile Include="Lucene\LuceneStorage.cs" />
     <Compile Include="Lucene\ScheduleIndexJobs.cs" />
+    <Compile Include="Lucene\SourceStorageFactory.cs" />
     <Compile Include="Lucene\SpecialFields.cs" />
     <Compile Include="Lucene\StaticDirectoryFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

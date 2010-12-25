@@ -13,11 +13,6 @@ namespace Plugins.Commands
         [ImportMany(AllowRecomposition = true)]
         public IEnumerable<ICommand> Commands { get; set; }
 
-        public Type ConvertedType
-        {
-            get { return typeof(ICommand); }
-        }
-
         public IItem FromDocumentToItem(Document document)
         {
             var fullname = document.GetField("fullname").StringValue();
