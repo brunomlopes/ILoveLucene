@@ -8,11 +8,13 @@ namespace Core.Lucene
     {
         public Dictionary<string, int> IndexingFrequencyForPlugin { get; set; }
         public int DefaultFrequency { get; set; }
+        public int MinimumFrequencyForPersistentSources { get; set; }
 
         public IndexerConfiguration()
         {
             IndexingFrequencyForPlugin = new Dictionary<string, int>();
             DefaultFrequency = 10*60;
+            MinimumFrequencyForPersistentSources = 60;
         }
 
         public int GetFrequencyForItemSource(IItemSource source)

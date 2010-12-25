@@ -35,11 +35,15 @@ namespace Core.Lucene
 
         public void Execute()
         {
-            var root = new FileInfo(Assembly.GetCallingAssembly().Location).DirectoryName;
-
             foreach (var sourceStorage in _sourceStorageFactory.GetAllSourceStorages())
             {
                 var frequency = Configuration.GetFrequencyForItemSource(sourceStorage.Source);
+
+                if (sourceStorage.Source.Persistent && frequency < Configuration.MinimumFrequencyForPersistentSources)
+                {
+                    frequency = Configuration.MinimumFrequencyForPersistentSources;
+                }
+
                 var itemSourceName = sourceStorage.Source.Id;
                 var jobDetail = new JobDetail("IndexerFor" + itemSourceName, JobGroup, typeof(IndexerJob));
                 
@@ -47,7 +51,7 @@ namespace Core.Lucene
 
                 var trigger = TriggerUtils.MakeSecondlyTrigger(frequency);
 
-                // add 4 seconds to "try" and ensure the first time gets executed always
+                // add 2 seconds to "try" and ensure the first time gets executed always
                 trigger.StartTimeUtc = DateTime.UtcNow.AddSeconds(2);
                 trigger.Name = "Each" + frequency + "SecondsFor" + sourceStorage;
                 trigger.MisfireInstruction = MisfireInstruction.SimpleTrigger.RescheduleNextWithRemainingCount;
