@@ -1,39 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using Core.Abstractions;
 using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Index;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
-using Directory = Lucene.Net.Store.Directory;
 using Version = Lucene.Net.Util.Version;
 
 namespace Core.Lucene
 {
-    public class AutoCompleteBasedOnLucene : LuceneBase, IAutoCompleteText
+    public class AutoCompleteBasedOnLucene : IAutoCompleteText
     {
         private readonly SourceStorageFactory _sourceStorageFactory;
         private readonly ILog _log;
+        private readonly IDirectoryFactory _directoryFactory;
+        private readonly LuceneStorage _storage;
+
+        [ImportMany]
+        public IEnumerable<IConverter> Converters { get; set; }
 
         [Import(AllowRecomposition = true)]
         public AutoCompleteConfiguration Configuration { get; set; }
 
         public AutoCompleteBasedOnLucene(IDirectoryFactory directoryFactory, LuceneStorage luceneStorage, SourceStorageFactory sourceStorageFactory, ILog log)
-            : base(directoryFactory, luceneStorage)
         {
             _sourceStorageFactory = sourceStorageFactory;
             _log = log;
+            _directoryFactory = directoryFactory;
+            _storage = luceneStorage;
         }
 
         public AutoCompletionResult Autocomplete(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return AutoCompletionResult.NoResult(text);
 
-            var searchers = DirectoryFactory.GetAllDirectories().Select(d => new IndexSearcher(d, true)).ToArray();
+            var searchers = _directoryFactory.GetAllDirectories().Select(d => new IndexSearcher(d, true)).ToArray();
             var searcher = new MultiSearcher(searchers);
             try
             {
@@ -63,7 +65,7 @@ namespace Core.Lucene
                                     var document = searcher.Doc(d.doc);
                                     try
                                     {
-                                        return Storage.GetCommandResultForDocument(document);
+                                        return _storage.GetCommandResultForDocument(document);
                                     }
                                     catch (Exception e)
                                     {

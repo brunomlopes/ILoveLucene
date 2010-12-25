@@ -80,15 +80,17 @@
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Lucene\AutoCompleteBasedOnLucene.cs" />
     <Compile Include="Lucene\AutoCompleteConfiguration.cs" />
+    <Compile Include="Lucene\FsStaticDirectoryFactory.cs" />
+    <Compile Include="Lucene\IDirectoryFactory.cs" />
     <Compile Include="Lucene\ILearningStorage.cs" />
     <Compile Include="Lucene\SourceStorage.cs" />
     <Compile Include="Lucene\IndexerJob.cs" />
     <Compile Include="Lucene\IndexerConfiguration.cs" />
     <Compile Include="Lucene\LearningStorage.cs" />
-    <Compile Include="Lucene\LuceneBase.cs" />
     <Compile Include="Lucene\LuceneStorage.cs" />
     <Compile Include="Lucene\ScheduleIndexJobs.cs" />
     <Compile Include="Lucene\SpecialFields.cs" />
+    <Compile Include="Lucene\StaticDirectoryFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scheduler\MefJobFactory.cs" />
   </ItemGroup>
