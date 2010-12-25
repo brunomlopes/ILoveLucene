@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using Lucene.Net.Store;
+﻿using System;
+using System.Collections.Generic;
+using Directory = Lucene.Net.Store.Directory;
 
 namespace Core.Lucene
 {

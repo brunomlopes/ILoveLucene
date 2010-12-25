@@ -48,7 +48,7 @@ namespace Core.Lucene
                 var trigger = TriggerUtils.MakeSecondlyTrigger(frequency);
 
                 // add 4 seconds to "try" and ensure the first time gets executed always
-                trigger.StartTimeUtc = TriggerUtils.GetEvenMinuteDate(DateTime.UtcNow.AddSeconds(10));
+                trigger.StartTimeUtc = DateTime.UtcNow.AddSeconds(2);
                 trigger.Name = "Each" + frequency + "SecondsFor" + sourceStorage;
                 trigger.MisfireInstruction = MisfireInstruction.SimpleTrigger.RescheduleNextWithRemainingCount;
 

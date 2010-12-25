@@ -19,5 +19,10 @@ namespace Plugins.Commands
             var commands = Commands; //FIXME:  this can be recomposed mid-iteration. we don't want that for now
             return Task.Factory.StartNew(() => commands.Cast<Object>());
         }
+
+        public override bool Persistent
+        {
+            get { return false; }
+        }
     }
 }

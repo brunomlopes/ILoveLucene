@@ -79,13 +79,15 @@ namespace ILoveLucene
 
             builder.RegisterType<ConverterRepository>().As<IConverterRepository>();
 
-            builder.RegisterType<LuceneStorage>().AsSelf();
-            builder.RegisterType<SourceStorageFactory>().AsSelf();
+            builder.RegisterType<LuceneStorage>().AsSelf().SingleInstance();
+            builder.RegisterType<SourceStorageFactory>().AsSelf().SingleInstance();
 
             builder.RegisterType<FileSystemLearningRepository>().As<ILearningRepository>().WithParameter("input", learningStorageLocation);
             builder.RegisterType<ScheduleIndexJobs>().As<IStartupTask>();
 
-            builder.RegisterType<FsStaticDirectoryFactory>().As<IDirectoryFactory>().WithParameter("root", indexStorageLocation);
+            builder.RegisterType<SeparateIndexesDirectoryFactory>()
+                .As<IDirectoryFactory>().WithParameter("root", indexStorageLocation)
+                .SingleInstance();
         }
 
         protected override void OnStartup(object sender, StartupEventArgs e)
