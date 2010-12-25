@@ -88,6 +88,7 @@
     <Compile Include="Processes\ProcessConverter.cs" />
     <Compile Include="Processes\ProcessItem.cs" />
     <Compile Include="Processes\ProcessSource.cs" />
+    <Compile Include="Processes\SwitchToWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Putty.cs" />
     <Compile Include="Reindex.cs" />
