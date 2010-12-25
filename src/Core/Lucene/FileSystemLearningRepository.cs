@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace Core.Lucene
 {
-    public class LearningStorage : ILearningStorage
+    public class FileSystemLearningRepository : ILearningRepository
     {
-        public LearningStorage(DirectoryInfo input)
+        public FileSystemLearningRepository(DirectoryInfo input)
         {
             _rootDirectory = input;
             if(!input.Exists)

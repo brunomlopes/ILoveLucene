@@ -13,7 +13,7 @@ namespace Core.Lucene
     public class LuceneStorage
     {
         private Dictionary<string, IConverter> _convertersForNamespaces;
-        private readonly ILearningStorage _learningStorage;
+        private readonly ILearningRepository _learningRepository;
 
         private IEnumerable<IConverter> _converters;
 
@@ -27,10 +27,19 @@ namespace Core.Lucene
                 _convertersForNamespaces = _converters.ToDictionary(c => c.GetId());
             }
         }
-
-        public LuceneStorage(ILearningStorage learningStorage)
+        private IConverter<T> GetConverter<T>()
         {
-            _learningStorage = learningStorage;
+            var converter = _convertersForNamespaces.Select(kvp => kvp.Value).OfType<IConverter<T>>().FirstOrDefault();
+            if (converter == null)
+            {
+                throw new NotImplementedException(string.Format("No converter for {0} found ", typeof(T)));
+            }
+            return converter;
+        }
+
+        public LuceneStorage(ILearningRepository learningRepository)
+        {
+            _learningRepository = learningRepository;
         }
 
         public void UpdateDocumentForObject(IndexWriter writer, IItemSource source, string tag, object item)
@@ -56,7 +65,7 @@ namespace Core.Lucene
 
             PopDocument(writer, hash); //deleting the old version of the doc
 
-            var learnings = _learningStorage.LearningsFor(hash);
+            var learnings = _learningRepository.LearningsFor(hash);
 
             document.Add(new Field(SpecialFields.Id, id, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
@@ -104,7 +113,7 @@ namespace Core.Lucene
             if (document == null)
                 throw new InvalidOperationException(string.Format("Didn't find command {0}", commandId));
 
-            var learnings = _learningStorage.LearnFor(input, commandIdHash);
+            var learnings = _learningRepository.LearnFor(input, commandIdHash);
 
             var field = document.GetField(SpecialFields.Learnings);
             if (field != null)
@@ -128,15 +137,7 @@ namespace Core.Lucene
             indexWriter.DeleteDocuments(query);
         }
 
-        private IConverter<T> GetConverter<T>()
-        {
-            var converter = _convertersForNamespaces.Select(kvp => kvp.Value).OfType<IConverter<T>>().FirstOrDefault();
-            if (converter == null)
-            {
-                throw new NotImplementedException(string.Format("No converter for {0} found ", typeof (T)));
-            }
-            return converter;
-        }
+        
 
         private Document PopDocument(IndexWriter writer, string sha1)
         {

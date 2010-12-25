@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,9 +15,9 @@ namespace Tests
 {
     public class IndexerTests
     {
-        private DirectoryInfo _storageLocation;
-        private LearningStorage _learningStorage;
-        private Directory _directory;
+        private readonly DirectoryInfo _storageLocation;
+        private readonly FileSystemLearningRepository _learningRepository;
+        private readonly Directory _directory;
 
         public IndexerTests()
         {
@@ -29,7 +28,7 @@ namespace Tests
                 _storageLocation.Refresh();
             }
 
-            _learningStorage = new LearningStorage(_storageLocation);
+            _learningRepository = new FileSystemLearningRepository(_storageLocation);
 
             _directory = new RAMDirectory();
         }
@@ -152,7 +151,7 @@ namespace Tests
         [Fact]
         public void CannotFindItemWhenItIsRemovedAfterBeingIndexed()
         {
-            var storage = new LuceneStorage(_learningStorage){Converters = new[] { new Converter() }};            
+            var storage = new LuceneStorage(_learningRepository){Converters = new[] { new Converter() }};            
 
             var source = new Source();
             var indexer = new SourceStorage(source, _directory, storage);
@@ -172,7 +171,7 @@ namespace Tests
         [Fact]
         public void CannotFindItemWhenIndexIsEmpty()
         {
-            var storage = new LuceneStorage(_learningStorage);
+            var storage = new LuceneStorage(_learningRepository);
 
             var source = new Source();
             var indexer = new SourceStorage(source, _directory, storage);
@@ -189,12 +188,12 @@ namespace Tests
 
         private AutoCompleteBasedOnLucene GetAutocompleter()
         {
-            return GetAutocompleter(new LuceneStorage(_learningStorage) { Converters = new[] { new Converter() } });
+            return GetAutocompleter(new LuceneStorage(_learningRepository) { Converters = new[] { new Converter() } });
         }
 
         private AutoCompleteBasedOnLucene GetAutocompleter(params TextItem[] items)
         {
-            return GetAutocompleter(new LuceneStorage(_learningStorage) { Converters = new[] { new Converter() } }, items);
+            return GetAutocompleter(new LuceneStorage(_learningRepository) { Converters = new[] { new Converter() } }, items);
         }
 
         private AutoCompleteBasedOnLucene GetAutocompleter(LuceneStorage storage, IEnumerable<IItem> items = null)
@@ -214,7 +213,7 @@ namespace Tests
 
         private void IndexItemIntoDirectory(params IItem[] items)
         {
-            var storage = new LuceneStorage(_learningStorage) { Converters = new[] { new Converter() } };
+            var storage = new LuceneStorage(_learningRepository) { Converters = new[] { new Converter() } };
             var source = new Source {Items = items};
 
             var indexer = new SourceStorage(source, _directory, storage);

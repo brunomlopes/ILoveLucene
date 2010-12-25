@@ -81,7 +81,7 @@ namespace ILoveLucene
 
             builder.RegisterType<LuceneStorage>().As<LuceneStorage>();
 
-            builder.RegisterType<LearningStorage>().As<ILearningStorage>().WithParameter("input", learningStorageLocation);
+            builder.RegisterType<FileSystemLearningRepository>().As<ILearningRepository>().WithParameter("input", learningStorageLocation);
             builder.RegisterType<ScheduleIndexJobs>().As<IStartupTask>();
 
             builder.RegisterType<FsStaticDirectoryFactory>().As<IDirectoryFactory>().WithParameter("root", indexStorageLocation);
