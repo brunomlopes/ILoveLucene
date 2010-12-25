@@ -10,10 +10,15 @@ using Lucene.Net.Search;
 
 namespace Core.Lucene
 {
-    public class LuceneStorage
+    public interface IConverterRepository
     {
-        private Dictionary<string, IConverter> _convertersForNamespaces;
-        private readonly ILearningRepository _learningRepository;
+        IConverter<T> GetConverterForType<T>();
+        IConverter GetConverterForId(string id);
+    }
+
+    public class ConverterRepository : IConverterRepository
+    {
+        private Dictionary<string, IConverter> _convertersPerId;
 
         private IEnumerable<IConverter> _converters;
 
@@ -24,12 +29,22 @@ namespace Core.Lucene
             set
             {
                 _converters = value;
-                _convertersForNamespaces = _converters.ToDictionary(c => c.GetId());
+                _convertersPerId = _converters.ToDictionary(c => c.GetId());
             }
         }
-        private IConverter<T> GetConverter<T>()
+
+        public ConverterRepository()
         {
-            var converter = _convertersForNamespaces.Select(kvp => kvp.Value).OfType<IConverter<T>>().FirstOrDefault();
+        }
+
+        public ConverterRepository(params IConverter[] converters)
+        {
+            Converters = converters;
+        }
+
+        public IConverter<T> GetConverterForType<T>()
+        {
+            var converter = _convertersPerId.Select(kvp => kvp.Value).OfType<IConverter<T>>().FirstOrDefault();
             if (converter == null)
             {
                 throw new NotImplementedException(string.Format("No converter for {0} found ", typeof(T)));
@@ -37,9 +52,26 @@ namespace Core.Lucene
             return converter;
         }
 
-        public LuceneStorage(ILearningRepository learningRepository)
+        public IConverter GetConverterForId(string id)
+        {
+            if (!_convertersPerId.ContainsKey(id))
+            {
+                throw new NotImplementedException(string.Format("No converter for id {0} found", id));
+            }
+            return _convertersPerId[id];
+        }
+    }
+
+    public class LuceneStorage
+    {
+        private readonly ILearningRepository _learningRepository;
+        private readonly IConverterRepository _converterRepository;
+
+
+        public LuceneStorage(ILearningRepository learningRepository, IConverterRepository converterRepository)
         {
             _learningRepository = learningRepository;
+            _converterRepository = converterRepository;
         }
 
         public void UpdateDocumentForObject(IndexWriter writer, IItemSource source, string tag, object item)
@@ -52,7 +84,7 @@ namespace Core.Lucene
 
         public void UpdateDocumentForItem<T>(IndexWriter writer, IItemSource source, string tag, T item)
         {
-            var converter = GetConverter<T>();
+            var converter = _converterRepository.GetConverterForType<T>();
             var converterId = converter.GetId();
             var id = converter.ToId(item);
             var name = converter.ToName(item);
@@ -92,12 +124,9 @@ namespace Core.Lucene
 
         public AutoCompletionResult.CommandResult GetCommandResultForDocument(Document document)
         {
-            var nspace = document.GetField(SpecialFields.ConverterId).StringValue();
-            if (!_convertersForNamespaces.ContainsKey(nspace))
-            {
-                throw new NotImplementedException(string.Format("No converter for namespace {0} found", nspace));
-            }
-            var command = _convertersForNamespaces[nspace].FromDocumentToItem(document);
+            var converterId = document.GetField(SpecialFields.ConverterId).StringValue();
+           
+            var command = _converterRepository.GetConverterForId(converterId).FromDocumentToItem(document);
 
             return new AutoCompletionResult.CommandResult(command, new DocumentId(document));
         }

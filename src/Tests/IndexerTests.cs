@@ -151,7 +151,7 @@ namespace Tests
         [Fact]
         public void CannotFindItemWhenItIsRemovedAfterBeingIndexed()
         {
-            var storage = new LuceneStorage(_learningRepository){Converters = new[] { new Converter() }};            
+            var storage = new LuceneStorage(_learningRepository, new ConverterRepository(new Converter()));
 
             var source = new Source();
             var indexer = new SourceStorage(source, _directory, storage);
@@ -171,7 +171,7 @@ namespace Tests
         [Fact]
         public void CannotFindItemWhenIndexIsEmpty()
         {
-            var storage = new LuceneStorage(_learningRepository);
+            var storage = new LuceneStorage(_learningRepository, new ConverterRepository(new Converter()));
 
             var source = new Source();
             var indexer = new SourceStorage(source, _directory, storage);
@@ -188,12 +188,12 @@ namespace Tests
 
         private AutoCompleteBasedOnLucene GetAutocompleter()
         {
-            return GetAutocompleter(new LuceneStorage(_learningRepository) { Converters = new[] { new Converter() } });
+            return GetAutocompleter(new LuceneStorage(_learningRepository, new ConverterRepository(new Converter())));
         }
 
         private AutoCompleteBasedOnLucene GetAutocompleter(params TextItem[] items)
         {
-            return GetAutocompleter(new LuceneStorage(_learningRepository) { Converters = new[] { new Converter() } }, items);
+            return GetAutocompleter(new LuceneStorage(_learningRepository, new ConverterRepository(new Converter())), items);
         }
 
         private AutoCompleteBasedOnLucene GetAutocompleter(LuceneStorage storage, IEnumerable<IItem> items = null)
@@ -213,7 +213,7 @@ namespace Tests
 
         private void IndexItemIntoDirectory(params IItem[] items)
         {
-            var storage = new LuceneStorage(_learningRepository) { Converters = new[] { new Converter() } };
+            var storage = new LuceneStorage(_learningRepository, new ConverterRepository(new Converter()));
             var source = new Source {Items = items};
 
             var indexer = new SourceStorage(source, _directory, storage);
