@@ -6,7 +6,7 @@
 			<StackPanel Orientation="Vertical" Height="Auto">
 				<TextBox Name="Input" Text="Sample text here" FontSize="22">
 					<i:Interaction.Triggers>
-						<i:EventTrigger EventName="KeyDown">
+						<i:EventTrigger EventName="PreviewKeyDown">
 							<cal:ActionMessage MethodName="ProcessShortcut">
 								<cal:Parameter Value="$source" />
 								<cal:Parameter Value="$eventArgs" />
@@ -26,7 +26,7 @@
                 </ComboBox>
 				<TextBox Name="Arguments" Text="" FontSize="22" Visibility="{Binding ArgumentsVisible}" Width="Auto">
 					<i:Interaction.Triggers>
-						<i:EventTrigger EventName="KeyDown">
+						<i:EventTrigger EventName="PreviewKeyDown">
 							<cal:ActionMessage MethodName="ProcessArgumentShortcut">
 								<cal:Parameter Value="$source" />
 								<cal:Parameter Value="$eventArgs" />

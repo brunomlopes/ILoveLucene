@@ -34,7 +34,9 @@ namespace Plugins
                 return ArgumentAutoCompletionResult.NoResult(arguments);
             }
             return ArgumentAutoCompletionResult.OrderedResult(arguments,
-                                                              _sessionNames.Where(s => s.Contains(arguments)));
+                                                              new[] {arguments}
+                                                                  .Concat(_sessionNames.Where(s => s.Contains(arguments)))
+                                                                  .Distinct());
         }
 
         public void ActOn(FileInfo item, string arguments)

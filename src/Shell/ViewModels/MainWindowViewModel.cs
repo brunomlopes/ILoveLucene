@@ -28,9 +28,11 @@ namespace ILoveLucene.ViewModels
             _log = log;
             _cancelationTokenSource = new CancellationTokenSource();
             _argumentCancelationTokenSource = new CancellationTokenSource();
-            CommandOptions = new List<AutoCompletionResult.CommandResult>();
-            ArgumentOptions = new List<string>();
-            Result = new AutoCompletionResult.CommandResult(new TextItem(string.Empty), null);
+            CommandOptions =
+                new ListWithCurrentSelection<AutoCompletionResult.CommandResult>(
+                    new AutoCompletionResult.CommandResult(new TextItem(string.Empty), null));
+            ArgumentOptions = new ListWithCurrentSelection<string>();
+            Result = CommandOptions.Current;
         }
 
         public void Execute(FrameworkElement source)
@@ -64,9 +66,9 @@ namespace ILoveLucene.ViewModels
                                       });
         }
 
-        private IList<AutoCompletionResult.CommandResult> _commandOptions;
+        private ListWithCurrentSelection<AutoCompletionResult.CommandResult> _commandOptions;
 
-        public IList<AutoCompletionResult.CommandResult> CommandOptions
+        public ListWithCurrentSelection<AutoCompletionResult.CommandResult> CommandOptions
         {
             get { return _commandOptions; }
             set
@@ -76,9 +78,9 @@ namespace ILoveLucene.ViewModels
             }
         }
 
-        private IList<string> _ArgumentOptions;
+        private ListWithCurrentSelection<string> _ArgumentOptions;
 
-        public IList<string> ArgumentOptions
+        public ListWithCurrentSelection<string> ArgumentOptions
         {
             get { return _ArgumentOptions; }
             set
@@ -107,13 +109,26 @@ namespace ILoveLucene.ViewModels
                 return;
             }
 
+            if(eventArgs.Key == Key.Down || eventArgs.Key == Key.Up)
+            {
+                if (eventArgs.Key == Key.Down)
+                    Result = CommandOptions.Next();
+                else
+                    Result = CommandOptions.Previous();
+
+                Task.Factory.StartNew(() => SetActionsForResult(Result))
+                    .GuardForException(SetError);
+                eventArgs.Handled = true;
+                return;
+            }
+
             if (eventArgs.KeyboardDevice.Modifiers != ModifierKeys.Control)
             {
                 return;
             }
 
-            var str = new KeyConverter().ConvertToString(eventArgs.Key);
             int index;
+            var str = new KeyConverter().ConvertToString(eventArgs.Key);
             if (int.TryParse(str, out index))
             {
                 if (index == 0) index = 10;
@@ -121,7 +136,7 @@ namespace ILoveLucene.ViewModels
                 index -= 1;
                 if (index < CommandOptions.Count)
                 {
-                    Result = CommandOptions[index];
+                    Result = CommandOptions.SetIndex(index);
                     Task.Factory.StartNew(() => SetActionsForResult(Result))
                         .GuardForException(SetError);
                     eventArgs.Handled = true;
@@ -144,6 +159,17 @@ namespace ILoveLucene.ViewModels
                 return;
             }
 
+            if (eventArgs.Key == Key.Down || eventArgs.Key == Key.Up)
+            {
+                if (eventArgs.Key == Key.Down)
+                    Arguments = ArgumentOptions.Next();
+                else
+                    Arguments = ArgumentOptions.Previous();
+
+                eventArgs.Handled = true;
+                return;
+            }
+
             if (eventArgs.KeyboardDevice.Modifiers != ModifierKeys.Control)
             {
                 return;
@@ -156,7 +182,7 @@ namespace ILoveLucene.ViewModels
                 index -= 1;
                 if (index < ArgumentOptions.Count)
                 {
-                    Arguments = ArgumentOptions[index];
+                    Arguments = ArgumentOptions.SetIndex(index);
                     eventArgs.Handled = true;
                 }
             }
@@ -180,18 +206,21 @@ namespace ILoveLucene.ViewModels
 
                                           if (result.HasAutoCompletion)
                                           {
-                                              Result = result.AutoCompletedCommand;
-                                              CommandOptions = new[] {Result}.Concat(result.OtherOptions).ToList();
-                                              Arguments = string.Empty;
+                                              CommandOptions = new[] {result.AutoCompletedCommand}
+                                                  .Concat(result.OtherOptions)
+                                                  .ToListWithCurrentSelection();
                                           }
                                           else
                                           {
-                                              Result = new AutoCompletionResult.CommandResult(new TextItem(Input),
-                                                                                              null);
-                                              CommandOptions = new List<AutoCompletionResult.CommandResult>();
-                                              ArgumentOptions = new List<string>();
-                                              Arguments = string.Empty;
+                                              CommandOptions =
+                                                  new ListWithCurrentSelection<AutoCompletionResult.CommandResult>(
+                                                      new AutoCompletionResult.CommandResult(new TextItem(Input),
+                                                                                             null));
                                           }
+                                          Result = CommandOptions.Current;
+                                          ArgumentOptions = new ListWithCurrentSelection<string>();
+                                          Arguments = string.Empty;
+
                                           SetActionsForResult(Result);
                                           AutoCompleteArgument();
                                       }, token)
@@ -207,7 +236,7 @@ namespace ILoveLucene.ViewModels
         {
             _argumentCancelationTokenSource.Cancel();
             _argumentCancelationTokenSource = new CancellationTokenSource();
-            ArgumentOptions = new List<string>();
+            ArgumentOptions = new ListWithCurrentSelection<string>();
 
             var token = _argumentCancelationTokenSource.Token;
             var autoCompleteArgumentsCommand = SelectedAction as IActOnItemWithAutoCompletedArguments;
@@ -224,13 +253,16 @@ namespace ILoveLucene.ViewModels
                                           if (result.HasAutoCompletion)
                                           {
                                               ArgumentOptions =
-                                                  new[] { result.AutoCompletedArgument }
-                                                      .Concat(result.OtherOptions).ToList();
+                                                  new[] {result.AutoCompletedArgument}
+                                                      .Concat(result.OtherOptions)
+                                                      .ToListWithCurrentSelection();
                                           }
                                           else
                                           {
-                                              ArgumentOptions = new List<string>();
+                                              ArgumentOptions = new ListWithCurrentSelection<string>(Arguments);
                                           }
+
+                                          Arguments = ArgumentOptions.Current;
                                       }, token)
                 .GuardForException(e => Description = e.Message);
         }
