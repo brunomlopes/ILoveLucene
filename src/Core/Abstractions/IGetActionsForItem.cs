@@ -5,6 +5,7 @@ namespace Core.Abstractions
 {
     public interface IGetActionsForItem
     {
-        IEnumerable<IActOnItem> ActionsForItem(IItem item);
+        IEnumerable<IActOnItem> ActionsForItem(AutoCompletionResult.CommandResult item);
+        void LearnActionForCommandResult(string input, IActOnItem selectedAction, AutoCompletionResult.CommandResult result);
     }
 }

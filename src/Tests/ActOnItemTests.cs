@@ -41,7 +41,7 @@ namespace Tests
 
             var getItems = new GetActionsForItem(new[] {act});
 
-            var actionsForItem = getItems.ActionsForItem(info);
+            var actionsForItem = getItems.ActionsForItem(ResultForItem(info));
             Assert.NotEmpty(actionsForItem);
             Assert.Contains(act, actionsForItem);
         }
@@ -55,7 +55,7 @@ namespace Tests
 
             var getItems = new GetActionsForItem(new IActOnItem[] {act, dontAct});
 
-            var actionsForItem = getItems.ActionsForItem(info);
+            var actionsForItem = getItems.ActionsForItem(ResultForItem(info));
             Assert.NotEmpty(actionsForItem);
             Assert.Contains(act, actionsForItem);
             Assert.DoesNotContain(dontAct, actionsForItem);
@@ -68,7 +68,7 @@ namespace Tests
             var action = new ExecuteCommand();
             var getItems = new GetActionsForItem(new IActOnItem[] {action});
 
-            var actionsForItem = getItems.ActionsForItem(new CommandItem(command));
+            var actionsForItem = getItems.ActionsForItem(ResultForItem(new CommandItem(command)));
             Assert.NotEmpty(actionsForItem);
             Assert.Contains(action, actionsForItem);
 
@@ -81,6 +81,11 @@ namespace Tests
         {
             var command = new MockActWithoutText();
             Assert.Equal("Mock Act Without Text", command.Text);
+        }
+
+        AutoCompletionResult.CommandResult ResultForItem(IItem item)
+        {
+            return new AutoCompletionResult.CommandResult(item, null);
         }
     }
 
