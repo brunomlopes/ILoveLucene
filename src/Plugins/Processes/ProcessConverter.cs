@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using Core.Abstractions;
 using Lucene.Net.Documents;
@@ -28,7 +29,12 @@ namespace Plugins.Processes
 
         public string ToName(Process t)
         {
-            return t.ProcessName;
+            return t.ProcessName + " - " + t.MainWindowTitle;
+        }
+
+        public string ToType(Process t)
+        {
+            return t.GetType().Name;
         }
     }
 }

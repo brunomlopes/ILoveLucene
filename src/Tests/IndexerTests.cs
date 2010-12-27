@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -264,6 +265,11 @@ namespace Tests
         public string ToName(TextItem t)
         {
             return t.Text;
+        }
+
+        public string ToType(TextItem t)
+        {
+            return t.GetType().Name;
         }
     }
 }

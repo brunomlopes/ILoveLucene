@@ -34,7 +34,7 @@ namespace Core.Lucene
             var id = converter.ToId(item);
             var name = converter.ToName(item);
             var document = converter.ToDocument(item);
-
+            var type = converter.ToType(item);
             var sourceId = source.Id;
 
             var documentId = new DocumentId(converterId, id, sourceId);
@@ -48,6 +48,9 @@ namespace Core.Lucene
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
             document.Add(new Field(SpecialFields.Name, name, Field.Store.YES,
+                                   Field.Index.ANALYZED,
+                                   Field.TermVector.WITH_POSITIONS_OFFSETS));
+            document.Add(new Field(SpecialFields.Type, type, Field.Store.YES,
                                    Field.Index.ANALYZED,
                                    Field.TermVector.WITH_POSITIONS_OFFSETS));
             document.Add(new Field(SpecialFields.Learnings, learnings, Field.Store.YES,

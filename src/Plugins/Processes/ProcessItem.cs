@@ -15,12 +15,12 @@ namespace Plugins.Processes
 
         public string Text
         {
-            get { return _process.ProcessName; }
+            get { return string.Format("{0} - {1}", _process.ProcessName, _process.MainWindowTitle); }
         }
 
         public string Description
         {
-            get { return _process.ProcessName + "-" + _process.MainWindowTitle; }
+            get { return string.Format("Process {0} - Window {1} with id: {2}", _process.ProcessName, _process.MainWindowTitle, _process.Id); }
         }
 
         public object Item

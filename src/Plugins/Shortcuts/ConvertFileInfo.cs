@@ -1,6 +1,8 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.IO;
 using Core.Abstractions;
+using Core.Extensions;
 using Lucene.Net.Documents;
 
 namespace Plugins.Shortcuts
@@ -16,6 +18,11 @@ namespace Plugins.Shortcuts
         public string ToName(FileInfo t)
         {
             return Path.GetFileNameWithoutExtension(t.Name);
+        }
+
+        public string ToType(FileInfo t)
+        {
+            return t.FriendlyTypeName();
         }
 
         public Document ToDocument(FileInfo fileInfo)

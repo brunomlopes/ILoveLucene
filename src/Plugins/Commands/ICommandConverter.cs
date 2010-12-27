@@ -40,5 +40,10 @@ namespace Plugins.Commands
         {
             return t.Text;
         }
+
+        public string ToType(ICommand t)
+        {
+            return "Command";
+        }
     }
 }

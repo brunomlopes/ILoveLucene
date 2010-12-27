@@ -12,6 +12,7 @@ namespace Core.Abstractions
         string ToId(T t);
         Document ToDocument(T t);
         string ToName(T t);
+        string ToType(T t);
     }
 
     public static class IConverterExtensions

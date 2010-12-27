@@ -82,7 +82,7 @@ namespace Core.Lucene
         private BooleanQuery GetQueryForText(string text)
         {
             var queryParser = new MultiFieldQueryParser(Version.LUCENE_29,
-                                                        new[] { SpecialFields.Name, SpecialFields.Learnings },
+                                                        new[] { SpecialFields.Name, SpecialFields.Learnings, SpecialFields.Type },
                                                         new StandardAnalyzer(Version.LUCENE_29));
             queryParser.SetFuzzyMinSim((float)Configuration.FuzzySimilarity);
             queryParser.SetDefaultOperator(QueryParser.Operator.AND);
