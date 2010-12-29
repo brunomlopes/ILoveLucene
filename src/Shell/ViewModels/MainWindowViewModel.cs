@@ -229,6 +229,14 @@ namespace ILoveLucene.ViewModels
 
         private void SetError(Exception e)
         {
+            var aggregateException = e as AggregateException;
+            if(aggregateException != null)
+            {
+                foreach (var exception in aggregateException.InnerExceptions)
+                {
+                    _log.Error(exception);
+                }
+            }
             Description = e.Message;
         }
 

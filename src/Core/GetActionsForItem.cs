@@ -28,13 +28,17 @@ namespace Core
         public IEnumerable<IActOnItem> ActionsForItem(AutoCompletionResult.CommandResult result)
         {
             var item = result.Item;
-            var sha1 = result.CompletionId.GetSha1();
             var actions = new List<IActOnItem>();
-            if (_learnings.ContainsKey(sha1) && _learnings[sha1].CanActOn(item))
+
+            if (result.CompletionId != null)
             {
-                actions.Add(_learnings[sha1]);
+                var sha1 = result.CompletionId.GetSha1();
+                if (_learnings.ContainsKey(sha1) && _learnings[sha1].CanActOn(item))
+                {
+                    actions.Add(_learnings[sha1]);
+                }
             }
-                
+
             return actions.Concat(Actions.Where(a => a.TypedItemType.IsInstanceOfType(item.Item) && a.CanActOn(item)).OrderBy(c => c.Text)).Distinct();
         }
 
