@@ -51,6 +51,7 @@ namespace Plugins
 
         private double? Calculate(string expression)
         {
+            if (expression.StartsWith("=")) expression = expression.Substring(1);
             ScriptSource source =
                 _engine.CreateScriptSourceFromString(expression,
                                                      SourceCodeKind.Expression);
