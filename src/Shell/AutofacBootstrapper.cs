@@ -20,6 +20,7 @@ using Quartz;
 using Quartz.Impl;
 using Quartz.Simpl;
 using Autofac.Integration.Mef;
+using ILog = Core.Abstractions.ILog;
 
 namespace ILoveLucene
 {
@@ -50,12 +51,18 @@ namespace ILoveLucene
             loadConfiguration
                 .Load(MefContainer);
 
+              var root = new FileInfo(Assembly.GetCallingAssembly().Location).DirectoryName;
+            var learningStorageLocation = new DirectoryInfo(Path.Combine(root, "learnings"));
+            var indexStorageLocation = new DirectoryInfo(Path.Combine(root, "index"));
+            var logFileLocation = new FileInfo(Path.Combine(root, "log.txt"));
+
             var scheduler = new StdSchedulerFactory().GetScheduler();
             scheduler.JobFactory = new MefJobFactory(new SimpleJobFactory(), MefContainer);
 
             var batch = new CompositionBatch();
             batch.AddExportedValue(MefContainer);
             batch.AddExportedValue<ILoadConfiguration>(loadConfiguration);
+            batch.AddExportedValue<ILog>(new FileLogger(logFileLocation, tag: "mef"));
             MefContainer.Compose(batch);
 
             builder.RegisterInstance(MefContainer).AsSelf();
@@ -64,10 +71,7 @@ namespace ILoveLucene
             builder.RegisterInstance<IWindowManager>(new WindowManager());
             builder.RegisterInstance<IEventAggregator>(new EventAggregator());
 
-            var root = new FileInfo(Assembly.GetCallingAssembly().Location).DirectoryName;
-            var learningStorageLocation = new DirectoryInfo(Path.Combine(root, "learnings"));
-            var indexStorageLocation = new DirectoryInfo(Path.Combine(root, "index"));
-            var logFileLocation = new FileInfo(Path.Combine(root, "log.txt"));
+          
 
 
             builder.RegisterModule(new LoggingModule(t => new FileLogger(logFileLocation, t.Name)));
@@ -84,6 +88,7 @@ namespace ILoveLucene
 
             builder.RegisterType<FileSystemLearningRepository>().As<ILearningRepository>().WithParameter("input", learningStorageLocation);
             builder.RegisterType<ScheduleIndexJobs>().As<IStartupTask>();
+
 
             builder.RegisterType<SeparateIndexesDirectoryFactory>()
                 .As<IDirectoryFactory>().WithParameter("root", indexStorageLocation)
