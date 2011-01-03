@@ -38,6 +38,11 @@ namespace Core
                     actions.Add(_learnings[sha1]);
                 }
             }
+            var actionForType = ActionForType(item.GetType());
+            if(actionForType != null && actionForType.CanActOn(item))
+            {
+                actions.Add(actionForType);
+            }
 
             return actions.Concat(Actions.Where(a => a.TypedItemType.IsInstanceOfType(item.Item) && a.CanActOn(item)).OrderBy(c => c.Text)).Distinct();
         }
@@ -45,6 +50,34 @@ namespace Core
         public void LearnActionForCommandResult(string input, IActOnItem selectedAction, AutoCompletionResult.CommandResult result)
         {
             _learnings[result.CompletionId.GetSha1()] = selectedAction;
+            LearnForType(result.Item.GetType(), selectedAction);
+        }
+
+        private void LearnForType(Type type, IActOnItem selectedAction)
+        {
+            var iface = GenericITypedItem(type);
+            if (iface != null)
+            {
+                _learnings[KeyForType(iface)] = selectedAction;
+            }
+        }
+
+        private IActOnItem ActionForType(Type type)
+        {
+            var iface = GenericITypedItem(type);
+            if (iface != null && _learnings.ContainsKey(KeyForType(iface)))
+            {
+                return _learnings[KeyForType(iface)];
+            }
+            return null;
+        }
+        private Type GenericITypedItem(Type type)
+        {
+            return type.GetInterfaces().SingleOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (ITypedItem<>));
+        }
+        private string KeyForType(Type type)
+        {
+            return type.GetGenericArguments().First().FullName;
         }
     }
 }
