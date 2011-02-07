@@ -98,6 +98,7 @@
     <Compile Include="Shortcuts\FileInfoItem.cs" />
     <Compile Include="Shortcuts\RunFileInfo.cs" />
     <Compile Include="Shortcuts\ShortcutSource.cs" />
+    <Compile Include="Tasks\CreateTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

@@ -1,4 +1,4 @@
 ﻿{
-	IndexingFrequencyForPlugin : {"Plugins.Shortcuts.ShortcutSource, Plugins":1800 , "Plugins.Commands.StandaloneCommandsSource, Plugins":1200, "Plugins.Processes.ProcessSource, Plugins":5},
+	IndexingFrequencyForPlugin : {"Plugins.Shortcuts.ShortcutSource, Plugins":1800 , "Plugins.Commands.StandaloneCommandsSource, Plugins":1200, "Plugins.Processes.ProcessSource, Plugins":5, "Plugins.Tasks.TaskRepository, Plugins":60},
 	DefaultFrequency : 900
 }
