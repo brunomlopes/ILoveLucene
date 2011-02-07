@@ -43,7 +43,7 @@ namespace ILoveLucene
         private void WriteWithLevel(string level, string format, object[] args, string optional = null)
         {
             var now = DateTime.Now;
-            var prefix = now.ToShortDateString() + " - " + now.ToShortTimeString() + " ["+level+"] " + _tag + " - ";
+            var prefix = string.Format("{0} - {1}.{2:000} [{3}] {4} - ", now.ToShortDateString(), now.ToShortTimeString(), now.Millisecond, level, _tag);
             var formated = string.Format(format, args);
             var output = prefix + formated + "\n";
 
@@ -53,7 +53,6 @@ namespace ILoveLucene
             lock (SyncFile)
             {
                 File.AppendAllText(_outFile.FullName, output, Encoding.UTF8);
-                
             }
         }
     }
