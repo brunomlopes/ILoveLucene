@@ -12,6 +12,13 @@ namespace Core.Abstractions
         string ToId(T t);
         Document ToDocument(T t);
         string ToName(T t);
+
+        /// <summary>
+        /// Type name used in the indexer and later on in the searcher to allow the user to filter by type
+        /// Search would be something like "process firefox"
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         string ToType(T t);
     }
 

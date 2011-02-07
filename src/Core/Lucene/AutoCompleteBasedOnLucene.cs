@@ -35,7 +35,20 @@ namespace Core.Lucene
         {
             if (string.IsNullOrWhiteSpace(text)) return AutoCompletionResult.NoResult(text);
 
-            var searchers = _directoryFactory.GetAllDirectories().Select(d => new IndexSearcher(d, true)).ToArray();
+            var searchers = _directoryFactory.GetAllDirectories().Select(d =>
+                                                                             {
+                                                                                 try
+                                                                                 {
+                                                                                     return new IndexSearcher(d, true);
+                                                                                 }
+                                                                                 catch (Exception e)
+                                                                                 {
+                                                                                     _log.Error(e, "While searching directory {0}", d);
+                                                                                     return null;
+                                                                                 }
+                                                                             })
+                                                                             .Where(s => s != null)
+                                                                             .ToArray();
             var searcher = new MultiSearcher(searchers);
             try
             {
