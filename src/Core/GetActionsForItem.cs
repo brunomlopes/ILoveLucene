@@ -49,6 +49,7 @@ namespace Core
 
         public void LearnActionForCommandResult(string input, IActOnItem selectedAction, AutoCompletionResult.CommandResult result)
         {
+            if (result.IsTransient()) return;
             _learnings[result.CompletionId.GetSha1()] = selectedAction;
             LearnForType(result.Item.GetType(), selectedAction);
         }

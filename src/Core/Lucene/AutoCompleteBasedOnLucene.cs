@@ -87,7 +87,7 @@ namespace Core.Lucene
 
         public void LearnInputForCommandResult(string input, AutoCompletionResult.CommandResult result)
         {
-            if (result.CompletionId == null) return;
+            if (result.IsTransient()) return;
 
             var storage = _sourceStorageFactory.SourceStorageFor(result.CompletionId.SourceId);
 

@@ -16,6 +16,11 @@ namespace Core.Abstractions
                 Item = item;
                 CompletionId = completionId;
             }
+
+            public bool IsTransient()
+            {
+                return CompletionId == null;
+            }
         }
 
         public bool HasAutoCompletion
