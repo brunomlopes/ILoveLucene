@@ -67,6 +67,23 @@ namespace Plugins.Tasks
             return !item.LastStartDate.HasValue;
         }
     }
+    
+    [Export(typeof(IActOnItem))]
+    public class ArchiveTask : BaseActOnTypedItem<Task>, ICanActOnTypedItem<Task>
+    {
+        [Import]
+        public TaskRepository Repository { get; set; }
+
+        public override void ActOn(Task task)
+        {
+            Repository.ArchiveTask(task);
+        }
+
+        public bool CanActOn(Task item)
+        {
+            return !item.LastStartDate.HasValue;
+        }
+    }
 
     [Export(typeof(IActOnItem))]
     public class StopTask: BaseActOnTypedItem<Task>, ICanActOnTypedItem<Task>
@@ -143,6 +160,7 @@ namespace Plugins.Tasks
 
             _safeFilenameRegex = new Regex(@"[<>:""/\\|?*]");
             if (!Directory.Exists(_tasksLocation)) Directory.CreateDirectory(_tasksLocation);
+            if (!Directory.Exists(Path.Combine(_tasksLocation, "archive"))) Directory.CreateDirectory(Path.Combine(_tasksLocation, "archive"));
         }
 
         public void CreateTask(Task task)
@@ -206,6 +224,12 @@ namespace Plugins.Tasks
         public override bool Persistent
         {
             get { return false; }
+        }
+
+        public void ArchiveTask(Task task)
+        {
+            File.Move(Path.Combine(_tasksLocation, task.FileName),
+                      Path.Combine(_tasksLocation, "archive", task.FileName));
         }
     }
 
