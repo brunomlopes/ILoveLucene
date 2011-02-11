@@ -15,8 +15,9 @@ namespace Plugins.Shortcuts
     public class ShortcutSource : BaseItemSource
     {
         private HashSet<FileInfo> _shortcutPaths;
-        private static readonly object _shortcutPathsLock = new object();
-        public static string[] _extensions = new[] {".exe", ".bat", ".ps1", ".ipy", ".lnk", ".appref-ms"};
+
+        [Import]
+        public ILog Log { get; set; }
 
         [Import(typeof(Configuration))]
         public Configuration Conf { get; set; }
@@ -29,17 +30,19 @@ namespace Plugins.Shortcuts
         private void ScanDirectoryForShortcuts(string s)
         {
             var currentDir = new DirectoryInfo(s);
+            if(!currentDir.Exists)
+            {
+                Log.Info("Directory '{0}' doesn't exist", s);
+                return;
+            }
 
             try
             {
                 var fileInfos = currentDir
                     .GetFiles("*.*", SearchOption.TopDirectoryOnly)
                     .Where(f => Conf.Extensions.Contains(f.Extension)).ToList();
-                Debug.WriteLine("Found {0} files in {1}", fileInfos.Count(), currentDir);
-                lock (_shortcutPathsLock)
-                {
-                    _shortcutPaths.UnionWith(fileInfos);
-                }
+                Log.Debug("Found {0} files in {1}", fileInfos.Count(), currentDir);
+                _shortcutPaths.UnionWith(fileInfos);
             }
             catch (UnauthorizedAccessException)
             {
@@ -68,7 +71,7 @@ namespace Plugins.Shortcuts
                                                      .ForEach(ScanDirectoryForShortcuts);
                                                  return _shortcutPaths.Cast<object>();
                                              })
-                .GuardForException(e => Debug.WriteLine("Exception on task:" + e));
+                .GuardForException(e => Log.Debug("Exception on task:" + e));
         }
     }
 }

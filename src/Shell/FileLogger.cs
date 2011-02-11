@@ -12,11 +12,13 @@ namespace ILoveLucene
 
         private readonly FileInfo _outFile;
         private string _tag;
+        private readonly bool _writeDebug;
 
-        public FileLogger(FileInfo outFile, string tag = null)
+        public FileLogger(FileInfo outFile, string tag = null, bool writeDebug = false)
         {
             if (tag == null) tag = string.Empty;
             _tag = tag;
+            _writeDebug = writeDebug;
             _outFile = outFile;
         }
 
@@ -38,6 +40,18 @@ namespace ILoveLucene
         public void Error(Exception exception, string format, params object[] args)
         {
             WriteWithLevel("ERROR", format, args, exception.StackTrace);
+        }
+
+        public void Debug(string format, params object[] args)
+        {
+            if(_writeDebug)
+            {
+                WriteWithLevel("DEBUG", format, args);
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine(format, args);
+            }
         }
 
         private void WriteWithLevel(string level, string format, object[] args, string optional = null)

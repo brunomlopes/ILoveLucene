@@ -9,24 +9,29 @@ namespace ILoveLucene
     {
         public void Info(string format, params object[] args)
         {
-            Debug.WriteLine(string.Format(format, args));
+            System.Diagnostics.Debug.WriteLine(string.Format(format, args));
         }
 
         public void Warn(string format, params object[] args)
         {
-            Debug.WriteLine(string.Format(format, args));
+            System.Diagnostics.Debug.WriteLine(string.Format(format, args));
         }
 
         public void Error(Exception exception)
         {
-            Debug.WriteLine(exception.ToString());
+            System.Diagnostics.Debug.WriteLine(exception.ToString());
         }
 
         public void Error(Exception exception, string format, params object[] args)
         {
-            Debug.WriteLine(string.Format(format,args));
-            Debug.WriteLine(exception.ToString());
-            Debug.WriteLine(exception.StackTrace);
+            System.Diagnostics.Debug.WriteLine(string.Format(format, args));
+            System.Diagnostics.Debug.WriteLine(exception.ToString());
+            System.Diagnostics.Debug.WriteLine(exception.StackTrace);
+        }
+
+        public void Debug(string format, params object[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(format, args);
         }
     }
 }
