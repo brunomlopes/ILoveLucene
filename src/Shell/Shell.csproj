@@ -79,6 +79,7 @@
     <Compile Include="AutofacBootstrapper.cs" />
     <Compile Include="Commands\XCopyPathToClipboard.cs" />
     <Compile Include="FileLogger.cs" />
+    <Compile Include="OnCaliburnMicroUiThread.cs" />
     <Compile Include="ListWithCurrentSelection.cs" />
     <Compile Include="Modules\LoggingModule.cs" />
     <Compile Include="Modules\SatisfyMefImports.cs" />

@@ -15,20 +15,12 @@ namespace ILoveLucene.Commands
         [Import]
         public ILog Log { get; set; }
 
+        [Import]
+        public IOnUiThread OnUiThread { get; set; }
+
         public override void ActOn(FileInfo item)
         {
-            // TODO: calling onuithread should be wrapped in order to trap exceptions
-            Caliburn.Micro.Execute.OnUIThread(() =>
-                                                  {
-                                                      try
-                                                      {
-                                                          Clipboard.SetText(item.FullName);
-                                                      }
-                                                      catch (Exception e)
-                                                      {
-                                                          Log.Error(e, "Error setting clipboard:{0}", e.Message);
-                                                      }
-                                                  });
+            OnUiThread.Execute(() => Clipboard.SetText(item.FullName));
         }
     }
 }
