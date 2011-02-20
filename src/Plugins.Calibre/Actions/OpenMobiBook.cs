@@ -9,7 +9,7 @@ namespace Plugins.Calibre.Actions
     {
         protected override Func<string, bool> FormatSelector
         {
-            get { return f => f.ToLowerInvariant().EndsWith(".epub");}
+            get { return f => f.ToLowerInvariant().EndsWith(".mobi");}
         }
     }
 }
