@@ -64,6 +64,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -93,6 +94,12 @@
     <Compile Include="Putty.cs" />
     <Compile Include="Reindex.cs" />
     <Compile Include="ReloadConfiguration.cs" />
+    <Compile Include="Services\RestartProcess.cs" />
+    <Compile Include="Services\ServiceItemConverter.cs" />
+    <Compile Include="Services\ServiceTypedItem.cs" />
+    <Compile Include="Services\ServicesSource.cs" />
+    <Compile Include="Services\StartProcess.cs" />
+    <Compile Include="Services\StopProcess.cs" />
     <Compile Include="Shortcuts\Configuration.cs" />
     <Compile Include="Shortcuts\ConvertFileInfo.cs" />
     <Compile Include="Shortcuts\FileInfoItem.cs" />

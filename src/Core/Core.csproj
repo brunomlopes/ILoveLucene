@@ -74,6 +74,7 @@
     <Compile Include="Abstractions\PluginConfigurationAttribute.cs" />
     <Compile Include="Abstractions\TextItem.cs" />
     <Compile Include="Extensions\AnalyzerExtension.cs" />
+    <Compile Include="Extensions\DocumentExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="GetActionsForItem.cs" />
     <Compile Include="LoadConfiguration.cs" />

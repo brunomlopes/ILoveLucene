@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using Core.Abstractions;
 using Lucene.Net.Documents;
+using Core.Extensions;
 
 namespace Plugins.Processes
 {
@@ -22,9 +23,7 @@ namespace Plugins.Processes
 
         public Document ToDocument(Process t)
         {
-            var document = new Document();
-            document.Add(new Field("id", t.Id.ToString(), Field.Store.YES, Field.Index.NO));
-            return document;
+            return this.Document().Store("id", t.Id.ToString());
         }
 
         public string ToName(Process t)
