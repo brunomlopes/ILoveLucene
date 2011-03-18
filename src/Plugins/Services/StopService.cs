@@ -5,7 +5,7 @@ using Core.Abstractions;
 namespace Plugins.Services
 {
     [Export(typeof (IActOnItem))]
-    public class StopProcess : BaseActOnTypedItem<ServiceController>, ICanActOnTypedItem<ServiceController>
+    public class StopService : BaseActOnTypedItem<ServiceController>, ICanActOnTypedItem<ServiceController>
     {
         public bool CanActOn(ServiceController item)
         {
@@ -14,7 +14,7 @@ namespace Plugins.Services
 
         public override void ActOn(ServiceController item)
         {
-            item.Stop();
+            ServicesSource.GetElevatedHandler().StopService(item.ServiceName);
         }
     }
 }

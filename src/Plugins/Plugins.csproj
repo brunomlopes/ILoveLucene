@@ -64,6 +64,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -94,12 +95,12 @@
     <Compile Include="Putty.cs" />
     <Compile Include="Reindex.cs" />
     <Compile Include="ReloadConfiguration.cs" />
-    <Compile Include="Services\RestartProcess.cs" />
+    <Compile Include="Services\RestartService.cs" />
     <Compile Include="Services\ServiceItemConverter.cs" />
     <Compile Include="Services\ServiceTypedItem.cs" />
     <Compile Include="Services\ServicesSource.cs" />
-    <Compile Include="Services\StartProcess.cs" />
-    <Compile Include="Services\StopProcess.cs" />
+    <Compile Include="Services\StartService.cs" />
+    <Compile Include="Services\StopService.cs" />
     <Compile Include="Shortcuts\Configuration.cs" />
     <Compile Include="Shortcuts\ConvertFileInfo.cs" />
     <Compile Include="Shortcuts\FileInfoItem.cs" />
@@ -111,6 +112,10 @@
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{28E91DF6-B35A-4341-AB82-E9CE24B04750}</Project>
       <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ElevationHelper.Services\ElevationHelper.Services.csproj">
+      <Project>{5397046B-020B-45D0-9779-388F12FCE744}</Project>
+      <Name>ElevationHelper.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
