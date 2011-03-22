@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElevationHelper", "src\Elev
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElevationHelper.Services", "src\ElevationHelper.Services\ElevationHelper.Services.csproj", "{5397046B-020B-45D0-9779-388F12FCE744}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugins.SqlServer", "src\Plugins.SqlServer\Plugins.SqlServer.csproj", "{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,16 @@ Global
 		{5397046B-020B-45D0-9779-388F12FCE744}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{5397046B-020B-45D0-9779-388F12FCE744}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{5397046B-020B-45D0-9779-388F12FCE744}.Release|x86.ActiveCfg = Release|Any CPU
+		{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

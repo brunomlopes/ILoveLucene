@@ -146,6 +146,10 @@
       <Project>{B8C7C8AE-FB80-473B-85D5-5D0D7F302E09}</Project>
       <Name>Plugins.Calibre</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Plugins.SqlServer\Plugins.SqlServer.csproj">
+      <Project>{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}</Project>
+      <Name>Plugins.SqlServer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Plugins\Plugins.csproj">
       <Project>{133FD5D5-7C29-4A09-9DD3-A8E1506767C7}</Project>
       <Name>Plugins</Name>
