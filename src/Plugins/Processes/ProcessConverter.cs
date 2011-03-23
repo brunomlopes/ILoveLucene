@@ -7,7 +7,7 @@ using Core.Extensions;
 
 namespace Plugins.Processes
 {
-    [Export(typeof(IConverter))]
+    [Export(typeof (IConverter))]
     public class ProcessConverter : IConverter<Process>
     {
         public IItem FromDocumentToItem(Document document)
@@ -33,7 +33,7 @@ namespace Plugins.Processes
 
         public string ToType(Process t)
         {
-            return t.GetType().Name;
+            return t.MainWindowHandle != IntPtr.Zero ? "process window" : "process";
         }
     }
 }
