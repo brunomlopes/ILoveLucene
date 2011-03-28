@@ -30,6 +30,11 @@ namespace ElevationHelper.Services
             service.Start();
         }
 
+        public void AmIAlive()
+        {
+            return;
+        }
+
         private ServiceController GetService(string serviceName)
         {
             return ServiceController.GetServices().Single(s => s.ServiceName == serviceName);
