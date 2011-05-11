@@ -138,6 +138,10 @@
       <Project>{28E91DF6-B35A-4341-AB82-E9CE24B04750}</Project>
       <Name>Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ElevationHelper.Services\ElevationHelper.Services.csproj">
+      <Project>{5397046B-020B-45D0-9779-388F12FCE744}</Project>
+      <Name>ElevationHelper.Services</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ElevationHelper\ElevationHelper.csproj">
       <Project>{5E8250D4-5A43-497B-A425-002E084F6043}</Project>
       <Name>ElevationHelper</Name>

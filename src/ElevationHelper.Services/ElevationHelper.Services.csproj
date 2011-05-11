@@ -42,7 +42,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addresses.cs" />
+    <Compile Include="ElevatedChannel.cs" />
+    <Compile Include="IAmAlive.cs" />
     <Compile Include="IServiceHandler.cs" />
+    <Compile Include="IStopTheElevationHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceHandler.cs" />
   </ItemGroup>

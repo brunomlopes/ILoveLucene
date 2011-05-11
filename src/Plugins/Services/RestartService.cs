@@ -14,7 +14,7 @@ namespace Plugins.Services
 
         public override void ActOn(ServiceController item)
         {
-            ServicesSource.GetElevatedHandler().RestartService(item.ServiceName);
+            ServicesSource.ElevatedServiceHandler.GetElevatedHandler().RestartService(item.ServiceName);
         }
     }
 }

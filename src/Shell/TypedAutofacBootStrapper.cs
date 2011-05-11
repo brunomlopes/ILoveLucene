@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using Autofac;
 using Caliburn.Micro;
+using ElevationHelper.Services;
 using IContainer = Autofac.IContainer;
 
 namespace ILoveLucene
@@ -16,6 +17,13 @@ namespace ILoveLucene
         protected IContainer Container
         {
             get { return _container; }
+        }
+
+        protected override void OnExit(object sender, EventArgs e)
+        {
+            var elevatedChannel = new ElevatedChannel<IStopTheElevationHelper>(Addresses.StopElevationHelper);
+            if(elevatedChannel.ElevationProcessExists())
+                elevatedChannel.GetElevatedHandler().Stop();
         }
 
         protected override void Configure()

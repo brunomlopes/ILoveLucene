@@ -1,4 +1,6 @@
-﻿using System.ServiceModel;
+﻿using System;
+using System.ServiceModel;
+using System.ServiceModel.Description;
 using ElevationHelper.Services;
 
 namespace ElevationHelper
@@ -9,19 +11,29 @@ namespace ElevationHelper
 
         private static void Main(string[] args)
         {
-            var svh = new ServiceHost(typeof (ServiceHandler));
-            svh.AddServiceEndpoint(typeof (IServiceHandler), new NetNamedPipeBinding(), Addresses.Services);
-
-            svh.Open();
+            ServiceHost svh = OpenServiceHost(typeof (ServiceHandler), typeof (IServiceHandler), Addresses.Services);
+            ServiceHost stop = OpenServiceHost(new StopElevationHelper(stopFlag), typeof(IStopTheElevationHelper), Addresses.StopElevationHelper);
 
             stopFlag.WaitOne();
 
             svh.Close();
+            stop.Close();
         }
 
-        public static void Stop()
+        private static ServiceHost OpenServiceHost(Type type, Type contract, string address)
         {
-            stopFlag.Set();
+            var svh = new ServiceHost(type);
+            svh.AddServiceEndpoint(contract, new NetNamedPipeBinding(), address);
+            svh.Open();
+            return svh;
+        }
+
+        private static ServiceHost OpenServiceHost(object singletonInstance, Type contract, string address)
+        {
+            var svh = new ServiceHost(singletonInstance);
+            svh.AddServiceEndpoint(contract, new NetNamedPipeBinding(), address);            
+            svh.Open();
+            return svh;
         }
     }
 }

@@ -3,5 +3,6 @@
     public static class Addresses
     {
         public const string Services = "net.pipe://localhost/ILoveLucene.ElevationPipe/Services";
+        public const string StopElevationHelper = "net.pipe://localhost/ILoveLucene.ElevationPipe/StopElevationHelper";
     }
 }
