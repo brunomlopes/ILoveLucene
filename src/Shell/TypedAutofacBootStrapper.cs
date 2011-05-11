@@ -21,7 +21,7 @@ namespace ILoveLucene
 
         protected override void OnExit(object sender, EventArgs e)
         {
-            var elevatedChannel = new ElevatedChannel<IStopTheElevationHelper>(Addresses.StopElevationHelper);
+            var elevatedChannel = new ElevatedChannel<IStopTheElevationHelper>();
             if(elevatedChannel.ElevationProcessExists())
                 elevatedChannel.GetElevatedHandler().Stop();
         }

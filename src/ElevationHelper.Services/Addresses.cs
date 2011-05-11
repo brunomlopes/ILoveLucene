@@ -1,8 +1,12 @@
-﻿namespace ElevationHelper.Services
+﻿using System;
+
+namespace ElevationHelper.Services
 {
     public static class Addresses
     {
-        public const string Services = "net.pipe://localhost/ILoveLucene.ElevationPipe/Services";
-        public const string StopElevationHelper = "net.pipe://localhost/ILoveLucene.ElevationPipe/StopElevationHelper";
+        public static string AddressForType(Type t)
+        {
+            return "net.pipe://localhost/ILoveLucene.ElevationPipe/" + t.FullName;
+        }
     }
 }

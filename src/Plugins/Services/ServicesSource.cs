@@ -11,7 +11,7 @@ namespace Plugins.Services
     [Export(typeof (IItemSource))]
     public class ServicesSource : BaseItemSource
     {
-        public static readonly ElevatedChannel<IServiceHandler> ElevatedServiceHandler = new ElevatedChannel<IServiceHandler>(Addresses.Services);
+        public static readonly ElevatedChannel<IServiceHandler> ElevatedServiceHandler = new ElevatedChannel<IServiceHandler>();
 
         public override Task<IEnumerable<object>> GetItems()
         {

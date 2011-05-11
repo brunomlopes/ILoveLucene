@@ -11,8 +11,8 @@ namespace ElevationHelper
 
         private static void Main(string[] args)
         {
-            ServiceHost svh = OpenServiceHost(typeof (ServiceHandler), typeof (IServiceHandler), Addresses.Services);
-            ServiceHost stop = OpenServiceHost(new StopElevationHelper(stopFlag), typeof(IStopTheElevationHelper), Addresses.StopElevationHelper);
+            ServiceHost svh = OpenServiceHost(typeof (ServiceHandler), typeof (IServiceHandler));
+            ServiceHost stop = OpenServiceHost(new StopElevationHelper(stopFlag), typeof(IStopTheElevationHelper));
 
             stopFlag.WaitOne();
 
@@ -20,18 +20,18 @@ namespace ElevationHelper
             stop.Close();
         }
 
-        private static ServiceHost OpenServiceHost(Type type, Type contract, string address)
+        private static ServiceHost OpenServiceHost(Type type, Type contract)
         {
             var svh = new ServiceHost(type);
-            svh.AddServiceEndpoint(contract, new NetNamedPipeBinding(), address);
+            svh.AddServiceEndpoint(contract, new NetNamedPipeBinding(), Addresses.AddressForType(contract));
             svh.Open();
             return svh;
         }
 
-        private static ServiceHost OpenServiceHost(object singletonInstance, Type contract, string address)
+        private static ServiceHost OpenServiceHost(object singletonInstance, Type contract)
         {
             var svh = new ServiceHost(singletonInstance);
-            svh.AddServiceEndpoint(contract, new NetNamedPipeBinding(), address);            
+            svh.AddServiceEndpoint(contract, new NetNamedPipeBinding(), Addresses.AddressForType(contract));            
             svh.Open();
             return svh;
         }

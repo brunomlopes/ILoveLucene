@@ -12,23 +12,16 @@ namespace ElevationHelper.Services
     {
         private T _elevatedHandler;
         private ChannelFactory<T> _channelFactory;
-        private string Address;
+        private readonly string _address;
 
-        public ElevatedChannel(string address)
+        public ElevatedChannel()
         {
-            Address = address;
+            _address = Addresses.AddressForType(typeof(T));
         }
 
         public T GetElevatedHandler()
         {
             // TODO: refactor this. it's quite messy.
-            T elevatedHandler = ReallyGetElevatedHandler();
-
-            return elevatedHandler;
-        }
-
-        private T ReallyGetElevatedHandler()
-        {
             if (!ElevationProcessExists())
             {
                 StartElevationHelper();
@@ -46,7 +39,7 @@ namespace ElevationHelper.Services
             }
             if (_channelFactory == null)
             {
-                _channelFactory = new ChannelFactory<T>(new NetNamedPipeBinding(), Address);
+                _channelFactory = new ChannelFactory<T>(new NetNamedPipeBinding(), _address);
                 _elevatedHandler = null;
             }
             var clientChannel = ((IClientChannel) _elevatedHandler);
@@ -65,7 +58,9 @@ namespace ElevationHelper.Services
             {
                 _elevatedHandler = null;
             }
-            return _elevatedHandler ?? (_elevatedHandler = _channelFactory.CreateChannel());
+            T elevatedHandler = _elevatedHandler ?? (_elevatedHandler = _channelFactory.CreateChannel());
+
+            return elevatedHandler;
         }
 
         public bool ElevationProcessExists()
@@ -73,9 +68,9 @@ namespace ElevationHelper.Services
             return Process.GetProcessesByName("ILoveLucene.ElevationHelper").Any();
         }
 
-        public static void StartElevationHelper()
+        private static void StartElevationHelper()
         {
-            string location = new FileInfo(Assembly.GetEntryAssembly().Location).Directory.FullName;
+            var location = new FileInfo(Assembly.GetEntryAssembly().Location).Directory.FullName;
             var arguments = new ProcessStartInfo(Path.Combine(location, "ILoveLucene.ElevationHelper.exe"));
             arguments.Verb = "runas";
             Process.Start(arguments);
