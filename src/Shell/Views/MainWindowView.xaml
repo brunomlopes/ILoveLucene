@@ -17,7 +17,7 @@
 						</i:EventTrigger>
 					</i:Interaction.Triggers>
 				</TextBox>
-                <ComboBox Name="Actions" FontSize="22">
+                <ComboBox Name="Actions" FontSize="22" TextSearch.TextPath="Text" IsSynchronizedWithCurrentItem="True" IsEditable="True" IsTextSearchEnabled="true" IsTextSearchCaseSensitive="False">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Text}" />
