@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
@@ -22,7 +21,6 @@ using ILoveLucene.ViewModels;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Simpl;
-using Autofac.Integration.Mef;
 using ILog = Core.Abstractions.ILog;
 
 namespace ILoveLucene
@@ -51,10 +49,9 @@ namespace ILoveLucene
 
             var loadConfiguration =
                 new LoadConfiguration(new DirectoryInfo(Path.Combine(assemblyDirectory, "Configuration")));
-            loadConfiguration
-                .Load(MefContainer);
+            loadConfiguration.Load(MefContainer);
 
-              var root = new FileInfo(Assembly.GetCallingAssembly().Location).DirectoryName;
+            var root = new FileInfo(Assembly.GetCallingAssembly().Location).DirectoryName;
             var learningStorageLocation = new DirectoryInfo(Path.Combine(root, "learnings"));
             var indexStorageLocation = new DirectoryInfo(Path.Combine(root, "index"));
             var logFileLocation = new FileInfo(Path.Combine(root, "log.txt"));
@@ -74,7 +71,6 @@ namespace ILoveLucene
             builder.RegisterInstance<IWindowManager>(new WindowManager());
             builder.RegisterInstance<IEventAggregator>(new EventAggregator());
 
-          
             builder.RegisterModule(new LoggingModule(t => new FileLogger(logFileLocation, t.Name)));
             builder.RegisterModule(new SatisfyMefImports(MefContainer));
 
