@@ -1,15 +1,17 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Autofac;
 using Caliburn.Micro;
-using ElevationHelper.Services;
 using IContainer = Autofac.IContainer;
 
-namespace ILoveLucene
+namespace ILoveLucene.Infrastructure
 {
-    public class TypedAutofacBootStrapper<TRootViewModel> : Bootstrapper<TRootViewModel>
+    /// <summary>
+    /// Base class for the bootstrapper
+    /// </summary>
+    public abstract class TypedAutofacBootStrapper<TRootViewModel> : Bootstrapper<TRootViewModel>
     {
         private readonly ILog _logger = LogManager.GetLog(typeof (TypedAutofacBootStrapper<>));
         private IContainer _container;
@@ -17,13 +19,6 @@ namespace ILoveLucene
         protected IContainer Container
         {
             get { return _container; }
-        }
-
-        protected override void OnExit(object sender, EventArgs e)
-        {
-            var elevatedChannel = new ElevatedChannel<IStopTheElevationHelper>();
-            if(elevatedChannel.ElevationProcessExists())
-                elevatedChannel.GetElevatedHandler().Stop();
         }
 
         protected override void Configure()

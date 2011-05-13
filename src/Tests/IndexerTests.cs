@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.Abstractions;
 using Core.Lucene;
 using ILoveLucene;
+using ILoveLucene.Loggers;
 using Lucene.Net.Documents;
 using Lucene.Net.Store;
 using Xunit;

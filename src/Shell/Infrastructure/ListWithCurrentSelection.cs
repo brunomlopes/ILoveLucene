@@ -1,18 +1,9 @@
-using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ILoveLucene
+namespace ILoveLucene.Infrastructure
 {
-    public static class ListWithCurrentSelectionExtensions
-    {
-        public static ListWithCurrentSelection<T> ToListWithCurrentSelection<T>(this IEnumerable<T> self)
-        {
-            return new ListWithCurrentSelection<T>(self);
-        }
-    }
-
     public class ListWithCurrentSelection<T> : IEnumerable<T>
     {
         private readonly T[] _items;

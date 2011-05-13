@@ -2,11 +2,10 @@
 using System.IO;
 using System.Text;
 using Caliburn.Micro;
-using CoreILog = Core.Abstractions.ILog;
 
-namespace ILoveLucene
+namespace ILoveLucene.Loggers
 {
-    public class FileLogger : ILog, CoreILog
+    public class FileLogger : ILog, Core.Abstractions.ILog
     {
         private static readonly object SyncFile = new object();
 

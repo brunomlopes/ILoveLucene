@@ -14,6 +14,9 @@ using Core;
 using Core.Abstractions;
 using Core.Lucene;
 using Core.Scheduler;
+using ElevationHelper.Services;
+using ILoveLucene.Infrastructure;
+using ILoveLucene.Loggers;
 using ILoveLucene.Modules;
 using ILoveLucene.ViewModels;
 using Quartz;
@@ -24,7 +27,7 @@ using ILog = Core.Abstractions.ILog;
 
 namespace ILoveLucene
 {
-    public class AutofacBootstrapper : TypedAutofacBootStrapper<IShell>
+    public class ApplicationBootstrapper : TypedAutofacBootStrapper<MainWindowViewModel>
     {
         private CompositionContainer MefContainer;
 
@@ -72,12 +75,10 @@ namespace ILoveLucene
             builder.RegisterInstance<IEventAggregator>(new EventAggregator());
 
           
-
-
             builder.RegisterModule(new LoggingModule(t => new FileLogger(logFileLocation, t.Name)));
             builder.RegisterModule(new SatisfyMefImports(MefContainer));
 
-            builder.RegisterType<MainWindowViewModel>().As<IShell>();
+            builder.RegisterType<MainWindowViewModel>().AsSelf();
             builder.RegisterType<AutoCompleteBasedOnLucene>().As<IAutoCompleteText>();
             builder.RegisterType<GetActionsForItem>().As<IGetActionsForItem>();
 
@@ -88,7 +89,6 @@ namespace ILoveLucene
 
             builder.RegisterType<FileSystemLearningRepository>().As<ILearningRepository>().WithParameter("input", learningStorageLocation);
             builder.RegisterType<ScheduleIndexJobs>().As<IStartupTask>();
-
 
             builder.RegisterType<SeparateIndexesDirectoryFactory>()
                 .As<IDirectoryFactory>().WithParameter("root", indexStorageLocation)
@@ -106,6 +106,10 @@ namespace ILoveLucene
         protected override void OnExit(object sender, EventArgs e)
         {
             Container.Resolve<IScheduler>().Shutdown();
+            var elevatedChannel = new ElevatedChannel<IStopTheElevationHelper>();
+            if (elevatedChannel.ElevationProcessExists())
+                elevatedChannel.GetElevatedHandler().Stop();
+
             base.OnExit(sender, e);
         }
     }

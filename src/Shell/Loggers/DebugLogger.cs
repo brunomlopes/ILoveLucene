@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
-using CoreILog = Core.Abstractions.ILog;
-using ILog = Caliburn.Micro.ILog;
+using Caliburn.Micro;
 
-namespace ILoveLucene
+namespace ILoveLucene.Loggers
 {
-    public class DebugLogger : ILog, CoreILog
+    public class DebugLogger : ILog, Core.Abstractions.ILog
     {
         public void Info(string format, params object[] args)
         {

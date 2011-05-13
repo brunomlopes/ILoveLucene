@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.ComponentModel.Composition;
 using Core.Abstractions;
 
-namespace ILoveLucene
+namespace ILoveLucene.Infrastructure
 {
     [Export(typeof(IOnUiThread))]
     public class OnCaliburnMicroUiThread : IOnUiThread

@@ -3,7 +3,7 @@
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary>
-					<local:AutofacBootstrapper x:Key="bootstrapper" />
+					<local:ApplicationBootstrapper x:Key="bootstrapper" />
 				</ResourceDictionary>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>

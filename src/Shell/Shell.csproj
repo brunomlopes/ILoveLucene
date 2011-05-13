@@ -76,17 +76,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="AutofacBootstrapper.cs" />
+    <Compile Include="ApplicationBootstrapper.cs" />
     <Compile Include="Commands\XCopyPathToClipboard.cs" />
-    <Compile Include="FileLogger.cs" />
-    <Compile Include="OnCaliburnMicroUiThread.cs" />
-    <Compile Include="ListWithCurrentSelection.cs" />
+    <Compile Include="Infrastructure\ListWithCurrentSelection.cs" />
+    <Compile Include="Infrastructure\ListWithCurrentSelectionExtensions.cs" />
+    <Compile Include="Infrastructure\OnCaliburnMicroUiThread.cs" />
+    <Compile Include="Infrastructure\TypedAutofacBootStrapper.cs" />
+    <Compile Include="Loggers\DebugLogger.cs" />
+    <Compile Include="Loggers\FileLogger.cs" />
     <Compile Include="Modules\LoggingModule.cs" />
     <Compile Include="Modules\SatisfyMefImports.cs" />
-    <Compile Include="TypedAutofacBootStrapper.cs" />
     <Compile Include="Commands\ExitApplication.cs" />
-    <Compile Include="DebugLogger.cs" />
-    <Compile Include="IShell.cs" />
     <Compile Include="ValueConverters\PositionConverter.cs" />
     <Compile Include="ValueConverters\CommandResultToStringConverter.cs" />
     <Compile Include="ValueConverters\IItemToStringConverter.cs" />

@@ -8,13 +8,14 @@ using System.Windows.Input;
 using Caliburn.Micro;
 using Core.Abstractions;
 using Core.Extensions;
+using ILoveLucene.Infrastructure;
 using ILoveLucene.Views;
 using Plugins.Shortcuts;
 using ILog = Caliburn.Micro.ILog;
 
 namespace ILoveLucene.ViewModels
 {
-    public class MainWindowViewModel : PropertyChangedBase, IShell
+    public class MainWindowViewModel : PropertyChangedBase
     {
         private readonly IAutoCompleteText _autoCompleteText;
         private readonly IGetActionsForItem _getActionsForItem;
