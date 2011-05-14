@@ -5,22 +5,33 @@ namespace Core.Abstractions
 {
     public static class IActOnItemExtension
     {
-        public static void ActOn(this IActOnItem self, IItem item)
+        public static IItem ActOn(this IActOnItem self, IItem item)
         {
-            UnwrapTargetInvocationException(() => 
-                self.GetType()
-                    .GetMethod("ActOn", BindingFlags.Instance | BindingFlags.Public, null, new []{self.TypedItemType}, null)
-                    .Invoke(self, new[] {item.Item})
-            );
-            
-        }
-        
-        public static void ActOn(this IActOnItemWithArguments self, IItem item, string arguments)
-        {
+            IItem returnedValue = null;
+            MethodInfo methodInfo = self.GetType()
+                .GetMethod("ActOn", BindingFlags.Instance | BindingFlags.Public, null, new[] {self.TypedItemType}, null);
             UnwrapTargetInvocationException(() =>
-                self.GetType()
-                .GetMethod("ActOn", BindingFlags.Instance | BindingFlags.Public, null, new[] { self.TypedItemType, typeof(string) }, null)
-                .Invoke(self, new object[] { item.Item, arguments }));
+                                            returnedValue = methodInfo.Invoke(self, new[] {item.Item}) as IItem);
+            if (methodInfo.ReturnType == typeof (void))
+            {
+                returnedValue = NoReturnValue.Object;
+            }
+            return returnedValue;
+        }
+
+        public static IItem ActOn(this IActOnItemWithArguments self, IItem item, string arguments)
+        {
+            IItem returnedValue = null;
+            MethodInfo methodInfo = self.GetType()
+                .GetMethod("ActOn", BindingFlags.Instance | BindingFlags.Public, null,
+                           new[] {self.TypedItemType, typeof (string)}, null);
+            UnwrapTargetInvocationException(() =>
+                                            returnedValue = methodInfo.Invoke(self, new object[] {item.Item, arguments}) as IItem);
+            if (methodInfo.ReturnType == typeof (void))
+            {
+                returnedValue = NoReturnValue.Object;
+            }
+            return returnedValue;
         }
 
         public static ArgumentAutoCompletionResult AutoCompleteArguments(this IActOnItemWithAutoCompletedArguments self, IItem item, string arguments)
@@ -70,6 +81,11 @@ namespace Core.Abstractions
         }
 
         public static Type GetTypedItemType<T>(this IActOnTypedItemWithArguments<T> self)
+        {
+            return typeof (T);
+        }
+
+        public static Type GetTypedItemType<T, TItem>(this IActOnTypedItemAndReturnValue<T,TItem> self)
         {
             return typeof (T);
         }

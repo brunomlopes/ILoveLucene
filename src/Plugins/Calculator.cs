@@ -9,7 +9,7 @@ using Microsoft.Scripting.Hosting;
 namespace Plugins
 {
     [Export(typeof(IActOnItem))]
-    public class Calculator : BaseActOnTypedItem<string>, ICanActOnTypedItem<string>, INotifyPropertyChanged
+    public class Calculator : BaseActOnTypedItemAndReturnTypedItem<string, string>, ICanActOnTypedItem<string>, INotifyPropertyChanged
     {
         private double? _lastResult;
         private ScriptEngine _engine;
@@ -22,11 +22,12 @@ namespace Plugins
             _scope = _engine.CreateScope();
         }
 
-        public override void ActOn(string item)
+        public override ITypedItem<string> ActOn(string item)
         {
             // TODO: is this the best way to show the result?
             // my quick usability check says it is (using it for a while)
             CanActOn(item);
+            return new TextItem(_lastResult.ToString(), item);
         }
 
         public override string Text

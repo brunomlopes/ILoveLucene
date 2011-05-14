@@ -5,6 +5,7 @@ using Core.Abstractions;
 using Plugins.Commands;
 using Plugins.Shortcuts;
 using Xunit;
+using Core.Extensions;
 
 namespace Tests
 {
@@ -19,6 +20,30 @@ namespace Tests
             act.ActOn((IItem)info);
             Assert.True(act.Acted);
             Assert.Equal(act.Info, info.TypedItem);
+        }
+        
+        [Fact]
+        public void CallActOnActionWithNoReturnValueReturnsProperObject()
+        {
+            var act = new MockActOnFileInfo();
+            var info = new FileInfoItem(new FileInfo("does.not.exist"));
+
+            var result = act.ActOn((IItem)info);
+
+            Assert.Equal(NoReturnValue.Object, result);
+        }
+        
+        [Fact]
+        public void CanGetReturnObjectFromCallAct()
+        {
+            var act = new MockActOnFileInfoAndReturnString();
+            var info = new FileInfoItem(new FileInfo("does.not.exist"));
+
+            object returnedObject = act.ActOn((IItem)info);
+            Assert.NotNull(returnedObject);
+            var typedItem = returnedObject as ITypedItem<string>;
+            Assert.NotNull(typedItem);
+            Assert.Equal("does.not.exist", typedItem.Item);
         }
         
         [Fact]
@@ -114,6 +139,24 @@ namespace Tests
         public override void ActOn(string item)
         {
             // NO-OP
+        }
+    }
+
+    internal class MockActOnFileInfoAndReturnString : IActOnTypedItemAndReturnValue<FileInfo, string>
+    {
+        public ITypedItem<string> ActOn(FileInfo item)
+        {
+            return new TextItem(item.Name);
+        }
+
+        public string Text
+        {
+            get { return this.FriendlyTypeName(); }
+        }
+
+        public Type TypedItemType
+        {
+            get { return this.GetTypedItemType(); }
         }
     }
 

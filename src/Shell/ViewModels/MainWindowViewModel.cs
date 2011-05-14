@@ -42,22 +42,33 @@ namespace ILoveLucene.ViewModels
                                       {
                                           try
                                           {
+                                              IItem result = null;
                                               if (ActionWithArguments != null)
                                               {
-                                                  ActionWithArguments.ActOn(Result.Item, Arguments);
+                                                  result = ActionWithArguments.ActOn(Result.Item, Arguments);
                                               }
                                               else
                                               {
-                                                  SelectedAction.ActOn(Result.Item);
+                                                  result = SelectedAction.ActOn(Result.Item);
                                               }
                                               _autoCompleteText.LearnInputForCommandResult(Input, Result);
                                               _getActionsForItem.LearnActionForCommandResult(Input, SelectedAction, Result);
 
-                                              Input = string.Empty;
-                                              Arguments = string.Empty;
-
-                                              // HACK
-                                              Caliburn.Micro.Execute.OnUIThread(() => ((MainWindowView)Window.GetWindow(source)).HideWindow());
+                                              result = result ?? NoReturnValue.Object;
+                                              if(result != NoReturnValue.Object)
+                                              {
+                                                  Input = result.Text;
+                                                  Description = result.Description;
+                                                  Arguments = string.Empty;
+                                                  Result = new AutoCompletionResult.CommandResult(result, null);
+                                              }
+                                              else
+                                              {
+                                                  Input = string.Empty;
+                                                  Arguments = string.Empty;
+                                                  // HACK
+                                                  Caliburn.Micro.Execute.OnUIThread(() => ((MainWindowView)Window.GetWindow(source)).HideWindow());
+                                              }
                                           }
                                           catch (Exception e)
                                           {
