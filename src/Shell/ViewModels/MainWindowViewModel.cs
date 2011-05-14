@@ -226,7 +226,7 @@ namespace ILoveLucene.ViewModels
                                           {
                                               CommandOptions =
                                                   new ListWithCurrentSelection<AutoCompletionResult.CommandResult>(
-                                                      new AutoCompletionResult.CommandResult(new TextItem(Input),
+                                                      new AutoCompletionResult.CommandResult(new TextItem(Input, Description),
                                                                                              null));
                                           }
                                           Result = CommandOptions.Current;

@@ -65,6 +65,7 @@ namespace ILoveLucene.Views
         private void ClearInputBoxes()
         {
             Input.Text = string.Empty;
+            Description.Text = string.Empty;
             Arguments.Text = string.Empty;
         }
 
