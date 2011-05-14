@@ -75,6 +75,10 @@
       <Project>{28E91DF6-B35A-4341-AB82-E9CE24B04750}</Project>
       <Name>Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Plugins.WindowsEnvironment\Plugins.WindowsEnvironment.csproj">
+      <Project>{5DB74A33-95C2-4B84-B638-C8C252CF7242}</Project>
+      <Name>Plugins.WindowsEnvironment</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Plugins\Plugins.csproj">
       <Project>{133FD5D5-7C29-4A09-9DD3-A8E1506767C7}</Project>
       <Name>Plugins</Name>

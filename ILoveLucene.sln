@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElevationHelper.Services", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugins.SqlServer", "src\Plugins.SqlServer\Plugins.SqlServer.csproj", "{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugins.WindowsEnvironment", "src\Plugins.WindowsEnvironment\Plugins.WindowsEnvironment.csproj", "{5DB74A33-95C2-4B84-B638-C8C252CF7242}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,6 +109,16 @@ Global
 		{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}.Release|x86.ActiveCfg = Release|Any CPU
+		{5DB74A33-95C2-4B84-B638-C8C252CF7242}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DB74A33-95C2-4B84-B638-C8C252CF7242}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DB74A33-95C2-4B84-B638-C8C252CF7242}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{5DB74A33-95C2-4B84-B638-C8C252CF7242}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{5DB74A33-95C2-4B84-B638-C8C252CF7242}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5DB74A33-95C2-4B84-B638-C8C252CF7242}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DB74A33-95C2-4B84-B638-C8C252CF7242}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DB74A33-95C2-4B84-B638-C8C252CF7242}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{5DB74A33-95C2-4B84-B638-C8C252CF7242}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{5DB74A33-95C2-4B84-B638-C8C252CF7242}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
