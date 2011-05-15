@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="InteropDebugHelpers.cs" />
     <Compile Include="ExperimentWithUIAutomation.cs" />
+    <Compile Include="OpenInNotepad2.cs" />
     <Compile Include="PickSelectedItemFromExplorer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WindowsExplorer.cs" />
