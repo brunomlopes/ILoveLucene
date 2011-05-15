@@ -12,10 +12,16 @@ namespace Plugins.WindowsEnvironment
     {
         public override IItem Act()
         {
-            FileInfo fileInfo = WindowsExplorer.GetTopSelectedFileFromExplorer();
-            if (fileInfo == null)
-                return null;
-            return new FileInfoItem(fileInfo);
+            var path = WindowsExplorer.GetTopSelectedPathFromWindowsExplorer();
+            if (path == null)
+            {
+                throw new InvalidOperationException("No explorer window open");
+            }
+            if(!File.Exists(path))
+            {
+                throw new InvalidOperationException(string.Format("Path '{0}' is not a file.", path));
+            }
+            return new FileInfoItem(new FileInfo(path));
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Plugins.WindowsEnvironment
     public class WindowsExplorer
     {
         [DllImport("user32.dll")]
-        public static extern IntPtr GetForegroundWindow();
+        private static extern IntPtr GetForegroundWindow();
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr GetWindow(IntPtr hWnd, GetWindow_Cmd uCmd);
@@ -55,7 +55,12 @@ namespace Plugins.WindowsEnvironment
             return null;
         }
 
-        private static string GetTopSelectedPathFromWindowsExplorer()
+        /// <summary>
+        /// Returns the currently selected path from windows explorer.
+        /// Can point into a directory, a file inside a zip file, control panel, whatever.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetTopSelectedPathFromWindowsExplorer()
         {
             IShellDispatch5 shell = new Shell();
 
