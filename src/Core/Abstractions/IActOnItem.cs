@@ -58,9 +58,14 @@ namespace Core.Abstractions
         void ActOn(T item);
     }
     
-    public interface IActOnTypedItemAndReturnValue<in T, out TItem> : IActOnItem
+    public interface IActOnTypedItemAndReturnTypedItem<in T, out TItem> : IActOnItem
     {
         ITypedItem<TItem> ActOn(T item);
+    }
+    
+    public interface IActOnTypedItemAndReturnItem<in T> : IActOnItem
+    {
+        IItem ActOn(T item);
     }
 
     public interface ICanActOnTypedItem<in T> : ICanActOnItem
@@ -83,7 +88,7 @@ namespace Core.Abstractions
         }
     }
 
-    public abstract class BaseActOnTypedItemAndReturnTypedItem<T, TReturnItem> : IActOnTypedItemAndReturnValue<T, TReturnItem> 
+    public abstract class BaseActOnTypedItemAndReturnTypedItem<T, TReturnItem> : IActOnTypedItemAndReturnTypedItem<T, TReturnItem> 
     {
         public abstract ITypedItem<TReturnItem> ActOn(T item);
 

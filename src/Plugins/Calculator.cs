@@ -37,6 +37,8 @@ namespace Plugins
 
         public bool CanActOn(string item)
         {
+            if (string.IsNullOrWhiteSpace(item))
+                return false;
             try
             {
                 _lastResult = Calculate(item);

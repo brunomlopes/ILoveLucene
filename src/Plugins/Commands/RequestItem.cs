@@ -2,16 +2,16 @@
 
 namespace Plugins.Commands
 {
-    public class CommandItem : ITypedItem<ICommand>
+    public class RequestItem : ITypedItem<IRequest>
     {
-        private ICommand _item;
+        private IRequest _item;
 
         public object Item
         {
             get { return _item; }
         }
 
-        public CommandItem(ICommand command)
+        public RequestItem(IRequest command)
         {
             _item = command;
         }
@@ -26,7 +26,7 @@ namespace Plugins.Commands
             get { return _item.Description; }
         }
 
-        public ICommand TypedItem
+        public IRequest TypedItem
         {
             get { return _item; }
         }

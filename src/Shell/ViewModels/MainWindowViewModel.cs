@@ -57,10 +57,7 @@ namespace ILoveLucene.ViewModels
                                               result = result ?? NoReturnValue.Object;
                                               if(result != NoReturnValue.Object)
                                               {
-                                                  Input = result.Text;
-                                                  Description = result.Description;
-                                                  Arguments = string.Empty;
-                                                  Result = new AutoCompletionResult.CommandResult(result, null);
+                                                  UpdateCommandOptions(result.ToListWithCurrentSelection());
                                               }
                                               else
                                               {
@@ -216,27 +213,33 @@ namespace ILoveLucene.ViewModels
                                                     result.AutoCompletedCommand, result.OriginalText,
                                                     result.OtherOptions.Count());
 
+                                          ListWithCurrentSelection<AutoCompletionResult.CommandResult> options;
                                           if (result.HasAutoCompletion)
                                           {
-                                              CommandOptions = new[] {result.AutoCompletedCommand}
+                                              options = new[] {result.AutoCompletedCommand}
                                                   .Concat(result.OtherOptions)
                                                   .ToListWithCurrentSelection();
                                           }
                                           else
                                           {
-                                              CommandOptions =
-                                                  new ListWithCurrentSelection<AutoCompletionResult.CommandResult>(
-                                                      new AutoCompletionResult.CommandResult(new TextItem(Input, Description),
-                                                                                             null));
+                                              options = new TextItem(Input, Description).ToListWithCurrentSelection();
+                                                  
                                           }
-                                          Result = CommandOptions.Current;
-                                          ArgumentOptions = new ListWithCurrentSelection<string>();
-                                          Arguments = string.Empty;
 
-                                          SetActionsForResult(Result);
-                                          AutoCompleteArgument();
+                                          UpdateCommandOptions(options);
                                       }, token)
                 .GuardForException(SetError);
+        }
+
+        private void UpdateCommandOptions(ListWithCurrentSelection<AutoCompletionResult.CommandResult> options)
+        {
+            CommandOptions = options;
+            Result = CommandOptions.Current;
+            ArgumentOptions = new ListWithCurrentSelection<string>();
+            Arguments = string.Empty;
+
+            SetActionsForResult(Result);
+            AutoCompleteArgument();
         }
 
         private void SetError(Exception e)

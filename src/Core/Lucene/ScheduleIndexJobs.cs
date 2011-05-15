@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using Core.Abstractions;
 using Quartz;
+using System.Linq;
 
 namespace Core.Lucene
 {
@@ -53,7 +54,7 @@ namespace Core.Lucene
 
                 // add 2 seconds to "try" and ensure the first time gets executed always
                 trigger.StartTimeUtc = DateTime.UtcNow.AddSeconds(2);
-                trigger.Name = "Each" + frequency + "SecondsFor" + sourceStorage;
+                trigger.Name = "Each" + frequency + "SecondsFor" + sourceStorage.Source.Id;
                 trigger.MisfireInstruction = MisfireInstruction.SimpleTrigger.RescheduleNextWithRemainingCount;
 
                 _scheduler.ScheduleJob(jobDetail, trigger);

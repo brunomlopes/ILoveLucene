@@ -142,7 +142,7 @@ namespace Tests
         }
     }
 
-    internal class MockActOnFileInfoAndReturnString : IActOnTypedItemAndReturnValue<FileInfo, string>
+    internal class MockActOnFileInfoAndReturnString : IActOnTypedItemAndReturnTypedItem<FileInfo, string>
     {
         public ITypedItem<string> ActOn(FileInfo item)
         {

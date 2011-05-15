@@ -1,10 +1,11 @@
-﻿using Core.Extensions;
+﻿using Core.Abstractions;
+using Core.Extensions;
 
 namespace Plugins.Commands
 {
-    public abstract class BaseCommand : ICommand
+    public abstract class BaseRequest : IRequest
     {
-        public abstract void Act();
+        public abstract IItem Act();
 
         public virtual string Text
         {

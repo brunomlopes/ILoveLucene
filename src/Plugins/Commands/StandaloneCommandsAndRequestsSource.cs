@@ -9,15 +9,20 @@ using Core.Abstractions;
 namespace Plugins.Commands
 {
     [Export(typeof (IItemSource))]
-    public class StandaloneCommandsSource : BaseItemSource
+    public class StandaloneCommandsAndRequestsSource : BaseItemSource
     {
         [ImportMany(AllowRecomposition = true)] 
         public IEnumerable<ICommand> Commands;
+        
+        [ImportMany(AllowRecomposition = true)] 
+        public IEnumerable<IRequest> Requests;
 
         public override Task<IEnumerable<object>> GetItems()
         {
-            var commands = Commands; //FIXME:  this can be recomposed mid-iteration. we don't want that for now
-            return Task.Factory.StartNew(() => commands.Cast<Object>());
+            //FIXME:  this can be recomposed mid-iteration. we don't want that for now
+            var commands = Commands; 
+            var requests = Requests; 
+            return Task.Factory.StartNew(() => commands.Cast<Object>().Concat(requests));
         }
 
         public override bool Persistent

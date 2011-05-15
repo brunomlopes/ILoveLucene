@@ -85,7 +85,7 @@ namespace Core.Abstractions
             return typeof (T);
         }
 
-        public static Type GetTypedItemType<T, TItem>(this IActOnTypedItemAndReturnValue<T,TItem> self)
+        public static Type GetTypedItemType<T, TItem>(this IActOnTypedItemAndReturnTypedItem<T,TItem> self)
         {
             return typeof (T);
         }
