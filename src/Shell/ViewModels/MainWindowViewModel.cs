@@ -58,6 +58,7 @@ namespace ILoveLucene.ViewModels
                                               if(result != NoReturnValue.Object)
                                               {
                                                   UpdateCommandOptions(result.ToListWithCurrentSelection());
+                                                  Input = CommandOptions.First().Item.Text;
                                               }
                                               else
                                               {
