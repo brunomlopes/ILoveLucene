@@ -57,7 +57,8 @@ namespace ILoveLucene.ViewModels
                                               result = result ?? NoReturnValue.Object;
                                               if(result != NoReturnValue.Object)
                                               {
-                                                  UpdateCommandOptions(result.ToListWithCurrentSelection());
+                                                  _temporaryResults = result.ToListWithCurrentSelection();
+                                                  UpdateCommandOptions(new ListWithCurrentSelection<AutoCompletionResult.CommandResult>());
                                                   Input = CommandOptions.First().Item.Text;
                                               }
                                               else
@@ -65,6 +66,7 @@ namespace ILoveLucene.ViewModels
                                                   Input = string.Empty;
                                                   Arguments = string.Empty;
                                                   // HACK
+                                                  _temporaryResults = new ListWithCurrentSelection<AutoCompletionResult.CommandResult>();
                                                   Caliburn.Micro.Execute.OnUIThread(() => ((MainWindowView)Window.GetWindow(source)).HideWindow());
                                               }
                                           }
@@ -115,6 +117,7 @@ namespace ILoveLucene.ViewModels
         {
             if (eventArgs.Key == Key.Escape)
             {
+                _temporaryResults = new ListWithCurrentSelection<AutoCompletionResult.CommandResult>();
                 ((MainWindowView) Window.GetWindow(source)).Toggle();
                 return;
             }
@@ -164,6 +167,7 @@ namespace ILoveLucene.ViewModels
         {
             if (eventArgs.Key == Key.Escape)
             {
+                _temporaryResults = new ListWithCurrentSelection<AutoCompletionResult.CommandResult>();
                 ((MainWindowView) Window.GetWindow(source)).Toggle();
                 eventArgs.Handled = true;
                 return;
@@ -234,6 +238,12 @@ namespace ILoveLucene.ViewModels
 
         private void UpdateCommandOptions(ListWithCurrentSelection<AutoCompletionResult.CommandResult> options)
         {
+            // HACK: this temporaryResults should be a source with results expiring regularly
+            var tempResults = _temporaryResults ?? new ListWithCurrentSelection<AutoCompletionResult.CommandResult>();
+            if (tempResults.Count > 0)
+            {
+                options = tempResults.Concat(options).ToListWithCurrentSelection();
+            }
             CommandOptions = options;
             Result = CommandOptions.Current;
             ArgumentOptions = new ListWithCurrentSelection<string>();
@@ -371,6 +381,7 @@ namespace ILoveLucene.ViewModels
 
         private string _input;
         private CancellationTokenSource _argumentCancelationTokenSource;
+        private ListWithCurrentSelection<AutoCompletionResult.CommandResult> _temporaryResults;
 
         public string Input
         {
