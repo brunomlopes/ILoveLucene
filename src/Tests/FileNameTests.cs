@@ -1,7 +1,10 @@
 using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Core;
 using Plugins.Tasks;
 using Xunit;
 
@@ -49,7 +52,7 @@ namespace Tests
         [Fact]
         public void RepositoryWorks()
         {
-            var taskRepository = new TaskRepository();
+            var taskRepository = new TaskRepository(new CoreConfiguration("."));
 
             var task = new Task("do stuff");
             task.Start();
@@ -70,7 +73,7 @@ namespace Tests
         [Fact]
         public void CanStartSaveGetAndStop()
         {
-            var taskRepository = new TaskRepository();
+            var taskRepository = new TaskRepository(new CoreConfiguration("."));
 
             var task = new Task("do stuff");
             task.Start();

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Core;
 using Core.Abstractions;
 using Lucene.Net.Documents;
 using Newtonsoft.Json;
@@ -149,9 +150,10 @@ namespace Plugins.Tasks
         [Import]
         public ILog Log { get; set; }
 
-        public TaskRepository()
+        [ImportingConstructor]
+        public TaskRepository(CoreConfiguration config)
         {
-            _tasksLocation = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tasks");
+            _tasksLocation = Path.Combine(config.DataDirectory, "Tasks");
 
             _settings = new JsonSerializerSettings();
             _settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -160,7 +162,7 @@ namespace Plugins.Tasks
 
             _safeFilenameRegex = new Regex(@"[<>:""/\\|?*]");
             if (!Directory.Exists(_tasksLocation)) Directory.CreateDirectory(_tasksLocation);
-            if (!Directory.Exists(Path.Combine(_tasksLocation, "archive"))) Directory.CreateDirectory(Path.Combine(_tasksLocation, "archive"));
+            if (!Directory.Exists(Path.Combine(_tasksLocation, "Archive"))) Directory.CreateDirectory(Path.Combine(_tasksLocation, "Archive"));
         }
 
         public void CreateTask(Task task)
@@ -229,7 +231,7 @@ namespace Plugins.Tasks
         public void ArchiveTask(Task task)
         {
             File.Move(Path.Combine(_tasksLocation, task.FileName),
-                      Path.Combine(_tasksLocation, "archive", task.FileName));
+                      Path.Combine(_tasksLocation, "Archive", task.FileName));
         }
     }
 

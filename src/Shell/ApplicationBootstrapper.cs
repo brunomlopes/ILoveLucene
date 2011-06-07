@@ -45,7 +45,7 @@ namespace ILoveLucene
                                    new AssemblyCatalog(typeof (IItem).Assembly)
                                };
 
-            var pluginsPath = Path.Combine(assemblyDirectory, "plugins");
+            var pluginsPath = Path.Combine(assemblyDirectory, "Plugins");
             if (Directory.Exists(pluginsPath))
             {
                 catalogs.Add(new DirectoryCatalog(pluginsPath, "Plugins.*.dll"));
@@ -56,16 +56,18 @@ namespace ILoveLucene
                 CompositionHost.Initialize(catalogs.ToArray());
 
             var loadConfiguration =
-                new LoadConfiguration(new DirectoryInfo(Path.Combine(assemblyDirectory, "configuration")));
-            var localConfigurationDirectory = new DirectoryInfo(Path.Combine(assemblyDirectory, "local.configuration"));
+                new LoadConfiguration(new DirectoryInfo(Path.Combine(assemblyDirectory, "Configuration")));
+            var localConfigurationDirectory = new DirectoryInfo(Path.Combine(assemblyDirectory, "LocalConfiguration"));
             if(localConfigurationDirectory.Exists)
                 loadConfiguration.AddConfigurationLocation(localConfigurationDirectory);
             loadConfiguration.Load(MefContainer);
 
-            var root = new FileInfo(Assembly.GetCallingAssembly().Location).DirectoryName;
-            var learningStorageLocation = new DirectoryInfo(Path.Combine(root, "data", "learnings"));
-            var indexStorageLocation = new DirectoryInfo(Path.Combine(root, "data", "index"));
-            var logFileLocation = new FileInfo(Path.Combine(root, "data", "log.txt"));
+            var dataDirectory = Path.Combine(assemblyDirectory, "Data");
+            var coreConfiguration = new CoreConfiguration(dataDirectory);
+
+            var learningStorageLocation = new DirectoryInfo(Path.Combine(coreConfiguration.DataDirectory, "Learnings"));
+            var indexStorageLocation = new DirectoryInfo(Path.Combine(coreConfiguration.DataDirectory, "Index"));
+            var logFileLocation = new FileInfo(Path.Combine(coreConfiguration.DataDirectory, "log.txt"));
 
             var scheduler = new StdSchedulerFactory().GetScheduler();
             scheduler.JobFactory = new MefJobFactory(new SimpleJobFactory(), MefContainer);
@@ -74,9 +76,11 @@ namespace ILoveLucene
             batch.AddExportedValue(MefContainer);
             batch.AddExportedValue<ILoadConfiguration>(loadConfiguration);
             batch.AddExportedValue<ILog>(new FileLogger(logFileLocation, tag: "mef"));
+            batch.AddExportedValue(coreConfiguration);
             MefContainer.Compose(batch);
 
             builder.RegisterInstance(MefContainer).AsSelf();
+            builder.RegisterInstance(coreConfiguration).AsSelf();
 
             builder.RegisterInstance(scheduler).As<IScheduler>();
             builder.RegisterInstance<IWindowManager>(new WindowManager());

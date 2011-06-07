@@ -73,6 +73,7 @@
     <Compile Include="Abstractions\IStartupTask.cs" />
     <Compile Include="Abstractions\PluginConfigurationAttribute.cs" />
     <Compile Include="Abstractions\TextItem.cs" />
+    <Compile Include="CoreConfiguration.cs" />
     <Compile Include="Extensions\AnalyzerExtension.cs" />
     <Compile Include="Extensions\DocumentExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
