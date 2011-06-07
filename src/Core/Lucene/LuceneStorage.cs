@@ -53,9 +53,15 @@ namespace Core.Lucene
             document.Add(new Field(SpecialFields.Type, type, Field.Store.YES,
                                    Field.Index.ANALYZED,
                                    Field.TermVector.WITH_POSITIONS_OFFSETS));
-            document.Add(new Field(SpecialFields.Learnings, learnings, Field.Store.YES,
-                                   Field.Index.ANALYZED,
-                                   Field.TermVector.WITH_POSITIONS_OFFSETS));
+            if (!string.IsNullOrWhiteSpace(learnings))
+            {
+                var field = new Field(SpecialFields.Learnings, learnings, Field.Store.YES,
+                                      Field.Index.ANALYZED,
+                                      Field.TermVector.YES);
+                field.SetBoost(2);
+                document.Add(field);
+            }
+            
             document.Add(new Field(SpecialFields.ConverterId, converterId, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
