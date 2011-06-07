@@ -97,6 +97,7 @@
     <Compile Include="Lucene\SourceStorageFactory.cs" />
     <Compile Include="Lucene\SpecialFields.cs" />
     <Compile Include="Lucene\StaticDirectoryFactory.cs" />
+    <Compile Include="ProgramVersionInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scheduler\MefJobFactory.cs" />
   </ItemGroup>

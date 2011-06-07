@@ -34,7 +34,8 @@ namespace ILoveLucene
             base.ConfigureContainer(builder);
 
             var assemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var catalogs = new ComposablePartCatalog[]
+
+            var catalogs = new List<ComposablePartCatalog>
                                {
                                    new AggregateCatalog(
                                        AssemblySource.Instance.Select(x => new AssemblyCatalog(x))
@@ -44,17 +45,27 @@ namespace ILoveLucene
                                    new AssemblyCatalog(typeof (IItem).Assembly)
                                };
 
+            var pluginsPath = Path.Combine(assemblyDirectory, "plugins");
+            if (Directory.Exists(pluginsPath))
+            {
+                catalogs.Add(new DirectoryCatalog(pluginsPath, "Plugins.*.dll"));
+                catalogs.Add(new DirectoryCatalog(pluginsPath, "Plugins.dll"));
+            }
+
             MefContainer =
-                CompositionHost.Initialize(catalogs);
+                CompositionHost.Initialize(catalogs.ToArray());
 
             var loadConfiguration =
-                new LoadConfiguration(new DirectoryInfo(Path.Combine(assemblyDirectory, "Configuration")));
+                new LoadConfiguration(new DirectoryInfo(Path.Combine(assemblyDirectory, "configuration")));
+            var localConfigurationDirectory = new DirectoryInfo(Path.Combine(assemblyDirectory, "local.configuration"));
+            if(localConfigurationDirectory.Exists)
+                loadConfiguration.AddConfigurationLocation(localConfigurationDirectory);
             loadConfiguration.Load(MefContainer);
 
             var root = new FileInfo(Assembly.GetCallingAssembly().Location).DirectoryName;
-            var learningStorageLocation = new DirectoryInfo(Path.Combine(root, "learnings"));
-            var indexStorageLocation = new DirectoryInfo(Path.Combine(root, "index"));
-            var logFileLocation = new FileInfo(Path.Combine(root, "log.txt"));
+            var learningStorageLocation = new DirectoryInfo(Path.Combine(root, "data", "learnings"));
+            var indexStorageLocation = new DirectoryInfo(Path.Combine(root, "data", "index"));
+            var logFileLocation = new FileInfo(Path.Combine(root, "data", "log.txt"));
 
             var scheduler = new StdSchedulerFactory().GetScheduler();
             scheduler.JobFactory = new MefJobFactory(new SimpleJobFactory(), MefContainer);

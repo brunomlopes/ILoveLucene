@@ -54,7 +54,7 @@ namespace ElevationHelper.Services
                 if (_elevatedHandler != null)
                     _elevatedHandler.AmIAlive();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 _elevatedHandler = null;
             }
