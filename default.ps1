@@ -14,23 +14,33 @@ Task Update-Solution-Assembly-Info -description "Updates the solution wide assem
 }
 
 Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a package on output directory" {
-    # Exec { msbuild /version }
-
+    $gitHash = Get-Git-Commit
     $outputRoot = (Get-Item .).FullName
     $outputDir = "$outputRoot\output"
     if (Test-Path $outputDir){
         Remove-Item $outputDir -recurse -force
+    }
+    $packageDir = "$outputRoot\package"
+    if (-not (Test-Path $packageDir)){
+        mkdir $packageDir
     }
     
     Exec { msbuild /t:clean /p:Configuration=Release /p:OutDir=$outputDir\ }
     Exec { msbuild /t:build /p:Configuration=Release /p:OutDir=$outputDir\ }
     $binaries = Get-ChildItem $outputDir -exclude ILoveLucene*,Plugins*,Configuration
     $plugins = Get-ChildItem $outputDir\Plugins*
-    mkdir $outputDir\Plugins
-    mkdir $outputDir\Bin
+    mkdir $outputDir\Plugins | Out-Null
+    mkdir $outputDir\Bin | Out-Null
     Move-Item $binaries $outputDir\Bin
     Move-Item $plugins $outputDir\Plugins
-
+    
+    Remove-Item $outputDir\Bin\*.pdb -exclude Core.pdb,ElevationHelper.Services.pdb
+    
+    Push-Location $outputDir
+    $zip = Write-Zip .\* "$packageDir\ILoveLucene-$version-$gitHash.zip" -level 9
+    Pop-Location
+    
+    Write-Host "File is up at $zip"
 }
 
 Task Help {
@@ -90,7 +100,12 @@ namespace Core
 
 function Get-Git-Commit
 {
-    $gitPath = ?? { (get-item "env:programfiles(x86)").Value } { $env:programfiles }
-    $gitLog = & "$gitPath\Git\bin\git.exe" log --oneline -1
+    $programFiles = ""
+    if (Test-Path "env:programfiles(x86)"){
+      $programFiles = (Get-Item "env:programfiles(x86)").Value
+    }else{
+      $programFiles = (Get-Item "env:programfiles").Value
+    }
+    $gitLog = & "$programFiles\Git\bin\git.exe" log --oneline -1
     return $gitLog.Split(' ')[0]
 }
