@@ -9,12 +9,19 @@ namespace ILoveLucene.Modules
 {
     public class AutoUpdateModule : Autofac.Module
     {
+        private readonly string _appcastUrl;
+
+        public AutoUpdateModule(string appcastUrl)
+        {
+            _appcastUrl = appcastUrl;
+        }
+
         protected override void Load(ContainerBuilder builder)
         {
             UpdateManager updManager = UpdateManager.Instance;
 
             updManager.UpdateFeedReader = new ZippedAppcastReader();
-            updManager.UpdateSource = new NAppUpdate.Framework.Sources.SimpleWebSource("file:///d:/documents/dev/ILoveLucene/appcast.xml");
+            updManager.UpdateSource = new NAppUpdate.Framework.Sources.SimpleWebSource(_appcastUrl);
 
             builder.RegisterInstance(updManager)
                 .AsSelf();

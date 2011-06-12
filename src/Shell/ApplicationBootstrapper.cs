@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -88,7 +89,8 @@ namespace ILoveLucene
 
             builder.RegisterModule(new LoggingModule(t => new FileLogger(logFileLocation, t.Name)));
             builder.RegisterModule(new SatisfyMefImports(MefContainer));
-            builder.RegisterModule(new AutoUpdateModule());
+            string appcastUrl = ConfigurationManager.AppSettings["auto_update_feed_url"];
+            builder.RegisterModule(new AutoUpdateModule(appcastUrl));
 
             builder.RegisterType<MainWindowViewModel>().AsSelf();
             builder.RegisterType<AutoCompleteBasedOnLucene>().As<IAutoCompleteText>();
