@@ -90,7 +90,11 @@
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationBootstrapper.cs" />
+    <Compile Include="AutoUpdate\AutoUpdateConfiguration.cs" />
+    <Compile Include="AutoUpdate\CheckForUpdatesJob.cs" />
     <Compile Include="AutoUpdate\ProgramVersionCondition.cs" />
+    <Compile Include="AutoUpdate\ScheduleUpdateCheck.cs" />
+    <Compile Include="AutoUpdate\UpdateManagerAdapter.cs" />
     <Compile Include="AutoUpdate\ZippedFilesUpdateTask.cs" />
     <Compile Include="AutoUpdate\ZippedAppcastReader.cs" />
     <Compile Include="Commands\XCopyPathToClipboard.cs" />
@@ -131,6 +135,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="Configuration\ILoveLucene.AutoUpdate.AutoUpdateConfiguration, ILoveLucene">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Configuration\Core.Lucene.AutoCompleteConfiguration, Core">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

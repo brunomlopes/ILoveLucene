@@ -1,6 +1,10 @@
 ﻿<Window x:Class="ILoveLucene.Views.MainWindowView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="MainWindow" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" xmlns:cal="clr-namespace:Caliburn.Micro;assembly=Caliburn.Micro" xmlns:t="clr-namespace:ILoveLucene.ValueConverters" MinHeight="270" Height="270" Width="1034" Icon="/ILoveLucene;component/Images/1305540890_heart_magnifier.png">
-    <StackPanel>
-	    <StackPanel Orientation="Horizontal">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="195*" />
+            <RowDefinition Height="36" />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.Row="0">
 		    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="503">
 			<TextBlock Name="Command" Text="{Binding Item, Converter={t:IItemToStringConverter}}" FontWeight="Bold" FontSize="24" Margin="5" />
 			<TextBlock Name="Description" Text="TextBlock" Margin="5" />
@@ -65,11 +69,11 @@
 			    </ListBox.ItemTemplate>
 		    </ListBox>
         </StackPanel>
-        <StatusBar >
+        <StatusBar Grid.Row="1">
         	<Button Name="Update" Padding="0" Focusable="True" ToolTip="Update available" Visibility="{Binding UpdateVisible}">
                 <Image Source="/ILoveLucene;component/Images/1307834877_Gnome-Software-Update-Available-64.png" Width="25"></Image>
             </Button>
-        	<TextBlock Name="StatusText">Welcome.</TextBlock>
+        	<TextBlock Name="StatusMessage"></TextBlock>
         </StatusBar>
-    </StackPanel>
+    </Grid>
 </Window>

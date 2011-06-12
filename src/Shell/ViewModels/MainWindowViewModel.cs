@@ -8,6 +8,7 @@ using System.Windows.Input;
 using Caliburn.Micro;
 using Core.Abstractions;
 using Core.Extensions;
+using ILoveLucene.AutoUpdate;
 using ILoveLucene.Infrastructure;
 using ILoveLucene.Views;
 using NAppUpdate.Framework;
@@ -21,25 +22,26 @@ namespace ILoveLucene.ViewModels
         private readonly IAutoCompleteText _autoCompleteText;
         private readonly IGetActionsForItem _getActionsForItem;
         private readonly ILog _log;
-        private readonly UpdateManager _updateManager;
+        private readonly UpdateManagerAdapter _updateManager;
         private CancellationTokenSource _cancelationTokenSource;
 
-        public MainWindowViewModel(IAutoCompleteText autoCompleteText, IGetActionsForItem getActionsForItem, ILog log, UpdateManager updateManager)
+        public MainWindowViewModel(IAutoCompleteText autoCompleteText, IGetActionsForItem getActionsForItem, ILog log, UpdateManagerAdapter updateManager)
         {
             _autoCompleteText = autoCompleteText;
             _getActionsForItem = getActionsForItem;
             _log = log;
 
+            StatusMessage = "Welcome";
             _updateManager = updateManager;
-            _updateManager.CheckForUpdateAsync(i =>
+            _updateManager.UpdatesAvailable += (sender, args) =>
                                                    {
-                                                       if(i > 0)
                                                        {
-                                                           StatusMessage = string.Format("{0} updates available", i);
+                                                           StatusMessage = "Update available";
                                                            NotifyOfPropertyChange(() => UpdateVisible);
                                                            NotifyOfPropertyChange(() => CanUpdate);
                                                        }
-                                                   });
+                                                   };
+            _updateManager.UpdatesReady += (sender, args) => _updateManager.ApplyUpdates();
 
             _cancelationTokenSource = new CancellationTokenSource();
             _argumentCancelationTokenSource = new CancellationTokenSource();
@@ -56,6 +58,7 @@ namespace ILoveLucene.ViewModels
                                       {
                                           try
                                           {
+                                              StatusMessage = "Executing";
                                               IItem result = null;
                                               if (ActionWithArguments != null)
                                               {
@@ -83,9 +86,11 @@ namespace ILoveLucene.ViewModels
                                                   _temporaryResults = new ListWithCurrentSelection<AutoCompletionResult.CommandResult>();
                                                   Caliburn.Micro.Execute.OnUIThread(() => ((MainWindowView)Window.GetWindow(source)).HideWindow());
                                               }
+                                              StatusMessage = "Done";
                                           }
                                           catch (Exception e)
                                           {
+                                              StatusMessage = "Error :"+e.Message;
                                               Description = e.Message;
                                               _log.Error(e);
                                           }
@@ -142,14 +147,16 @@ namespace ILoveLucene.ViewModels
         public void Update()
         {
             StatusMessage = "Updating";
-            _updateManager.PrepareUpdatesAsync(
-                b => _updateManager.ApplyUpdates(true)
-            );
+            _updateManager.PrepareUpdates();
         }
         
         public bool CanUpdate
         {
-            get { return _updateManager.State == UpdateManager.UpdateProcessState.Checked && _updateManager.UpdatesAvailable > 0; }
+            get
+            {
+                return _updateManager.State == UpdateManager.UpdateProcessState.Checked &&
+                       _updateManager.HaveUpdatesAvailable;
+            }
         }
 
         public Visibility UpdateVisible
@@ -157,7 +164,7 @@ namespace ILoveLucene.ViewModels
             get
             {
                 return (_updateManager.State == UpdateManager.UpdateProcessState.Checked &&
-                        _updateManager.UpdatesAvailable > 0)
+                        _updateManager.HaveUpdatesAvailable)
                            ? Visibility.Visible
                            : Visibility.Hidden;
             }
