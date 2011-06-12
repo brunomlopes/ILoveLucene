@@ -10,6 +10,7 @@ using Core.Abstractions;
 using Core.Extensions;
 using ILoveLucene.Infrastructure;
 using ILoveLucene.Views;
+using NAppUpdate.Framework;
 using Plugins.Shortcuts;
 using ILog = Caliburn.Micro.ILog;
 
@@ -20,13 +21,26 @@ namespace ILoveLucene.ViewModels
         private readonly IAutoCompleteText _autoCompleteText;
         private readonly IGetActionsForItem _getActionsForItem;
         private readonly ILog _log;
+        private readonly UpdateManager _updateManager;
         private CancellationTokenSource _cancelationTokenSource;
 
-        public MainWindowViewModel(IAutoCompleteText autoCompleteText, IGetActionsForItem getActionsForItem, ILog log)
+        public MainWindowViewModel(IAutoCompleteText autoCompleteText, IGetActionsForItem getActionsForItem, ILog log, UpdateManager updateManager)
         {
             _autoCompleteText = autoCompleteText;
             _getActionsForItem = getActionsForItem;
             _log = log;
+
+            _updateManager = updateManager;
+            _updateManager.CheckForUpdateAsync(i =>
+                                                   {
+                                                       if(i > 0)
+                                                       {
+                                                           StatusMessage = string.Format("{0} updates available", i);
+                                                           NotifyOfPropertyChange(() => UpdateVisible);
+                                                           NotifyOfPropertyChange(() => CanUpdate);
+                                                       }
+                                                   });
+
             _cancelationTokenSource = new CancellationTokenSource();
             _argumentCancelationTokenSource = new CancellationTokenSource();
             CommandOptions =
@@ -112,6 +126,44 @@ namespace ILoveLucene.ViewModels
                            : Visibility.Hidden;
             }
         }
+
+        private string _statusMessage;
+
+        public string StatusMessage
+        {
+            get { return _statusMessage; }
+            set
+            {
+                _statusMessage = value;
+                NotifyOfPropertyChange(() => StatusMessage);
+            }
+        }
+
+        public void Update()
+        {
+            StatusMessage = "Updating";
+            _updateManager.PrepareUpdatesAsync(
+                b => _updateManager.ApplyUpdates(true)
+            );
+        }
+        
+        public bool CanUpdate
+        {
+            get { return _updateManager.State == UpdateManager.UpdateProcessState.Checked && _updateManager.UpdatesAvailable > 0; }
+        }
+
+        public Visibility UpdateVisible
+        {
+            get
+            {
+                return (_updateManager.State == UpdateManager.UpdateProcessState.Checked &&
+                        _updateManager.UpdatesAvailable > 0)
+                           ? Visibility.Visible
+                           : Visibility.Hidden;
+            }
+        }
+
+
 
         public void ProcessShortcut(FrameworkElement source, KeyEventArgs eventArgs)
         {

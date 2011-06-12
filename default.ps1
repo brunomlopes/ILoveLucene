@@ -85,7 +85,8 @@ namespace Core
     using System;
     public static class ProgramVersionInformation
     {
-        public static string Version = ""$commit / $timestamp"";
+        public static string Version = ""$version"";
+        public static string GitVersion = ""$commit / $timestamp"";
         public static DateTime PackageDate = $datetime;
     }
 }

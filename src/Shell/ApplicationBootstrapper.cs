@@ -88,6 +88,7 @@ namespace ILoveLucene
 
             builder.RegisterModule(new LoggingModule(t => new FileLogger(logFileLocation, t.Name)));
             builder.RegisterModule(new SatisfyMefImports(MefContainer));
+            builder.RegisterModule(new AutoUpdateModule());
 
             builder.RegisterType<MainWindowViewModel>().AsSelf();
             builder.RegisterType<AutoCompleteBasedOnLucene>().As<IAutoCompleteText>();

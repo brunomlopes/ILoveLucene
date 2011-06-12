@@ -1,6 +1,7 @@
-﻿<Window x:Class="ILoveLucene.Views.MainWindowView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="MainWindow" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" xmlns:cal="clr-namespace:Caliburn.Micro;assembly=Caliburn.Micro" xmlns:t="clr-namespace:ILoveLucene.ValueConverters" Height="213" Width="1011" Icon="/ILoveLucene;component/Images/1305540890_heart_magnifier.png">
-	<StackPanel Orientation="Horizontal">
-		<StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="503">
+﻿<Window x:Class="ILoveLucene.Views.MainWindowView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="MainWindow" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" xmlns:cal="clr-namespace:Caliburn.Micro;assembly=Caliburn.Micro" xmlns:t="clr-namespace:ILoveLucene.ValueConverters" Height="278" Width="1034" Icon="/ILoveLucene;component/Images/1305540890_heart_magnifier.png">
+    <StackPanel>
+	    <StackPanel Orientation="Horizontal">
+		    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="503">
 			<TextBlock Name="Command" Text="{Binding Item, Converter={t:IItemToStringConverter}}" FontWeight="Bold" FontSize="24" Margin="5" />
 			<TextBlock Name="Description" Text="TextBlock" Margin="5" />
 			<StackPanel Orientation="Vertical" Height="Auto">
@@ -41,27 +42,34 @@
 
 			<Button Name="Execute" Content="Execute me!" IsDefault="True" Visibility="Visible" />
 		</StackPanel>
-		<ListBox Name="CommandOptions">
-			<ListBox.ItemTemplate>
-				<DataTemplate>
-					<StackPanel Orientation="Horizontal">
-						<TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType=ListBoxItem}, Converter={t:PositionConverter}}" TextDecorations="underline" />
-						<TextBlock Text=" - "></TextBlock>
-						<TextBlock Text="{Binding Item, Converter={t:IItemToStringConverter}}" />
-					</StackPanel>
-				</DataTemplate>
-			</ListBox.ItemTemplate>
-		</ListBox>
-		<ListBox Name="ArgumentOptions">
-			<ListBox.ItemTemplate>
-				<DataTemplate>
-					<StackPanel Orientation="Horizontal">
-						<TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType=ListBoxItem}, Converter={t:PositionConverter}}" TextDecorations="underline" />
-						<TextBlock Text=" - "></TextBlock>
-						<TextBlock Text="{Binding}" />
-					</StackPanel>
-				</DataTemplate>
-			</ListBox.ItemTemplate>
-		</ListBox>
-	</StackPanel>
+		    <ListBox Name="CommandOptions">
+			    <ListBox.ItemTemplate>
+				    <DataTemplate>
+					    <StackPanel Orientation="Horizontal">
+						    <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType=ListBoxItem}, Converter={t:PositionConverter}}" TextDecorations="underline" />
+						    <TextBlock Text=" - "></TextBlock>
+						    <TextBlock Text="{Binding Item, Converter={t:IItemToStringConverter}}" />
+					    </StackPanel>
+				    </DataTemplate>
+			    </ListBox.ItemTemplate>
+		    </ListBox>
+		    <ListBox Name="ArgumentOptions">
+			    <ListBox.ItemTemplate>
+				    <DataTemplate>
+					    <StackPanel Orientation="Horizontal">
+						    <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType=ListBoxItem}, Converter={t:PositionConverter}}" TextDecorations="underline" />
+						    <TextBlock Text=" - "></TextBlock>
+						    <TextBlock Text="{Binding}" />
+					    </StackPanel>
+				    </DataTemplate>
+			    </ListBox.ItemTemplate>
+		    </ListBox>
+        </StackPanel>
+        <StatusBar >
+        	<Button Name="Update" Padding="0" Focusable="True" ToolTip="Update available" Visibility="{Binding UpdateVisible}">
+                <Image Source="/ILoveLucene;component/Images/1307834877_Gnome-Software-Update-Available-64.png" Width="25"></Image>
+            </Button>
+        	<TextBlock Name="StatusText">Welcome.</TextBlock>
+        </StatusBar>
+    </StackPanel>
 </Window>

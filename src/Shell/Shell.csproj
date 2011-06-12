@@ -52,8 +52,14 @@
     <Reference Include="Microsoft.ComponentModel.Composition.Initialization.Desktop">
       <HintPath>..\..\lib\composition.initialization.desktop\Microsoft.ComponentModel.Composition.Initialization.Desktop.dll</HintPath>
     </Reference>
+    <Reference Include="NAppUpdate.Framework">
+      <HintPath>..\..\lib\nappupdate\NAppUpdate.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="Quartz">
       <HintPath>..\..\lib\quartz.net\Quartz.dll</HintPath>
+    </Reference>
+    <Reference Include="SevenZipSharp">
+      <HintPath>..\..\lib\sevenzipsharp\SevenZipSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -83,6 +89,9 @@
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationBootstrapper.cs" />
+    <Compile Include="AutoUpdate\ProgramVersionCondition.cs" />
+    <Compile Include="AutoUpdate\ZippedFilesUpdateTask.cs" />
+    <Compile Include="AutoUpdate\ZippedAppcastReader.cs" />
     <Compile Include="Commands\XCopyPathToClipboard.cs" />
     <Compile Include="Infrastructure\ListWithCurrentSelection.cs" />
     <Compile Include="Infrastructure\ListWithCurrentSelectionExtensions.cs" />
@@ -90,6 +99,7 @@
     <Compile Include="Infrastructure\TypedAutofacBootStrapper.cs" />
     <Compile Include="Loggers\DebugLogger.cs" />
     <Compile Include="Loggers\FileLogger.cs" />
+    <Compile Include="Modules\AutoUpdateModule.cs" />
     <Compile Include="Modules\LoggingModule.cs" />
     <Compile Include="Modules\SatisfyMefImports.cs" />
     <Compile Include="Commands\ExitApplication.cs" />
@@ -175,6 +185,15 @@
   <ItemGroup>
     <Resource Include="Images\1305540890_heart_magnifier.png" />
     <Resource Include="Images\1305540894_heart_magnifier.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\1307834877_Gnome-Software-Update-Available-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\lib\sevenzipsharp\7z.dll">
+      <Link>7z.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
