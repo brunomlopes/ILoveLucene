@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,6 +15,7 @@ using Core.Abstractions;
 using Core.Lucene;
 using Core.Scheduler;
 using ElevationHelper.Services;
+using ILoveLucene.AutoUpdate;
 using ILoveLucene.Infrastructure;
 using ILoveLucene.Loggers;
 using ILoveLucene.Modules;
@@ -69,6 +71,8 @@ namespace ILoveLucene
             var indexStorageLocation = new DirectoryInfo(Path.Combine(coreConfiguration.DataDirectory, "Index"));
             var logFileLocation = new FileInfo(Path.Combine(coreConfiguration.DataDirectory, "log.txt"));
 
+            var autoUpdateModule = new AutoUpdateModule();
+
             var scheduler = new StdSchedulerFactory().GetScheduler();
             scheduler.JobFactory = new MefJobFactory(new SimpleJobFactory(), MefContainer);
 
@@ -77,6 +81,7 @@ namespace ILoveLucene
             batch.AddExportedValue<ILoadConfiguration>(loadConfiguration);
             batch.AddExportedValue<ILog>(new FileLogger(logFileLocation, tag: "mef"));
             batch.AddExportedValue(coreConfiguration);
+            batch.AddExportedValue(autoUpdateModule.UpdateManagerAdapter);
             MefContainer.Compose(batch);
 
             builder.RegisterInstance(MefContainer).AsSelf();
@@ -88,6 +93,7 @@ namespace ILoveLucene
 
             builder.RegisterModule(new LoggingModule(t => new FileLogger(logFileLocation, t.Name)));
             builder.RegisterModule(new SatisfyMefImports(MefContainer));
+            builder.RegisterModule(autoUpdateModule);
 
             builder.RegisterType<MainWindowViewModel>().AsSelf();
             builder.RegisterType<AutoCompleteBasedOnLucene>().As<IAutoCompleteText>();
@@ -100,6 +106,7 @@ namespace ILoveLucene
 
             builder.RegisterType<FileSystemLearningRepository>().As<ILearningRepository>().WithParameter("input", learningStorageLocation);
             builder.RegisterType<ScheduleIndexJobs>().As<IStartupTask>();
+            builder.RegisterType<ScheduleUpdateCheck>().As<IStartupTask>();
 
             builder.RegisterType<SeparateIndexesDirectoryFactory>()
                 .As<IDirectoryFactory>().WithParameter("root", indexStorageLocation)

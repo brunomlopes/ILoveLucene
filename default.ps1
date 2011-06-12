@@ -1,6 +1,8 @@
 $framework = "4.0"
 properties {
-    $version = "1.0.0.0"
+    $version = "1.0.1.0"
+    $dropbox_base_url = "http://dl.dropbox.com/u/118385/ilovelucene/"
+    $package_path = "D:\documents\My Dropbox\Public\ilovelucene"
 }
 
 Task Update-Solution-Assembly-Info -description "Updates the solution wide assembly info" {
@@ -20,10 +22,8 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
     if (Test-Path $outputDir){
         Remove-Item $outputDir -recurse -force
     }
-    $packageDir = "$outputRoot\package"
-    if (-not (Test-Path $packageDir)){
-        mkdir $packageDir
-    }
+    $packageDir = $package_path
+    $appcast_path = "$packageDir\appcast.xml"
     
     Exec { msbuild /t:clean /p:Configuration=Release /p:OutDir=$outputDir\ }
     Exec { msbuild /t:build /p:Configuration=Release /p:OutDir=$outputDir\ }
@@ -36,11 +36,21 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
     
     Remove-Item $outputDir\Bin\*.pdb -exclude Core.pdb,ElevationHelper.Services.pdb
     
+    $package_name = "ILoveLucene-$version-$gitHash.zip"
+    $package_path = "$packageDir\$package_name"
+    
     Push-Location $outputDir
-    $zip = Write-Zip .\* "$packageDir\ILoveLucene-$version-$gitHash.zip" -level 9
+    $zip = Write-Zip .\* $package_path -level 9
     Pop-Location
     
     Write-Host "File is up at $zip"
+    
+    Generate-Appcast-Item `
+        -version $version `
+        -package_url $dropbox_base_url `
+        -package_filename $package_name `
+        -package_size (get-item $package_path).Length `
+        -appcast_path $appcast_path
 }
 
 Task Help {
@@ -48,6 +58,36 @@ Task Help {
 }
 
 Task default -depends Help
+
+function Generate-Appcast-Item
+{
+param(
+    [string]$version,
+    [string]$package_url,
+    [string]$package_filename,
+    [string]$package_size,
+    [string]$appcast_path
+)
+    $pub_date = Get-Date -format r
+    $template = [xml]"<?xml version=""1.0"" encoding=""utf-8""?>
+<rss version=""2.0"" xmlns:appcast=""http://www.adobe.com/xml-namespaces/appcast/1.0"">
+  <channel>
+    <title>ILoveLucene</title>
+    <link>http://github.com/brunomlopes/ILoveLucene/downloads</link>
+    <description>Fast and Extensible .Net Launcher</description>
+    <item>
+      <title>ILoveLucene</title>
+      <link>http://github.com/brunomlopes/ILoveLucene/downloads</link>
+      <description></description>
+      <pubDate>$pub_date</pubDate>
+      <appcast:version>$version</appcast:version>
+      <enclosure url=""$package_url$package_filename"" length=""$package_size"" type=""application/octet-stream"" />
+    </item>
+  </channel>
+</rss>
+"
+    $template | Format-Xml | Out-File -encoding utf8 $appcast_path
+}
 
 function Generate-Version-Info
 {
@@ -85,7 +125,8 @@ namespace Core
     using System;
     public static class ProgramVersionInformation
     {
-        public static string Version = ""$commit / $timestamp"";
+        public static string Version = ""$version"";
+        public static string GitVersion = ""$commit / $timestamp"";
         public static DateTime PackageDate = $datetime;
     }
 }
