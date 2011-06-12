@@ -1,6 +1,6 @@
 $framework = "4.0"
 properties {
-    $version = "1.0.1.0"
+    $version = "1.1.0.0"
     $dropbox_base_url = "http://dl.dropbox.com/u/118385/ilovelucene/"
     $package_path = "D:\documents\My Dropbox\Public\ilovelucene"
 }
