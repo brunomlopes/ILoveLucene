@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,18 +26,20 @@ namespace ILoveLucene.ViewModels
         private readonly UpdateManagerAdapter _updateManager;
         private CancellationTokenSource _cancelationTokenSource;
 
+        [Import]
+        public StatusMessage Status { get; set; }
+
         public MainWindowViewModel(IAutoCompleteText autoCompleteText, IGetActionsForItem getActionsForItem, ILog log, UpdateManagerAdapter updateManager)
         {
             _autoCompleteText = autoCompleteText;
             _getActionsForItem = getActionsForItem;
             _log = log;
 
-            StatusMessage = "Welcome";
             _updateManager = updateManager;
             _updateManager.UpdatesAvailable += (sender, args) =>
                                                    {
                                                        {
-                                                           StatusMessage = "Update available";
+                                                           Status.SetMessage(this, "Update available");
                                                            NotifyOfPropertyChange(() => UpdateVisible);
                                                            NotifyOfPropertyChange(() => CanUpdate);
                                                        }
@@ -58,7 +61,7 @@ namespace ILoveLucene.ViewModels
                                       {
                                           try
                                           {
-                                              StatusMessage = "Executing";
+                                              Status.SetMessage(this, "Executing");
                                               IItem result = null;
                                               if (ActionWithArguments != null)
                                               {
@@ -86,11 +89,11 @@ namespace ILoveLucene.ViewModels
                                                   _temporaryResults = new ListWithCurrentSelection<AutoCompletionResult.CommandResult>();
                                                   Caliburn.Micro.Execute.OnUIThread(() => ((MainWindowView)Window.GetWindow(source)).HideWindow());
                                               }
-                                              StatusMessage = "Done";
+                                              Status.SetMessage(this, "Done");
                                           }
                                           catch (Exception e)
                                           {
-                                              StatusMessage = "Error :"+e.Message;
+                                              Status.SetMessage(this, "Error :" + e.Message);
                                               Description = e.Message;
                                               _log.Error(e);
                                           }
@@ -132,21 +135,11 @@ namespace ILoveLucene.ViewModels
             }
         }
 
-        private string _statusMessage;
-
-        public string StatusMessage
-        {
-            get { return _statusMessage; }
-            set
-            {
-                _statusMessage = value;
-                NotifyOfPropertyChange(() => StatusMessage);
-            }
-        }
+ 
 
         public void Update()
         {
-            StatusMessage = "Updating";
+            Status.SetMessage(this, "Updating");
             _updateManager.PrepareUpdates();
         }
         

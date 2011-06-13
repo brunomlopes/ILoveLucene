@@ -73,7 +73,7 @@
         	<Button Name="Update" Padding="0" Focusable="True" ToolTip="Update available" Visibility="{Binding UpdateVisible}">
                 <Image Source="/ILoveLucene;component/Images/1307834877_Gnome-Software-Update-Available-64.png" Width="25"></Image>
             </Button>
-        	<TextBlock Name="StatusMessage"></TextBlock>
+        	<TextBlock Name="StatusMessage" Text="{Binding Status.Message}"></TextBlock>
         </StatusBar>
     </Grid>
 </Window>

@@ -97,6 +97,7 @@
     <Compile Include="AutoUpdate\UpdateManagerAdapter.cs" />
     <Compile Include="AutoUpdate\ZippedFilesUpdateTask.cs" />
     <Compile Include="AutoUpdate\ZippedAppcastReader.cs" />
+    <Compile Include="AutoUpdate\CheckForUpdatesCommand.cs" />
     <Compile Include="Commands\XCopyPathToClipboard.cs" />
     <Compile Include="Infrastructure\ListWithCurrentSelection.cs" />
     <Compile Include="Infrastructure\ListWithCurrentSelectionExtensions.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="ValueConverters\CommandResultToStringConverter.cs" />
     <Compile Include="ValueConverters\IItemToStringConverter.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\StatusMessage.cs" />
     <Compile Include="WindowsInterop\FocusHandler.cs" />
     <Compile Include="WindowsInterop\KeyboardHandler.cs" />
     <Compile Include="Views\MainWindowView.xaml.cs">
