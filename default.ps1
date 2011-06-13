@@ -1,11 +1,12 @@
 $framework = "4.0"
 properties {
-    $version = "1.1.0.0"
     $dropbox_base_url = "http://dl.dropbox.com/u/118385/ilovelucene/"
     $package_path = "D:\documents\My Dropbox\Public\ilovelucene"
+    $version_index_to_increase = 3
 }
 
 Task Update-Solution-Assembly-Info -description "Updates the solution wide assembly info" {
+    $version = Get-Next-Version
     Generate-Version-Info `
         -assembly_file ".\src\Core\Properties\AssemblyInfo.cs" `
         -class_file ".\src\Core\ProgramVersionInformation.cs" `
@@ -16,6 +17,7 @@ Task Update-Solution-Assembly-Info -description "Updates the solution wide assem
 }
 
 Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a package on output directory" {
+    $version = Get-Next-Version
     $gitHash = Get-Git-Commit
     $outputRoot = (Get-Item .).FullName
     $outputDir = "$outputRoot\output"
@@ -43,14 +45,15 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
     $zip = Write-Zip .\* $package_path -level 9
     Pop-Location
     
-    Write-Host "File is up at $zip"
-    
     Generate-Appcast-Item `
         -version $version `
         -package_url $dropbox_base_url `
         -package_filename $package_name `
         -package_size (get-item $package_path).Length `
         -appcast_path $appcast_path
+    $gitExec = Get-Git-Exec
+    & "$gitExec" tag "version_$version"
+    Write-Host "File is up at $zip, appcast updated with version $version"
 }
 
 Task Help {
@@ -139,7 +142,7 @@ namespace Core
     $classInfo | out-file -encoding utf8 $class_file
 }
 
-function Get-Git-Commit
+function Get-Git-Exec 
 {
     $programFiles = ""
     if (Test-Path "env:programfiles(x86)"){
@@ -147,6 +150,29 @@ function Get-Git-Commit
     }else{
       $programFiles = (Get-Item "env:programfiles").Value
     }
-    $gitLog = & "$programFiles\Git\bin\git.exe" log --oneline -1
+    return "$programFiles\Git\bin\git.exe"
+}
+
+function Get-Git-Commit
+{
+    $gitExec = Get-Git-Exec
+    $gitLog = & "$gitExec" log --oneline -1
     return $gitLog.Split(' ')[0]
+}
+
+function Get-Next-Version
+{
+    $gitExec = Get-Git-Exec
+    $description= (& "$gitExec" describe --tags).split("-")
+    $last_version_tag = $description[0]
+    if (-not $last_version_tag.startswith("version")) {
+        throw "Git description '$description' not valid for version" 
+    }
+    
+    $last_versions = $last_version_tag.split("_")[1].split(".") | foreach { [int]$_} 
+    if ($description.Length -eq 3) {
+        $last_versions[$version_index_to_increase]++
+    }
+    
+    return [string]::join(".", $last_versions)
 }
