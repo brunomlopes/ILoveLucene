@@ -20,7 +20,7 @@ namespace ILoveLucene.AutoUpdate
         public override void Act()
         {
             Status.SetMessage(this, "Checking for updates");
-            UpdateManagerAdapter.CheckForUpdates(new SimpleWebSource(Configuration.AppcastFeedUrl));
+            UpdateManagerAdapter.CheckForUpdates();
         }
     }
 }

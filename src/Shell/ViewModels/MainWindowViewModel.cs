@@ -39,12 +39,16 @@ namespace ILoveLucene.ViewModels
             _updateManager.UpdatesAvailable += (sender, args) =>
                                                    {
                                                        {
-                                                           Status.SetMessage(this, "Update available");
-                                                           NotifyOfPropertyChange(() => UpdateVisible);
-                                                           NotifyOfPropertyChange(() => CanUpdate);
+                                                           Status.SetMessage(this, "Update available, downloading");
+                                                           _updateManager.PrepareUpdates();
                                                        }
                                                    };
-            _updateManager.UpdatesReady += (sender, args) => _updateManager.ApplyUpdates();
+            _updateManager.UpdatesReady += (sender, args) =>
+                                               {
+                                                   Status.SetMessage(this, "Update prepared, ready for install");
+                                                   NotifyOfPropertyChange(() => UpdateVisible);
+                                                   NotifyOfPropertyChange(() => CanUpdate);
+                                               };
 
             _cancelationTokenSource = new CancellationTokenSource();
             _argumentCancelationTokenSource = new CancellationTokenSource();
@@ -139,15 +143,15 @@ namespace ILoveLucene.ViewModels
 
         public void Update()
         {
-            Status.SetMessage(this, "Updating");
-            _updateManager.PrepareUpdates();
+            Status.SetMessage(this, "Applying update");
+            _updateManager.ApplyUpdates();
         }
         
         public bool CanUpdate
         {
             get
             {
-                return _updateManager.State == UpdateManager.UpdateProcessState.Checked &&
+                return _updateManager.State == UpdateManager.UpdateProcessState.Prepared &&
                        _updateManager.HaveUpdatesAvailable;
             }
         }
@@ -156,7 +160,7 @@ namespace ILoveLucene.ViewModels
         {
             get
             {
-                return (_updateManager.State == UpdateManager.UpdateProcessState.Checked &&
+                return (_updateManager.State == UpdateManager.UpdateProcessState.Prepared &&
                         _updateManager.HaveUpdatesAvailable)
                            ? Visibility.Visible
                            : Visibility.Hidden;

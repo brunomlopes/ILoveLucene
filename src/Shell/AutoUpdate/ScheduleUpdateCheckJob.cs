@@ -5,7 +5,7 @@ using Quartz;
 
 namespace ILoveLucene.AutoUpdate
 {
-    public class ScheduleUpdateCheck : IStartupTask
+    public class ScheduleUpdateCheckJob : IStartupTask
     {
         private readonly IScheduler _scheduler;
 
@@ -15,14 +15,14 @@ namespace ILoveLucene.AutoUpdate
         [Import]
         public AutoUpdateConfiguration Configuration { get; set; }
 
-        public ScheduleUpdateCheck(IScheduler scheduler)
+        public ScheduleUpdateCheckJob(IScheduler scheduler)
         {
             _scheduler = scheduler;
         }
 
         public void Execute()
         {
-            var jobDetail = new JobDetail("ScheduleUpdateCheck", "ILoveLucene.AutoUpdate", typeof (CheckForUpdatesJob));
+            var jobDetail = new JobDetail("ScheduleUpdateCheckJob", "ILoveLucene.AutoUpdate", typeof (CheckForUpdatesJob));
             var trigger = TriggerUtils.MakeMinutelyTrigger(Configuration.PeriodicityInMinutes);
             trigger.StartTimeUtc = DateTime.UtcNow.AddMinutes(2);
             trigger.Name = "TriggerAutoUpdateEach" + Configuration.PeriodicityInMinutes + "Minutes";

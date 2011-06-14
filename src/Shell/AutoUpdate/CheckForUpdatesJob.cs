@@ -14,7 +14,7 @@ namespace ILoveLucene.AutoUpdate
 
         public void Execute(JobExecutionContext context)
         {
-            UpdateManagerAdapter.CheckForUpdates(new SimpleWebSource(Configuration.AppcastFeedUrl));
+            UpdateManagerAdapter.CheckForUpdates();
         }
     }
 }
