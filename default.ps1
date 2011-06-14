@@ -44,6 +44,7 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
     Push-Location $outputDir
     $zip = Write-Zip .\* $package_path -level 9
     Pop-Location
+    Write-Host "File is up at $zip"
     
     Generate-Appcast-Item `
         -version $version `
@@ -53,7 +54,11 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
         -appcast_path $appcast_path
     $gitExec = Get-Git-Exec
     & "$gitExec" tag "version_$version"
-    Write-Host "File is up at $zip, appcast updated with version $version"
+    
+    & "$gitExec" reset ".\src\Core\Properties\AssemblyInfo.cs" 
+    & "$gitExec" reset ".\src\Core\ProgramVersionInformation.cs"
+    
+    Write-Host "Appcast updated with version $version"
 }
 
 Task Help {
