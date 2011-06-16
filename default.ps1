@@ -55,8 +55,9 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
     $gitExec = Get-Git-Exec
     & "$gitExec" tag "version_$version"
     
-    & "$gitExec" reset ".\src\Core\Properties\AssemblyInfo.cs" 
-    & "$gitExec" reset ".\src\Core\ProgramVersionInformation.cs"
+    & "$gitExec" checkout ".\src\Core\Properties\AssemblyInfo.cs" 
+    & "$gitExec" checkout ".\src\Core\ProgramVersionInformation.cs"
+    & "$gitExec" push --tags
     
     Write-Host "Appcast updated with version $version"
 }
