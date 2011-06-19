@@ -60,6 +60,9 @@
     <Compile Include="Abstractions\ArgumentAutoCompletionResult.cs" />
     <Compile Include="Abstractions\AutoCompletionResult.cs" />
     <Compile Include="Abstractions\DocumentId.cs" />
+    <Compile Include="Abstractions\IFindDefaultActionForItemStrategy.cs" />
+    <Compile Include="DefaultActionAttribute.cs" />
+    <Compile Include="GetDefaultActionBasedOnAttributeForType.cs" />
     <Compile Include="Abstractions\IActOnItem.cs" />
     <Compile Include="Abstractions\IActOnItemExtension.cs" />
     <Compile Include="Abstractions\IAutoCompleteText.cs" />

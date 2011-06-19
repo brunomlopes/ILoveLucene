@@ -1,7 +1,9 @@
-﻿using Core.Abstractions;
+﻿using Core;
+using Core.Abstractions;
 
 namespace Plugins.Commands
 {
+    [DefaultAction(typeof(ExecuteCommand))]
     public class CommandItem : ITypedItem<ICommand>
     {
         private ICommand _item;

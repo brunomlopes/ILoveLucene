@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using Core;
 using Core.Abstractions;
 
 namespace Plugins.Processes
 {
+    [DefaultAction(typeof(SwitchToWindow))]
     internal class ProcessItem : ITypedItem<Process>
     {
         private readonly Process _process;

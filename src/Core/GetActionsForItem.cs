@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using Core.Abstractions;
 
@@ -9,8 +8,12 @@ namespace Core
 {
     public class GetActionsForItem : IGetActionsForItem
     {
+        [Import]
+        public IFindDefaultActionForItemStrategy FindDefaultActionForItemStrategy { get; set; }
+
         [ImportMany(typeof(IActOnItem), AllowRecomposition = true)]
         public IEnumerable<IActOnItem> Actions { get; set; }
+
 
         Dictionary<string, IActOnItem> _learnings = new Dictionary<string, IActOnItem>();
 
@@ -24,19 +27,28 @@ namespace Core
         {
             Actions = actions;
         }
+        
+        public GetActionsForItem(IEnumerable<IActOnItem> actions, IFindDefaultActionForItemStrategy findDefaultActionForItemStrategy)
+        {
+            FindDefaultActionForItemStrategy = findDefaultActionForItemStrategy;
+            Actions = actions;
+        }
 
         public IEnumerable<IActOnItem> ActionsForItem(AutoCompletionResult.CommandResult result)
         {
             var item = result.Item;
             var actions = new List<IActOnItem>();
 
-            if (result.CompletionId != null)
+            var defaultActionForItem = DefaultActionForResult(result.Item);
+            if(defaultActionForItem != null && defaultActionForItem.CanActOn(item))
             {
-                var sha1 = result.CompletionId.GetSha1();
-                if (_learnings.ContainsKey(sha1) && _learnings[sha1].CanActOn(item))
-                {
-                    actions.Add(_learnings[sha1]);
-                }
+                actions.Add(defaultActionForItem);
+            }
+
+            var actionForResult = ActionForResult(result);
+            if(actionForResult != null && actionForResult.CanActOn(item))
+            {
+                actions.Add(actionForResult);
             }
             var actionForType = ActionForType(item.GetType());
             if(actionForType != null && actionForType.CanActOn(item))
@@ -44,14 +56,33 @@ namespace Core
                 actions.Add(actionForType);
             }
 
-            return actions.Concat(Actions.Where(a => a.TypedItemType.IsInstanceOfType(item.Item) && a.CanActOn(item)).OrderBy(c => c.Text)).Distinct();
+            var actionsForItem = Actions
+                .Where(a => a.TypedItemType.IsInstanceOfType(item.Item))
+                .Where(a => a.CanActOn(item))
+                .OrderBy(c => c.Text);
+            return actions.Concat(actionsForItem)
+                .Distinct();
+        }
+
+        private IActOnItem DefaultActionForResult(IItem item)
+        {
+            if (FindDefaultActionForItemStrategy != null)
+            {
+                return FindDefaultActionForItemStrategy.DefaultForItem(item);
+            }
+            return null;
         }
 
         public void LearnActionForCommandResult(string input, IActOnItem selectedAction, AutoCompletionResult.CommandResult result)
         {
             if (result.IsTransient()) return;
-            _learnings[result.CompletionId.GetSha1()] = selectedAction;
+            LearnForResult(result, selectedAction);
             LearnForType(result.Item.GetType(), selectedAction);
+        }
+
+        private void LearnForResult(AutoCompletionResult.CommandResult result, IActOnItem selectedAction)
+        {
+            _learnings[result.CompletionId.GetSha1()] = selectedAction;
         }
 
         private void LearnForType(Type type, IActOnItem selectedAction)
@@ -72,6 +103,21 @@ namespace Core
             }
             return null;
         }
+
+        private IActOnItem ActionForResult(AutoCompletionResult.CommandResult result)
+        {
+            IActOnItem actionForResult = null;
+            if (result.CompletionId != null)
+            {
+                var sha1 = result.CompletionId.GetSha1();
+                if (_learnings.ContainsKey(sha1))
+                {
+                    actionForResult = _learnings[sha1];
+                }
+            }
+            return actionForResult;
+        }
+
         private Type GenericITypedItem(Type type)
         {
             return type.GetInterfaces().SingleOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (ITypedItem<>));

@@ -1,8 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections;
+using System.IO;
+using Core;
 using Core.Abstractions;
 
 namespace Plugins.Shortcuts
 {
+    [DefaultAction(typeof(Run))]
     public class FileInfoItem : ITypedItem<FileInfo>
     {
         public FileInfoItem(FileInfo shortcut)

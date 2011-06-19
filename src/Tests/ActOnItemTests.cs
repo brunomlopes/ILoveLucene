@@ -6,6 +6,8 @@ using Plugins.Commands;
 using Plugins.Shortcuts;
 using Xunit;
 using Core.Extensions;
+using Xunit.Extensions;
+using System.Linq;
 
 namespace Tests
 {
@@ -87,6 +89,61 @@ namespace Tests
         }
         
         [Fact]
+        public void DefaultActionForItemAppearsFirst()
+        {
+            var act = new MockActOnFileInfo();
+            var defaultAct = new MockDefaultActOnFileInfo();
+            var info = new FileInfoItem(new FileInfo("does.not.exist"));
+
+            var getItems = new GetActionsForItem(new IActOnItem[] {act, defaultAct}, 
+                new FakeFindDefaultActionForItemStrategy(defaultAct));
+
+            var actionsForItem = getItems.ActionsForItem(ResultForItem(info));
+            Assert.NotEmpty(actionsForItem);
+            Assert.Contains(defaultAct, actionsForItem);
+            Assert.Equal(defaultAct, actionsForItem.First());
+        }
+        
+        [Fact]
+        public void AttributeStrategyForDefaultActionForFileInfoShowsDefaultFirst()
+        {
+            var act = new MockActOnFileInfo();
+            var defaultAct = new MockDefaultActOnFileInfo();
+            var run = new Run();
+            var info = new FileInfoItem(new FileInfo("does.not.exist"));
+
+            var actions = new IActOnItem[] {act, defaultAct, run};
+            var strategy = new GetDefaultActionBasedOnAttributeForType();
+            strategy.Actions = actions;
+
+            var getItems = new GetActionsForItem(actions, strategy);
+
+            var actionsForItem = getItems.ActionsForItem(ResultForItem(info));
+            Assert.NotEmpty(actionsForItem);
+            Assert.Contains(run, actionsForItem);
+            Assert.Equal(run, actionsForItem.First());
+        } 
+        
+        [Fact]
+        public void AttributeStrategyForDefaultActionForFileInfoShowsDoesNotFindAction()
+        {
+            var act = new MockActOnFileInfo();
+            var defaultAct = new MockDefaultActOnFileInfo();
+            var run = new Run();
+            var info = new FileInfoItem(new FileInfo("does.not.exist"));
+
+            var actions = new IActOnItem[] {act, defaultAct};
+            var strategy = new GetDefaultActionBasedOnAttributeForType();
+            strategy.Actions = actions;
+
+            var getItems = new GetActionsForItem(actions, strategy);
+
+            var actionsForItem = getItems.ActionsForItem(ResultForItem(info));
+            Assert.NotEmpty(actionsForItem);
+            Assert.DoesNotContain(run, actionsForItem);
+        }
+        
+        [Fact]
         public void ExecuteCanActOnCommand()
         {
             var command = new MockCommand();
@@ -114,6 +171,22 @@ namespace Tests
         }
     }
 
+    class FakeFindDefaultActionForItemStrategy : IFindDefaultActionForItemStrategy
+    {
+        private readonly IActOnItem _act;
+
+        public FakeFindDefaultActionForItemStrategy(IActOnItem act)
+        {
+            _act = act;
+        }
+
+        public IActOnItem DefaultForItem(IItem item)
+        {
+            return _act;
+        }
+    }
+
+  
     class MockCommand : ICommand
     {
         public bool Acted;
@@ -183,6 +256,11 @@ namespace Tests
         {
             get { return "not relevant"; }
         }
+    }
+    
+    class MockDefaultActOnFileInfo : MockActOnFileInfo
+    {
+      
     }
 
 
