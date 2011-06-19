@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using Core;
 
 namespace ILoveLucene.ViewModels
 {
@@ -26,6 +27,7 @@ namespace ILoveLucene.ViewModels
         public StatusMessage()
         {
             PropertyChanged += (sender, e) => { };
+            Message = string.Format("ILoveLucene version {0} built {1}", ProgramVersionInformation.Version, ProgramVersionInformation.PackageDate.ToLongDateString());
         }
     }
 }
