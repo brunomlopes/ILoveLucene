@@ -60,12 +60,10 @@
     <Compile Include="Abstractions\ArgumentAutoCompletionResult.cs" />
     <Compile Include="Abstractions\AutoCompletionResult.cs" />
     <Compile Include="Abstractions\DocumentId.cs" />
-    <Compile Include="Abstractions\IFindDefaultActionForItemStrategy.cs" />
-    <Compile Include="DefaultActionAttribute.cs" />
-    <Compile Include="GetDefaultActionBasedOnAttributeForType.cs" />
     <Compile Include="Abstractions\IActOnItem.cs" />
     <Compile Include="Abstractions\IActOnItemExtension.cs" />
     <Compile Include="Abstractions\IAutoCompleteText.cs" />
+    <Compile Include="Abstractions\IFindDefaultActionForItemStrategy.cs" />
     <Compile Include="Abstractions\IGetActionsForItem.cs" />
     <Compile Include="Abstractions\IItem.cs" />
     <Compile Include="Abstractions\IConverter.cs" />
@@ -77,10 +75,12 @@
     <Compile Include="Abstractions\PluginConfigurationAttribute.cs" />
     <Compile Include="Abstractions\TextItem.cs" />
     <Compile Include="CoreConfiguration.cs" />
+    <Compile Include="DefaultActionAttribute.cs" />
     <Compile Include="Extensions\AnalyzerExtension.cs" />
     <Compile Include="Extensions\DocumentExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="GetActionsForItem.cs" />
+    <Compile Include="GetDefaultActionBasedOnAttributeForType.cs" />
     <Compile Include="LoadConfiguration.cs" />
     <Compile Include="ConfigurationPart.cs" />
     <Compile Include="Extensions\TaskExtensions.cs" />

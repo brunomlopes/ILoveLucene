@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\..\lib\autofac\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="IronPython, Version=2.6.10920.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\ironpython\IronPython.dll</HintPath>
@@ -87,6 +90,7 @@
     <Compile Include="Commands\IRequestConverter.cs" />
     <Compile Include="Commands\RequestItem.cs" />
     <Compile Include="Commands\StandaloneCommandsAndRequestsSource.cs" />
+    <Compile Include="Diagnostics\DumpAllIndexes.cs" />
     <Compile Include="EmptyRecycleBin.cs" />
     <Compile Include="ExportLearnings.cs" />
     <Compile Include="Google.cs" />

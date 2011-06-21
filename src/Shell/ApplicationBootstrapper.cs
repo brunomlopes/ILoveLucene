@@ -118,7 +118,11 @@ namespace ILoveLucene
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
             base.OnStartup(sender, e);
-            
+
+            var hack = new CompositionBatch();
+            hack.AddExportedValue(Container);
+            MefContainer.Compose(hack);
+
             Container.Resolve<IScheduler>().Start();
             Container.Resolve<IEnumerable<IStartupTask>>().AsParallel().ForAll(t => t.Execute());
         }
