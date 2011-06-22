@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Forms;
+using Core;
 using ILoveLucene.WindowsInterop;
+using Application = System.Windows.Application;
 
 namespace ILoveLucene.Views
 {
@@ -8,6 +11,7 @@ namespace ILoveLucene.Views
     {
         private readonly KeyboardHandler _globalHotKeyHandler;
         private readonly FocusHandler _focusHandler;
+        private NotifyIcon _notifyIcon;
 
         public MainWindowView()
         {
@@ -15,12 +19,29 @@ namespace ILoveLucene.Views
             _globalHotKeyHandler = new KeyboardHandler(this, Toggle);
             _focusHandler = new FocusHandler(this);
             Input.Focus();
+
+            SetupNotifyIcon();
+        }
+
+        private void SetupNotifyIcon()
+        {
+            _notifyIcon = new System.Windows.Forms.NotifyIcon();
+            _notifyIcon.Text = "ILoveLucene v" + ProgramVersionInformation.Version;
+            var imageUri = new Uri("/ILoveLucene;component/Images/1305540894_heart_magnifier.ico", UriKind.Relative);
+            using (var stream = Application.GetResourceStream(imageUri).Stream)
+            {
+                _notifyIcon.Icon = new System.Drawing.Icon(stream);
+                _notifyIcon.DoubleClick += (sender, e) => ShowThisWindow();
+                _notifyIcon.Visible = true;
+            }
         }
 
         protected override void OnClosed(EventArgs e)
         {
             if (_globalHotKeyHandler != null)
                 _globalHotKeyHandler.Dispose();
+            if(_notifyIcon != null)
+                _notifyIcon.Dispose();
         }
 
         public void Toggle()
