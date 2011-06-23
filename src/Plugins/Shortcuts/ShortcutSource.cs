@@ -19,7 +19,7 @@ namespace Plugins.Shortcuts
         [Import]
         public ILog Log { get; set; }
 
-        [Import(typeof(Configuration))]
+        [ImportConfiguration]
         public Configuration Conf { get; set; }
 
         public ShortcutSource()

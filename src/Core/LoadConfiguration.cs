@@ -23,13 +23,15 @@ namespace Core
 
         public void Load(CompositionContainer container)
         {
+            var previousConfigurations = Configurations;
+
             Configurations = _configurationDirectories.SelectMany(c => c.GetFiles())
                 .GroupBy(c => c.Name)
                 .Select((name) => ConfigurationPart.FromFiles(name.Key, name))
                 .Where(r => r != null)
                 .ToList();
-            
-            container.Compose(new CompositionBatch(Configurations, new ComposablePart[]{}));
+
+            container.Compose(new CompositionBatch(Configurations, previousConfigurations));
         }
 
         public void Reload()

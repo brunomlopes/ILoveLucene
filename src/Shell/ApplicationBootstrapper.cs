@@ -60,7 +60,7 @@ namespace ILoveLucene
 
             var loadConfiguration =
                 new LoadConfiguration(new DirectoryInfo(Path.Combine(assemblyDirectory, "Configuration")));
-            var localConfigurationDirectory = new DirectoryInfo(Path.Combine(assemblyDirectory, "LocalConfiguration"));
+            var localConfigurationDirectory = new DirectoryInfo(Path.Combine(assemblyDirectory, "Local.Configuration"));
             if(localConfigurationDirectory.Exists)
                 loadConfiguration.AddConfigurationLocation(localConfigurationDirectory);
             loadConfiguration.Load(MefContainer);
@@ -83,6 +83,7 @@ namespace ILoveLucene
             batch.AddExportedValue<ILog>(new FileLogger(logFileLocation, tag: "mef"));
             batch.AddExportedValue(coreConfiguration);
             batch.AddExportedValue(updateManagerAdapter);
+            batch.AddExportedValue<IScheduler>(scheduler);
             MefContainer.Compose(batch);
 
             MefContainer.SatisfyImportsOnce(updateManagerAdapter);

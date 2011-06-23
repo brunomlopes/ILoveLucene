@@ -52,7 +52,7 @@ namespace Tests
         [Fact]
         public void RepositoryWorks()
         {
-            var taskRepository = new TaskRepository(new CoreConfiguration("."));
+            var taskRepository = new TaskRepository() { Configuration = new CoreConfiguration(".") };
 
             var task = new Task("do stuff");
             task.Start();
@@ -73,7 +73,8 @@ namespace Tests
         [Fact]
         public void CanStartSaveGetAndStop()
         {
-            var taskRepository = new TaskRepository(new CoreConfiguration("."));
+            var taskRepository = new TaskRepository() { Configuration = new CoreConfiguration(".") };
+            
 
             var task = new Task("do stuff");
             task.Start();

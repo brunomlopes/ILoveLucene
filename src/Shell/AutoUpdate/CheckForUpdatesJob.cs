@@ -9,9 +9,6 @@ namespace ILoveLucene.AutoUpdate
         [Import]
         public UpdateManagerAdapter UpdateManagerAdapter { get; set; }
 
-        [Import]
-        public AutoUpdateConfiguration Configuration { get; set; }
-
         public void Execute(JobExecutionContext context)
         {
             UpdateManagerAdapter.CheckForUpdates();

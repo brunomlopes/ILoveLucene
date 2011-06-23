@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Core.Abstractions;
+using Plugins.Commands;
 using Quartz;
 using System.Linq;
 
@@ -53,5 +54,22 @@ namespace Plugins
     //    {
     //        get { return this; }
     //    }
-    //}
+    
+    [Export(typeof(ICommand))]
+    public class ReindexAll : BaseCommand
+    {
+        [Import]
+        public IScheduler Scheduler { get; private set; }
+
+        [Import("IIndexer.JobGroup")]
+        public string JobGroup { get; set; }
+
+        public override void Act()
+        {
+            foreach (var jobName in Scheduler.GetJobNames(JobGroup))
+            {
+                Scheduler.TriggerJobWithVolatileTrigger(jobName, JobGroup);
+            }
+        }
+    }
 }

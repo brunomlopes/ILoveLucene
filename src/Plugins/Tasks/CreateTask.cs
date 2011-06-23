@@ -150,38 +150,37 @@ namespace Plugins.Tasks
         [Import]
         public ILog Log { get; set; }
 
-        [ImportingConstructor]
-        public TaskRepository(CoreConfiguration config)
-        {
-            _tasksLocation = Path.Combine(config.DataDirectory, "Tasks");
+        [ImportConfiguration]
+        public CoreConfiguration Configuration { get; set; }
 
+        [ImportingConstructor]
+        public TaskRepository()
+        {
             _settings = new JsonSerializerSettings();
             _settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             
             _formatting = Formatting.Indented;
 
             _safeFilenameRegex = new Regex(@"[<>:""/\\|?*]");
-            if (!Directory.Exists(_tasksLocation)) Directory.CreateDirectory(_tasksLocation);
-            if (!Directory.Exists(Path.Combine(_tasksLocation, "Archive"))) Directory.CreateDirectory(Path.Combine(_tasksLocation, "Archive"));
         }
 
         public void CreateTask(Task task)
         {
             task.FileName = TaskToFileName(task);
             string serializedTask = JsonConvert.SerializeObject(task, _formatting, _settings);
-            File.WriteAllText(Path.Combine(_tasksLocation, task.FileName), serializedTask);
+            File.WriteAllText(Path.Combine(TasksLocation, task.FileName), serializedTask);
         }
 
         public void UpdateTask(Task task)
         {
             string serializedTask = JsonConvert.SerializeObject(task, _formatting, _settings);
 
-            File.WriteAllText(Path.Combine(_tasksLocation, task.FileName), serializedTask);
+            File.WriteAllText(Path.Combine(TasksLocation, task.FileName), serializedTask);
         }
 
         public Task FromFileName(string filename)
         {
-            var fullPath = Path.Combine(_tasksLocation, filename);
+            var fullPath = Path.Combine(TasksLocation, filename);
             return File.Exists(fullPath) ? FileToTask(fullPath) : null;
         }
 
@@ -190,7 +189,7 @@ namespace Plugins.Tasks
             int i = 1;
             string rootFileName = _safeFilenameRegex.Replace(task.Name, "_")+".task";
             var fileName = rootFileName;
-            while(File.Exists(Path.Combine(_tasksLocation, fileName)))
+            while(File.Exists(Path.Combine(TasksLocation, fileName)))
             {
                 fileName = rootFileName + "_" + i.ToString();
                 i += 1;
@@ -201,7 +200,7 @@ namespace Plugins.Tasks
         public override Task<IEnumerable<object>> GetItems()
         {
             return System.Threading.Tasks.Task.Factory
-                .StartNew(() => Directory.EnumerateFiles(_tasksLocation, "*.task")
+                .StartNew(() => Directory.EnumerateFiles(TasksLocation, "*.task")
                                     .Select(FileToTask)
                                     .Where(t => t != null)
                                     .Cast<object>());
@@ -228,10 +227,26 @@ namespace Plugins.Tasks
             get { return false; }
         }
 
+        public string TasksLocation
+        {
+            get
+            {
+                var location = Path.Combine(Configuration.DataDirectory, "Tasks");
+                if (location != _tasksLocation)
+                {
+                    _tasksLocation = location;
+                    if (!Directory.Exists(TasksLocation)) Directory.CreateDirectory(_tasksLocation);
+                    if (!Directory.Exists(Path.Combine(TasksLocation, "Archive"))) Directory.CreateDirectory(Path.Combine(_tasksLocation, "Archive"));
+                }
+
+                return _tasksLocation;
+            }
+        }
+
         public void ArchiveTask(Task task)
         {
-            File.Move(Path.Combine(_tasksLocation, task.FileName),
-                      Path.Combine(_tasksLocation, "Archive", task.FileName));
+            File.Move(Path.Combine(TasksLocation, task.FileName),
+                      Path.Combine(TasksLocation, "Archive", task.FileName));
         }
     }
 

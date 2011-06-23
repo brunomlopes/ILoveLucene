@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using Core.Abstractions;
 using NAppUpdate.Framework;
 using NAppUpdate.Framework.Sources;
 
@@ -12,7 +13,7 @@ namespace ILoveLucene.AutoUpdate
         public event EventHandler<EventArgs> UpdatesAvailable;
         public event EventHandler<EventArgs> UpdatesReady;
 
-        [Import]
+        [ImportConfiguration]
         public AutoUpdateConfiguration Configuration { get; set; }
 
         public UpdateManagerAdapter()

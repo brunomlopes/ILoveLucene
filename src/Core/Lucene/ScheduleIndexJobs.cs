@@ -11,6 +11,11 @@ namespace Core.Lucene
 {
     public class ScheduleIndexJobs : IStartupTask
     {
+        public class JobGroupExporter
+        {
+            [Export("IIndexer.JobGroup")]
+            public static string JobGroup = "Indexers";
+        }
         private readonly SourceStorageFactory _sourceStorageFactory;
         private readonly IScheduler _scheduler;
 
@@ -20,11 +25,8 @@ namespace Core.Lucene
         [ImportMany]
         public IEnumerable<IConverter> Converters { get; set; }
 
-        [Import]
+        [ImportConfiguration]
         public IndexerConfiguration Configuration { get; set; }
-
-        [Export("IIndexer.JobGroup")]
-        public const string JobGroup = "Indexers";
 
         public ScheduleIndexJobs(SourceStorageFactory sourceStorageFactory, IScheduler scheduler)
         {
@@ -46,7 +48,7 @@ namespace Core.Lucene
                 }
 
                 var itemSourceName = sourceStorage.Source.Id;
-                var jobDetail = new JobDetail("IndexerFor" + itemSourceName, JobGroup, typeof(IndexerJob));
+                var jobDetail = new JobDetail("IndexerFor" + itemSourceName, JobGroupExporter.JobGroup, typeof(IndexerJob));
                 
                 jobDetail.JobDataMap[IndexerJob.SourceStorageKey] = sourceStorage;
 
@@ -55,7 +57,7 @@ namespace Core.Lucene
                 // add 2 seconds to "try" and ensure the first time gets executed always
                 trigger.StartTimeUtc = DateTime.UtcNow.AddSeconds(2);
                 trigger.Name = "Each" + frequency + "SecondsFor" + sourceStorage.Source.Id;
-                trigger.MisfireInstruction = MisfireInstruction.SimpleTrigger.RescheduleNextWithRemainingCount;
+                trigger.MisfireInstruction = MisfireInstruction.SimpleTrigger.RescheduleNextWithExistingCount;
 
                 _scheduler.ScheduleJob(jobDetail, trigger);
             }

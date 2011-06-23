@@ -108,7 +108,7 @@ namespace Tests
             Assert.Equal(200, conf.SecondValue);
         }
 
-        [Fact(Skip = "Not able to compose twice :S")]
+        [Fact()]
         public void ComposingTwiceIsNotABigDeal()
         {
             var container = new CompositionContainer();

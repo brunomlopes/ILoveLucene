@@ -1,4 +1,5 @@
 using System.ComponentModel.Composition;
+using Core.Abstractions;
 using ILoveLucene.ViewModels;
 using NAppUpdate.Framework.Sources;
 using Plugins.Commands;
@@ -11,7 +12,7 @@ namespace ILoveLucene.AutoUpdate
         [Import]
         public UpdateManagerAdapter UpdateManagerAdapter { get; set; }
 
-        [Import]
+        [ImportConfiguration]
         public AutoUpdateConfiguration Configuration { get; set; }
         
         [Import]

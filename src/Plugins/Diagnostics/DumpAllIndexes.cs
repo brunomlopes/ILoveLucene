@@ -1,6 +1,7 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using Core;
+using Core.Abstractions;
 using Core.Lucene;
 using Lucene.Net.Analysis;
 using Lucene.Net.Index;
@@ -14,7 +15,7 @@ namespace Plugins.Diagnostics
     [Export(typeof(ICommand))]
     public class DumpAllIndexes : BaseCommand
     {
-        [Import]
+        [ImportConfiguration]
         public CoreConfiguration CoreConfiguration { get; set; }
 
         [Import]

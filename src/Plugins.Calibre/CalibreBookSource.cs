@@ -17,7 +17,7 @@ namespace Plugins.Calibre
         private static Process _currentCalibreProcess;
         private static readonly object ProcessLock = new object();
 
-        [Import]
+        [ImportConfiguration]
         public Configuration Config { get; set; }
 
         [Import]

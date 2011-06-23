@@ -20,7 +20,7 @@ namespace Core.Lucene
         [ImportMany]
         public IEnumerable<IConverter> Converters { get; set; }
 
-        [Import(AllowRecomposition = true)]
+        [ImportConfiguration]
         public AutoCompleteConfiguration Configuration { get; set; }
 
         public AutoCompleteBasedOnLucene(IDirectoryFactory directoryFactory, LuceneStorage luceneStorage, SourceStorageFactory sourceStorageFactory, ILog log)
