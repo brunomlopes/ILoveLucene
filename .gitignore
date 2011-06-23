@@ -30,3 +30,5 @@ _ReSharper*/
 *.vs10x
 output/*
 package/*
+ILoveLucene.sln.docstates
+ILoveLucene.1.1.dotCover
