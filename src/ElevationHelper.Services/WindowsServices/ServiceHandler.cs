@@ -3,7 +3,7 @@ using System.Linq;
 using System.ServiceModel;
 using System.ServiceProcess;
 
-namespace ElevationHelper.Services
+namespace ElevationHelper.Services.WindowsServices
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall, IncludeExceptionDetailInFaults = true)]
     public class ServiceHandler : IServiceHandler

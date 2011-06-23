@@ -1,6 +1,6 @@
 ﻿using System.ServiceModel;
 
-namespace ElevationHelper.Services
+namespace ElevationHelper.Services.Infrastructure
 {
     [ServiceContract]
     public interface IStopTheElevationHelper : IAmAlive

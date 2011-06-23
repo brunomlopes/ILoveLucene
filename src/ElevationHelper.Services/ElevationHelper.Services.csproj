@@ -47,9 +47,11 @@
     <Compile Include="Addresses.cs" />
     <Compile Include="ElevatedChannel.cs" />
     <Compile Include="IAmAlive.cs" />
-    <Compile Include="IServiceHandler.cs" />
-    <Compile Include="IStopTheElevationHelper.cs" />
-    <Compile Include="ServiceHandler.cs" />
+    <Compile Include="Infrastructure\ElevationHelperReady.cs" />
+    <Compile Include="Infrastructure\IElevationHelperReady.cs" />
+    <Compile Include="Infrastructure\IStopTheElevationHelper.cs" />
+    <Compile Include="WindowsServices\IServiceHandler.cs" />
+    <Compile Include="WindowsServices\ServiceHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

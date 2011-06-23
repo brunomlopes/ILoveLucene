@@ -15,6 +15,7 @@ using Core.Abstractions;
 using Core.Lucene;
 using Core.Scheduler;
 using ElevationHelper.Services;
+using ElevationHelper.Services.Infrastructure;
 using ILoveLucene.AutoUpdate;
 using ILoveLucene.Infrastructure;
 using ILoveLucene.Loggers;

@@ -1,20 +1,32 @@
 ﻿using System;
+using System.Diagnostics;
 using System.ServiceModel;
 using System.ServiceModel.Description;
 using ElevationHelper.Services;
+using ElevationHelper.Services.Infrastructure;
+using ElevationHelper.Services.WindowsServices;
 
 namespace ElevationHelper
 {
     public class Program
     {
-        private static System.Threading.AutoResetEvent stopFlag = new System.Threading.AutoResetEvent(false);
+        private static readonly System.Threading.AutoResetEvent StopFlag = new System.Threading.AutoResetEvent(false);
 
         private static void Main(string[] args)
         {
+            System.Diagnostics.Debugger.Break();
             ServiceHost svh = OpenServiceHost(typeof (ServiceHandler), typeof (IServiceHandler));
-            ServiceHost stop = OpenServiceHost(new StopElevationHelper(stopFlag), typeof(IStopTheElevationHelper));
+            ServiceHost stop = OpenServiceHost(new StopElevationHelper(StopFlag), typeof(IStopTheElevationHelper));
 
-            stopFlag.WaitOne();
+
+            var readyChannelFactory = new ChannelFactory<IElevationHelperReady>(new NetNamedPipeBinding(), Addresses.AddressForType(typeof(IElevationHelperReady)));
+            Debug.Write("Opening channel to main process");
+
+            var channel = readyChannelFactory.CreateChannel();
+
+            Debug.Write("Ready");
+            channel.Ready();
+            StopFlag.WaitOne();
 
             svh.Close();
             stop.Close();

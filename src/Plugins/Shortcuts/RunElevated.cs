@@ -6,11 +6,13 @@ using Core.Abstractions;
 namespace Plugins.Shortcuts
 {
     [Export(typeof(IActOnItem))]
-    public class Run : BaseActOnTypedItem<FileInfo>
+    public class RunElevated : BaseActOnTypedItem<FileInfo>
     {
         public override void ActOn(FileInfo item)
         {
-            Process.Start(item.FullName);
+            var arguments = new ProcessStartInfo(item.FullName);
+            arguments.Verb = "runas";
+            Process.Start(arguments);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.ServiceModel;
 using System.Threading;
 using ElevationHelper.Services;
+using ElevationHelper.Services.Infrastructure;
 
 namespace ElevationHelper
 {

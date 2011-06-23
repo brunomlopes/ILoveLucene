@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Abstractions;
 using System.Linq;
 using ElevationHelper.Services;
+using ElevationHelper.Services.WindowsServices;
 
 namespace Plugins.Services
 {
