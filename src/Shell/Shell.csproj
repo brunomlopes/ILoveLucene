@@ -74,6 +74,9 @@
     <Reference Include="Caliburn.Micro">
       <HintPath>..\..\lib\caliburn_micro\Caliburn.Micro.dll</HintPath>
     </Reference>
+    <Reference Include="Ionic.Zip.Reduced">
+      <HintPath>..\..\lib\DotNetZipLib-DevKit-v1.9\DotNetZip-v1.9-Reduced\Release\Ionic.Zip.Reduced.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.ComponentModel.Composition.Initialization.Desktop">
       <HintPath>..\..\lib\composition.initialization.desktop\Microsoft.ComponentModel.Composition.Initialization.Desktop.dll</HintPath>
     </Reference>
@@ -82,9 +85,6 @@
     </Reference>
     <Reference Include="Quartz">
       <HintPath>..\..\lib\quartz.net\Quartz.dll</HintPath>
-    </Reference>
-    <Reference Include="SevenZipSharp">
-      <HintPath>..\..\lib\sevenzipsharp\SevenZipSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -224,12 +224,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\1307834877_Gnome-Software-Update-Available-64.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\lib\sevenzipsharp\7z.dll">
-      <Link>7z.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">

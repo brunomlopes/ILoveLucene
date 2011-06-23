@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Ionic.Zip;
 using NAppUpdate.Framework;
 using NAppUpdate.Framework.Conditions;
 using NAppUpdate.Framework.Sources;
 using NAppUpdate.Framework.Tasks;
-using SevenZip;
 
 namespace ILoveLucene.AutoUpdate
 {
@@ -48,31 +48,28 @@ namespace ILoveLucene.AutoUpdate
             _tempDecompressedDir = Path.Combine(UpdateManager.Instance.TempFolder, Path.GetRandomFileName());
             Directory.CreateDirectory(_tempDecompressedDir);
 
-            SevenZipBase.SetLibraryPath(Path.Combine(Path.GetDirectoryName(typeof(SevenZipExtractor).Assembly.Location), "7z.dll"));
-
-            using (var tmp = new SevenZipExtractor(_tempFile))
+            using (ZipFile zip = ZipFile.Read(_tempFile))
             {
-                tmp.ExtractArchive(_tempDecompressedDir);
+                zip.ExtractAll(_tempDecompressedDir, ExtractExistingFileAction.OverwriteSilently);
 
-                for (int i = 0; i < tmp.ArchiveFileData.Count; i++)
+                foreach (ZipEntry e in zip)
                 {
-                    var archiveFileInfo = tmp.ArchiveFileData[i];
-
-                    if (archiveFileInfo.IsDirectory)
+                    if (e.IsDirectory)
                     {
-                        string appDirectoryName = Path.Combine(_appPath, archiveFileInfo.FileName);
-                        if(!Directory.Exists(appDirectoryName))
+                        string appDirectoryName = Path.Combine(_appPath, e.FileName);
+                        if (!Directory.Exists(appDirectoryName))
                         {
                             _directoriesToCreate.Add(appDirectoryName);
                         }
                     }
                     else
                     {
-                        _coldUpdates[archiveFileInfo.FileName] = Path.Combine(_tempDecompressedDir,
-                                                                              archiveFileInfo.FileName);
+                        _coldUpdates[e.FileName] = Path.Combine(_tempDecompressedDir,
+                                                                e.FileName);
                     }
                 }
             }
+
             File.Delete(_tempFile);
             return true;
         }
