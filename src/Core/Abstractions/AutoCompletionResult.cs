@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Core.Lucene;
+using Lucene.Net.Search;
 
 namespace Core.Abstractions
 {
@@ -10,11 +11,13 @@ namespace Core.Abstractions
         {
             public DocumentId CompletionId { get; private set; }
             public IItem Item { get; private set; }
+            public Explanation Explanation { get; private set; }
 
-            public CommandResult(IItem item, DocumentId completionId)
+            public CommandResult(IItem item, DocumentId completionId, Explanation explanation = null)
             {
                 Item = item;
                 CompletionId = completionId;
+                Explanation = explanation;
             }
 
             public bool IsTransient()

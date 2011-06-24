@@ -10,7 +10,7 @@ using Version = Lucene.Net.Util.Version;
 
 namespace Core.Lucene
 {
-    public class AutoCompleteBasedOnLucene : IAutoCompleteText
+    public class AutoCompleteBasedOnLucene
     {
         private readonly SourceStorageFactory _sourceStorageFactory;
         private readonly ILog _log;
@@ -31,7 +31,7 @@ namespace Core.Lucene
             _storage = luceneStorage;
         }
 
-        public AutoCompletionResult Autocomplete(string text)
+        public AutoCompletionResult Autocomplete(string text, bool includeExplanation = false)
         {
             if (string.IsNullOrWhiteSpace(text)) return AutoCompletionResult.NoResult(text);
 
@@ -53,7 +53,7 @@ namespace Core.Lucene
             try
             {
                 BooleanQuery query = GetQueryForText(text);
-
+                
                 var results = searcher.Search(query, 10);
                 var commands = results.scoreDocs
                     .Select(d =>
@@ -61,7 +61,12 @@ namespace Core.Lucene
                                     var document = searcher.Doc(d.doc);
                                     try
                                     {
-                                        return _storage.GetCommandResultForDocument(document);
+                                        Explanation explanation = null;
+                                        if (includeExplanation)
+                                        {
+                                            explanation = searcher.Explain(query, d.doc);
+                                        }
+                                        return _storage.GetCommandResultForDocument(document, explanation);
                                     }
                                     catch (Exception e)
                                     {
@@ -96,9 +101,18 @@ namespace Core.Lucene
 
         private BooleanQuery GetQueryForText(string text)
         {
+            // boosts are not working as I think they would
+            var boosts = new Dictionary<string, float>()
+                             {
+                                 {SpecialFields.Learnings, 10},
+                                 {SpecialFields.Type, 4}
+                             };
             var queryParser = new MultiFieldQueryParser(Version.LUCENE_29,
                                                         new[] { SpecialFields.Name, SpecialFields.Learnings, SpecialFields.Type },
-                                                        new StandardAnalyzer(Version.LUCENE_29));
+                                                        new StandardAnalyzer(Version.LUCENE_29)
+                                                        //,boosts
+                                                        );
+            
             queryParser.SetFuzzyMinSim((float)Configuration.FuzzySimilarity);
             queryParser.SetDefaultOperator(QueryParser.Operator.AND);
 
@@ -109,6 +123,7 @@ namespace Core.Lucene
 
             Query substringQuery = queryParser.Parse(textWithSubString);
             Query fuzzyQuery = queryParser.Parse(textWithFuzzy);
+
 
             var query = new BooleanQuery();
             query.Add(fuzzyQuery, BooleanClause.Occur.SHOULD);

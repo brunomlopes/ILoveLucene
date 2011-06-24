@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,6 +14,7 @@ using Core.Lucene;
 using ILoveLucene.AutoUpdate;
 using ILoveLucene.Infrastructure;
 using ILoveLucene.Views;
+using Lucene.Net.Search;
 using NAppUpdate.Framework;
 using Plugins.Shortcuts;
 using ILog = Caliburn.Micro.ILog;
@@ -114,6 +116,18 @@ namespace ILoveLucene.ViewModels
             {
                 _commandOptions = value;
                 NotifyOfPropertyChange(() => CommandOptions);
+            }
+        }
+
+        private String _explanation;
+
+        public string Explanation
+        {
+            get { return _explanation; }
+            set
+            {
+                _explanation = value;
+                NotifyOfPropertyChange(() => Explanation);
             }
         }
 
@@ -289,6 +303,30 @@ namespace ILoveLucene.ViewModels
                                           }
 
                                           UpdateCommandOptions(options);
+                                      }, token)
+                .GuardForException(SetError);
+        }
+        public void ExplainResult()
+        {
+            _cancelationTokenSource.Cancel();
+            _cancelationTokenSource = new CancellationTokenSource();
+
+            var token = _cancelationTokenSource.Token;
+            Task.Factory.StartNew(() =>
+                                      {
+                                          var result = _autoCompleteText.Autocomplete(Input, true);
+
+                                          token.ThrowIfCancellationRequested();
+
+                                          if (!result.HasAutoCompletion) return;
+
+                                          var commandResults = new[] {result.AutoCompletedCommand}
+                                              .Concat(result.OtherOptions).ToList();
+
+                                          Caliburn.Micro.Execute.OnUIThread(
+                                              () => new ExplanationView(commandResults)
+                                                        .Show());
+
                                       }, token)
                 .GuardForException(SetError);
         }

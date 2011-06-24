@@ -76,13 +76,13 @@ namespace Core.Lucene
             writer.AddDocument(document);
         }
 
-        public AutoCompletionResult.CommandResult GetCommandResultForDocument(Document document)
+        public AutoCompletionResult.CommandResult GetCommandResultForDocument(Document document, Explanation explanation)
         {
             var converterId = document.GetField(SpecialFields.ConverterId).StringValue();
            
             var command = _converterRepository.GetConverterForId(converterId).FromDocumentToItem(document);
 
-            return new AutoCompletionResult.CommandResult(command, new DocumentId(document));
+            return new AutoCompletionResult.CommandResult(command, new DocumentId(document), explanation);
         }
 
         public void LearnCommandForInput(IndexWriter writer, DocumentId commandId, string input)
