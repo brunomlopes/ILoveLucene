@@ -100,7 +100,7 @@ namespace ILoveLucene
             builder.RegisterModule(new SatisfyMefImports(MefContainer));
 
             builder.RegisterType<MainWindowViewModel>().AsSelf();
-            builder.RegisterType<AutoCompleteBasedOnLucene>().As<IAutoCompleteText>();
+            builder.RegisterType<AutoCompleteBasedOnLucene>().AsSelf();
             builder.RegisterType<GetActionsForItem>().As<IGetActionsForItem>();
 
             builder.RegisterType<ConverterRepository>().As<IConverterRepository>();

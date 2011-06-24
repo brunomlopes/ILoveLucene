@@ -6,46 +6,46 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Grid.Row="0">
 		    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="503">
-			<TextBlock Name="Command" Text="{Binding Item, Converter={t:IItemToStringConverter}}" FontWeight="Bold" FontSize="24" Margin="5" />
-			<TextBlock Name="Description" Text="TextBlock" Margin="5" />
-			<StackPanel Orientation="Vertical" Height="Auto">
-				<TextBox Name="Input" Text="Sample text here" FontSize="22">
-					<i:Interaction.Triggers>
-						<i:EventTrigger EventName="PreviewKeyDown">
-							<cal:ActionMessage MethodName="ProcessShortcut">
-								<cal:Parameter Value="$source" />
-								<cal:Parameter Value="$eventArgs" />
-							</cal:ActionMessage>
-						</i:EventTrigger>
-						<i:EventTrigger EventName="TextChanged">
-							<cal:ActionMessage MethodName="AutoComplete" />
-						</i:EventTrigger>
-					</i:Interaction.Triggers>
-				</TextBox>
-                <ComboBox Name="Actions" FontSize="22" TextSearch.TextPath="Text" IsEditable="True" IsTextSearchEnabled="true" IsTextSearchCaseSensitive="False">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Text}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-				<TextBox Name="Arguments" Text="" FontSize="22" Visibility="{Binding ArgumentsVisible}" Width="Auto">
-					<i:Interaction.Triggers>
-						<i:EventTrigger EventName="PreviewKeyDown">
-							<cal:ActionMessage MethodName="ProcessArgumentShortcut">
-								<cal:Parameter Value="$source" />
-								<cal:Parameter Value="$eventArgs" />
-							</cal:ActionMessage>
-						</i:EventTrigger>
-						<i:EventTrigger EventName="TextChanged">
-							<cal:ActionMessage MethodName="AutoCompleteArgument" />
-						</i:EventTrigger>
-					</i:Interaction.Triggers>
-				</TextBox>
-			</StackPanel>
+			    <TextBlock Name="Command" Text="{Binding Item, Converter={t:IItemToStringConverter}}" FontWeight="Bold" FontSize="24" Margin="5" />
+			    <TextBlock Name="Description" Text="TextBlock" Margin="5" />
+			    <StackPanel Orientation="Vertical" Height="Auto">
+				    <TextBox Name="Input" Text="Sample text here" FontSize="22">
+					    <i:Interaction.Triggers>
+						    <i:EventTrigger EventName="PreviewKeyDown">
+							    <cal:ActionMessage MethodName="ProcessShortcut">
+								    <cal:Parameter Value="$source" />
+								    <cal:Parameter Value="$eventArgs" />
+							    </cal:ActionMessage>
+						    </i:EventTrigger>
+						    <i:EventTrigger EventName="TextChanged">
+							    <cal:ActionMessage MethodName="AutoComplete" />
+						    </i:EventTrigger>
+					    </i:Interaction.Triggers>
+				    </TextBox>
+                    <ComboBox Name="Actions" FontSize="22" TextSearch.TextPath="Text" IsEditable="True" IsTextSearchEnabled="true" IsTextSearchCaseSensitive="False">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Text}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+				    <TextBox Name="Arguments" Text="" FontSize="22" Visibility="{Binding ArgumentsVisible}" Width="Auto">
+					    <i:Interaction.Triggers>
+						    <i:EventTrigger EventName="PreviewKeyDown">
+							    <cal:ActionMessage MethodName="ProcessArgumentShortcut">
+								    <cal:Parameter Value="$source" />
+								    <cal:Parameter Value="$eventArgs" />
+							    </cal:ActionMessage>
+						    </i:EventTrigger>
+						    <i:EventTrigger EventName="TextChanged">
+							    <cal:ActionMessage MethodName="AutoCompleteArgument" />
+						    </i:EventTrigger>
+					    </i:Interaction.Triggers>
+				    </TextBox>
+			    </StackPanel>
 
-			<Button Name="Execute" Content="Execute me!" IsDefault="True" Visibility="Visible" />
-		</StackPanel>
+			    <Button Name="Execute" Content="Execute me!" IsDefault="True" Visibility="Visible" />
+		    </StackPanel>
 		    <ListBox Name="CommandOptions">
 			    <ListBox.ItemTemplate>
 				    <DataTemplate>
@@ -73,7 +73,17 @@
         	<Button Name="Update" Padding="0" Focusable="True" ToolTip="Update available" Visibility="{Binding UpdateVisible}">
                 <Image Source="/ILoveLucene;component/Images/1307834877_Gnome-Software-Update-Available-64.png" Width="25"></Image>
             </Button>
-        	<TextBlock Name="StatusMessage" Text="{Binding Status.Message}"></TextBlock>
+            <Separator Width="20" Background="{x:Null}">
+                
+            </Separator>
+            <Button Name="ExplainResult" ToolTip="Explain result" HorizontalAlignment="Right">
+                Explain Result
+            </Button>
+            <Separator Width="10" Background="{x:Null}">
+
+            </Separator>
+            <TextBlock Name="StatusMessage" Text="{Binding Status.Message}">Lorem ipsum</TextBlock>
+           
         </StatusBar>
     </Grid>
 </Window>

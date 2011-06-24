@@ -9,6 +9,7 @@ using System.Windows.Input;
 using Caliburn.Micro;
 using Core.Abstractions;
 using Core.Extensions;
+using Core.Lucene;
 using ILoveLucene.AutoUpdate;
 using ILoveLucene.Infrastructure;
 using ILoveLucene.Views;
@@ -20,7 +21,7 @@ namespace ILoveLucene.ViewModels
 {
     public class MainWindowViewModel : PropertyChangedBase
     {
-        private readonly IAutoCompleteText _autoCompleteText;
+        private readonly AutoCompleteBasedOnLucene _autoCompleteText;
         private readonly IGetActionsForItem _getActionsForItem;
         private readonly ILog _log;
         private readonly UpdateManagerAdapter _updateManager;
@@ -29,7 +30,7 @@ namespace ILoveLucene.ViewModels
         [Import]
         public StatusMessage Status { get; set; }
 
-        public MainWindowViewModel(IAutoCompleteText autoCompleteText, IGetActionsForItem getActionsForItem, ILog log, UpdateManagerAdapter updateManager)
+        public MainWindowViewModel(AutoCompleteBasedOnLucene autoCompleteText, IGetActionsForItem getActionsForItem, ILog log, UpdateManagerAdapter updateManager)
         {
             _autoCompleteText = autoCompleteText;
             _getActionsForItem = getActionsForItem;
