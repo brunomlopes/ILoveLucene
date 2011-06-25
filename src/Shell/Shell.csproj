@@ -75,7 +75,7 @@
       <HintPath>..\..\lib\caliburn_micro\Caliburn.Micro.dll</HintPath>
     </Reference>
     <Reference Include="Ionic.Zip.Reduced">
-      <HintPath>..\..\lib\DotNetZipLib-DevKit-v1.9\DotNetZip-v1.9-Reduced\Release\Ionic.Zip.Reduced.dll</HintPath>
+      <HintPath>..\..\lib\DotNetZipLib-DevKit-v1.9\DotNetZip-v1.9-Reduced\Ionic.Zip.Reduced.dll</HintPath>
     </Reference>
     <Reference Include="Lucene.Net, Version=2.9.2.2, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.ComponentModel.Composition.Initialization.Desktop">
