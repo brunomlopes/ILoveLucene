@@ -21,7 +21,10 @@ namespace ILoveLucene.Modules
 
         private void OnComponentRegistrationOnActivated(object sender, ActivatedEventArgs<object> activation_event)
         {
-            _mefContainer.SatisfyImportsOnce(activation_event.Instance);
+            // compose by batch to allow for recomposition
+            var batch = new CompositionBatch();
+            batch.AddPart(activation_event.Instance);
+            _mefContainer.Compose(batch);
         }
     }
 }

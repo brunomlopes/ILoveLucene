@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace Core.Lucene
 {
-    public class ScheduleIndexJobs : IStartupTask
+    public class ScheduleIndexJobs : IStartupTask, IPartImportsSatisfiedNotification
     {
         public class JobGroupExporter
         {
@@ -38,6 +38,13 @@ namespace Core.Lucene
 
         public void Execute()
         {
+            if (!_scheduler.IsStarted) return;
+
+            foreach (var jobName in _scheduler.GetJobNames(JobGroupExporter.JobGroup))
+            {
+                _scheduler.DeleteJob(jobName, JobGroupExporter.JobGroup);
+            }
+
             foreach (var sourceStorage in _sourceStorageFactory.GetAllSourceStorages())
             {
                 var frequency = Configuration.GetFrequencyForItemSource(sourceStorage.Source);
@@ -61,6 +68,11 @@ namespace Core.Lucene
 
                 _scheduler.ScheduleJob(jobDetail, trigger);
             }
-        }    
+        }
+
+        public void OnImportsSatisfied()
+        {
+            Execute();
+        }
     }
 }

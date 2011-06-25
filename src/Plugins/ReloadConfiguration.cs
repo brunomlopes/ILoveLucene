@@ -10,9 +10,11 @@ namespace Plugins
         [Import(AllowRecomposition = true)]
         public ILoadConfiguration LoadConfiguration { get; set; }
 
+        
+
         public override void Act()
         {
-            LoadConfiguration.Reload();
+            LoadConfiguration.Load();
         }
 
         public override string Description

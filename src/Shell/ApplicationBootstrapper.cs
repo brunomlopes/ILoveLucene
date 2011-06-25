@@ -59,11 +59,11 @@ namespace ILoveLucene
                 CompositionHost.Initialize(catalogs.ToArray());
 
             var loadConfiguration =
-                new LoadConfiguration(new DirectoryInfo(Path.Combine(assemblyDirectory, "Configuration")));
+                new LoadConfiguration(new DirectoryInfo(Path.Combine(assemblyDirectory, "Configuration")), MefContainer);
             var localConfigurationDirectory = new DirectoryInfo(Path.Combine(assemblyDirectory, "Local.Configuration"));
             if(localConfigurationDirectory.Exists)
                 loadConfiguration.AddConfigurationLocation(localConfigurationDirectory);
-            loadConfiguration.Load(MefContainer);
+            loadConfiguration.Load();
 
             var dataDirectory = Path.Combine(assemblyDirectory, "Data");
             var coreConfiguration = new CoreConfiguration(dataDirectory);

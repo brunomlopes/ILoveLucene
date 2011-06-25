@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.IO;
@@ -12,16 +13,19 @@ namespace Core
     [Export(typeof(ILoadConfiguration))]
     public class LoadConfiguration : ILoadConfiguration
     {
+        private readonly CompositionContainer _container;
         private readonly List<DirectoryInfo> _configurationDirectories;
 
 
-        public LoadConfiguration(DirectoryInfo configurationDirectory)
+        public LoadConfiguration(DirectoryInfo configurationDirectory, CompositionContainer container)
         {
+            _container = container;
             _configurationDirectories = new List<DirectoryInfo>();
             _configurationDirectories.Add(configurationDirectory);
+            Configurations = new ConfigurationPart[] {};
         }
 
-        public void Load(CompositionContainer container)
+        public void Load()
         {
             var previousConfigurations = Configurations;
 
@@ -31,15 +35,7 @@ namespace Core
                 .Where(r => r != null)
                 .ToList();
 
-            container.Compose(new CompositionBatch(Configurations, previousConfigurations));
-        }
-
-        public void Reload()
-        {
-            foreach (var configurationPart in Configurations)
-            {
-                configurationPart.Reload();
-            }
+            _container.Compose(new CompositionBatch(Configurations, previousConfigurations));
         }
 
         protected IEnumerable<ConfigurationPart> Configurations { get; set; }
