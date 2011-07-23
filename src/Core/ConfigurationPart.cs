@@ -32,20 +32,19 @@ namespace Core
             PopulateFromFiles(configurationInstance);
         }
 
-        public static ConfigurationPart FromFiles(string name, IEnumerable<FileInfo> fileInfo)
+        public static ConfigurationPart FromFiles(Type configurationType, IEnumerable<FileInfo> fileInfo)
         {
-            var configurationType = Type.GetType(name, false, true);
             if (configurationType == null)
             {
-                throw new InvalidOperationException(
-                    string.Format("Type '{0}' not found. Did you forget the assembly name?", name));
+                throw new ArgumentNullException("configurationType");
             }
 
             if (configurationType.GetCustomAttributes(typeof(PluginConfigurationAttribute), true).Length == 0)
             {
-                // this is no configuration type, so do nothing
+                // If we try to load configuration for a type not marked as configuration, throw up
                 throw new InvalidOperationException(
-                    string.Format("Type '{0}' is not marked with PluginConfiguration attribute", name));
+                    string.Format("Type '{0}' is not marked with PluginConfiguration attribute",
+                                  configurationType.FullName));
             }
             var instance = Activator.CreateInstance(configurationType);
             return new ConfigurationPart(fileInfo, configurationType, instance);
