@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.ServiceModel;
-using System.ServiceModel.Description;
 using ElevationHelper.Services;
 using ElevationHelper.Services.Infrastructure;
 using ElevationHelper.Services.WindowsServices;
@@ -14,7 +13,6 @@ namespace ElevationHelper
 
         private static void Main(string[] args)
         {
-            System.Diagnostics.Debugger.Break();
             ServiceHost svh = OpenServiceHost(typeof (ServiceHandler), typeof (IServiceHandler));
             ServiceHost stop = OpenServiceHost(new StopElevationHelper(StopFlag), typeof(IStopTheElevationHelper));
 
