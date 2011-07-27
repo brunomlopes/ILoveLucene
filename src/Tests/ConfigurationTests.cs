@@ -1,10 +1,6 @@
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Linq;
-using Caliburn.Micro;
 using Core;
 using Core.Abstractions;
 using Newtonsoft.Json;
@@ -62,10 +58,33 @@ namespace Tests
         }
         
         [Fact]
+        public void ShouldIgnoreReadmeFile()
+        {
+            var container = new CompositionContainer(new AssemblyCatalog(this.GetType().Assembly));
+
+            var configurationDirectory = new DirectoryInfo(@"temp-configuration");
+            if (configurationDirectory.Exists)
+            {
+                configurationDirectory.Delete(true);
+            }
+            configurationDirectory.Create();
+            File.WriteAllText(Path.Combine(configurationDirectory.FullName,"readme.txt"), "Text");
+            var configurationCatalog = new LoadConfiguration(configurationDirectory, container);
+            configurationCatalog.Load();
+
+            var conf = container.GetExportedValue<SampleConfigurationWithDefaultValues>();
+            Assert.Equal(5, conf.Value);
+        }
+
+        [Fact]
         public void RequestingStoredConfigurationWithADefaultTypeAlreadyRegisteredShouldReturnStoredConfiguration()
         {
             var configurationDirectory = new DirectoryInfo(@"temp-configuration");
-        
+            if (configurationDirectory.Exists)
+            {
+                configurationDirectory.Delete(true);
+            }
+            configurationDirectory.Create();
             var conf = new SampleConfigurationWithDefaultValues() {Value = 10};
             WriteConfiguration<SampleConfigurationWithDefaultValues>(configurationDirectory, conf);
 
@@ -83,9 +102,84 @@ namespace Tests
             var userConfigurationDirectory = new DirectoryInfo("user-configuration");
             var systemConfigurationDirectory = new DirectoryInfo("temp-configuration");
 
+            if(userConfigurationDirectory.Exists)
+            {
+                userConfigurationDirectory.Delete(true);
+            }
+            userConfigurationDirectory.Create();
+            if(systemConfigurationDirectory.Exists)
+            {
+                systemConfigurationDirectory.Delete(true);
+            }
+            systemConfigurationDirectory.Create();
+
             var systemConfiguration = new SampleConfigurationWithDefaultValues() {Value = 10, SecondValue = 200};
             var userConfiguration = new {Value = 20};
             WriteConfiguration<SampleConfigurationWithDefaultValues>(userConfigurationDirectory, userConfiguration);
+            WriteConfiguration<SampleConfigurationWithDefaultValues>(systemConfigurationDirectory, systemConfiguration);
+
+            var container = new CompositionContainer();
+            var configurationCatalog = new LoadConfiguration(systemConfigurationDirectory, container);
+            configurationCatalog.AddConfigurationLocation(userConfigurationDirectory);
+
+            configurationCatalog.Load();
+            var conf = container.GetExportedValue<SampleConfigurationWithDefaultValues>();
+            Assert.Equal(20, conf.Value);
+            Assert.Equal(200, conf.SecondValue);
+        }
+        
+        [Fact]
+        public void CanLoadConfigurationFromGlobalAndUserRepositoryUsingShortName()
+        {
+            var userConfigurationDirectory = new DirectoryInfo("user-configuration");
+            var systemConfigurationDirectory = new DirectoryInfo("temp-configuration");
+
+            if(userConfigurationDirectory.Exists)
+            {
+                userConfigurationDirectory.Delete(true);
+            }
+            userConfigurationDirectory.Create();
+            if(systemConfigurationDirectory.Exists)
+            {
+                systemConfigurationDirectory.Delete(true);
+            }
+            systemConfigurationDirectory.Create();
+
+            var systemConfiguration = new SampleConfigurationWithDefaultValues() {Value = 10, SecondValue = 200};
+            var userConfiguration = new {Value = 20};
+            WriteConfiguration<SampleConfigurationWithDefaultValues>(userConfigurationDirectory, userConfiguration, true);
+            WriteConfiguration<SampleConfigurationWithDefaultValues>(systemConfigurationDirectory, systemConfiguration, true);
+
+            var container = new CompositionContainer();
+            var configurationCatalog = new LoadConfiguration(systemConfigurationDirectory, container);
+            configurationCatalog.AddConfigurationLocation(userConfigurationDirectory);
+
+            configurationCatalog.Load();
+            var conf = container.GetExportedValue<SampleConfigurationWithDefaultValues>();
+            Assert.Equal(20, conf.Value);
+            Assert.Equal(200, conf.SecondValue);
+        }
+
+        [Fact]
+        public void CanLoadConfigurationFromGlobalAndUserRepositoryUsingShortAndLongName()
+        {
+            var userConfigurationDirectory = new DirectoryInfo("user-configuration");
+            var systemConfigurationDirectory = new DirectoryInfo("temp-configuration");
+
+            if(userConfigurationDirectory.Exists)
+            {
+                userConfigurationDirectory.Delete(true);
+            }
+            userConfigurationDirectory.Create();
+            if(systemConfigurationDirectory.Exists)
+            {
+                systemConfigurationDirectory.Delete(true);
+            }
+            systemConfigurationDirectory.Create();
+
+            var systemConfiguration = new SampleConfigurationWithDefaultValues() {Value = 10, SecondValue = 200};
+            var userConfiguration = new {Value = 20};
+            WriteConfiguration<SampleConfigurationWithDefaultValues>(userConfigurationDirectory, userConfiguration, true);
             WriteConfiguration<SampleConfigurationWithDefaultValues>(systemConfigurationDirectory, systemConfiguration);
 
             var container = new CompositionContainer();
@@ -112,56 +206,23 @@ namespace Tests
             conf = container.GetExportedValue<Configuration>();
             Assert.Contains(@"%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu", conf.Directories);
         }
-        
-        [Fact()]
-        public void SecondLoadTriggersPartsImportSatisfiedNotification()
+
+        private void WriteConfiguration<T>(DirectoryInfo configurationDirectory, object conf,
+                                           bool useShortTypeName = false)
         {
-            var container = CompositionHost.Initialize(new TypeCatalog(typeof(ClassWithConfigurationAndNotification)));
-
-            var configurationDirectory = new DirectoryInfo(@"temp-configuration");
-
-            var conf = new SampleConfigurationWithDefaultValues() { Value = 10 };
-            WriteConfiguration<SampleConfigurationWithDefaultValues>(configurationDirectory, conf);
-
-            var configurationCatalog = new LoadConfiguration(configurationDirectory, container);
-            configurationCatalog.Load();
-
-            var instance = container.GetExportedValue<ClassWithConfigurationAndNotification>("A");
-
-            Assert.Equal(1, instance.OnImportsSatisfiedCalled);
-
-            configurationCatalog.Load();
-            Assert.Equal(2, instance.OnImportsSatisfiedCalled);
-        }
-
-        private void WriteConfiguration<T>(DirectoryInfo configurationDirectory, object conf)
-        {
-            if (configurationDirectory.Exists)
+            string fileName = typeof(T).AssemblyQualifiedName;
+            if(useShortTypeName)
             {
-                configurationDirectory.Delete(true);
+                fileName = string.Join(",", fileName.Split(',').Take(2).ToArray());
             }
-            configurationDirectory.Create();
-
+            string filePath = Path.Combine(configurationDirectory.FullName,
+                                          fileName);
             File.WriteAllText(
-                Path.Combine(configurationDirectory.FullName,
-                             typeof(T).AssemblyQualifiedName),
+                filePath,
                 JsonConvert.SerializeObject(conf));
         }
     }
 
-    [Export("A", typeof(ClassWithConfigurationAndNotification))]
-    class ClassWithConfigurationAndNotification: IPartImportsSatisfiedNotification
-    {
-        public int OnImportsSatisfiedCalled;
-
-        [ImportConfiguration]
-        public SampleConfigurationWithDefaultValues Config { get; set; }
-
-        public void OnImportsSatisfied()
-        {
-            OnImportsSatisfiedCalled++;
-        }
-    }
 
     [PluginConfiguration]
     public class SampleConfigurationWithDefaultValues
