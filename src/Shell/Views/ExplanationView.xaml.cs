@@ -1,15 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Core.Abstractions;
 using Lucene.Net.Search;
 
@@ -23,23 +15,25 @@ namespace ILoveLucene.Views
         public ExplanationView(IEnumerable<AutoCompletionResult.CommandResult> commandResults)
         {
             InitializeComponent();
-            StringBuilder builder = new StringBuilder();
 
             foreach (var commandResult in commandResults)
             {
-                builder.AppendLine(commandResult.Item.Text + commandResult.CompletionId);
-                Action<string, Explanation> renderExplanation = null;
-                renderExplanation = (i, exp) =>
+                var commandTreeItem = new TreeViewItem {Header = commandResult.Item.Text + commandResult.CompletionId};
+                Action<TreeViewItem, Explanation> renderExplanation = null;
+                renderExplanation = (t, exp) =>
                                         {
-                                            builder.AppendLine(i + + exp.GetValue() + " "+ exp.GetDescription());
+                                            var header = exp.GetValue() + " " + exp.GetDescription() + " ";
+                                            var childItem = new TreeViewItem {Header = header};
+                                            t.Items.Add(childItem);
                                             foreach (var explanation in exp.GetDetails() ?? new Explanation[] {})
                                             {
-                                                renderExplanation(i + " ", explanation);
+                                                renderExplanation(childItem, explanation);
                                             }
                                         };
-                renderExplanation(" ", commandResult.Explanation);
+                renderExplanation(commandTreeItem, commandResult.Explanation);
+                commandTreeItem.ExpandSubtree();
+                ExplanationTree.Items.Add(commandTreeItem); 
             }
-            Explanation.Text = builder.ToString();
         }
     }
 }

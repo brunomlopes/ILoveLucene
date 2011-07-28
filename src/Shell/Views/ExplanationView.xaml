@@ -3,8 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Explanation" Height="300" Width="300">
     <Grid>
-        <TextBox Name="Explanation" IsReadOnly="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" AcceptsReturn="True">
-
-        </TextBox>
+        <TreeView Name="ExplanationTree">
+        </TreeView>
     </Grid>
 </Window>
