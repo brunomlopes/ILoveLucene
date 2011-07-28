@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Core.Lucene
 {
@@ -18,25 +19,25 @@ namespace Core.Lucene
 
             var dirs = input.EnumerateDirectories("??");
             _learnings = dirs
-                .SelectMany(d =>d.EnumerateFiles().Select(f => new {f.Name, Text = File.ReadAllText(f.FullName).Trim()}))
+                .SelectMany(d =>d.EnumerateFiles().Select(f => new {f.Name, Text = File.ReadAllText(f.FullName).Trim().Split('\n').ToList()}))
                 .ToDictionary(t => t.Name, t => t.Text);
         }
 
-        public string LearningsFor(string sha1)
+        public IEnumerable<string> LearningsFor(string sha1)
         {
             if (_learnings.ContainsKey(sha1))
             {
                 return _learnings[sha1];
             }
-            return String.Empty;
+            return new string[]{};
         }
 
-        public string LearnFor(string learning, string sha1)
+        public IEnumerable<string> LearnFor(string learning, string sha1)
         {
             if(!_learnings.ContainsKey(sha1))
-                _learnings[sha1] = learning;
+                _learnings[sha1] = new List<string>() { learning };
             else
-                _learnings[sha1] += " " + learning;
+                _learnings[sha1].Add(learning);
             WriteLearning(sha1, _learnings[sha1]);
             return _learnings[sha1];
         }
@@ -51,14 +52,19 @@ namespace Core.Lucene
             }
         }
 
-        private void WriteLearning(string sha1, string learningValue)
+        private void WriteLearning(string sha1, IList<string> learningValue)
         {
             var path = SubPathFor(sha1);
             if(!Directory.Exists(path))
                 _rootDirectory.CreateSubdirectory(path);
 
             var fullPath = Path.Combine(_rootDirectory.FullName, path, sha1);
-            File.WriteAllText(fullPath, learningValue);
+            var b = new StringBuilder();
+            foreach (string learning in learningValue)
+            {
+                b.AppendFormat("{0}\n", learning);
+            }
+            File.WriteAllText(fullPath, b.ToString());
         }
 
         private string SubPathFor(string sha1)
@@ -66,7 +72,7 @@ namespace Core.Lucene
             return sha1.Substring(0, 1);
         }
 
-        private readonly Dictionary<string, string> _learnings;
+        private readonly Dictionary<string, List<string>> _learnings;
 
         private readonly DirectoryInfo _rootDirectory;
     }

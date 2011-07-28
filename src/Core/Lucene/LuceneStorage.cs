@@ -53,15 +53,11 @@ namespace Core.Lucene
             document.Add(new Field(SpecialFields.Type, type, Field.Store.YES,
                                    Field.Index.ANALYZED,
                                    Field.TermVector.WITH_POSITIONS_OFFSETS));
-            if (!string.IsNullOrWhiteSpace(learnings))
+            foreach (string learning in learnings.Where(learning => !string.IsNullOrWhiteSpace(learning)))
             {
-                var field = new Field(SpecialFields.Learnings, learnings, Field.Store.YES,
-                                      Field.Index.ANALYZED,
-                                      Field.TermVector.YES);
-                field.SetBoost(2);
-                document.Add(field);
+                document.Add(FieldForLearning(learning));
             }
-            
+           
             document.Add(new Field(SpecialFields.ConverterId, converterId, Field.Store.YES,
                                    Field.Index.NOT_ANALYZED_NO_NORMS,
                                    Field.TermVector.NO));
@@ -75,6 +71,7 @@ namespace Core.Lucene
                                    Field.TermVector.NO));
             writer.AddDocument(document);
         }
+
 
         public AutoCompletionResult.CommandResult GetCommandResultForDocument(Document document, Explanation explanation)
         {
@@ -97,16 +94,17 @@ namespace Core.Lucene
                 throw new InvalidOperationException(string.Format("Didn't find command {0}", commandId));
 
             var learnings = _learningRepository.LearnFor(input, commandIdHash);
-
-            var field = document.GetField(SpecialFields.Learnings);
-            if (field != null)
+            
+            var field = document.GetFields(SpecialFields.Learnings);
+            
+            if (field != null && field.Length > 0)
             {
-                document.RemoveField(SpecialFields.Learnings);
+                document.RemoveFields(SpecialFields.Learnings);
             }
-            var newField = new Field(SpecialFields.Learnings, learnings, Field.Store.YES, Field.Index.ANALYZED);
-                
-            document.Add(newField);
-
+            foreach (string learning in learnings.Where(learning => !string.IsNullOrWhiteSpace(learning)))
+            {
+                document.Add(FieldForLearning(learning));
+            }
             writer.AddDocument(document);
         }
 
@@ -118,6 +116,15 @@ namespace Core.Lucene
             query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.Tag, tag)),
                                         BooleanClause.Occur.MUST_NOT));
             indexWriter.DeleteDocuments(query);
+        }
+
+        private static Field FieldForLearning(string learning)
+        {
+            var field = new Field(SpecialFields.Learnings, learning, Field.Store.YES,
+                                  Field.Index.ANALYZED,
+                                  Field.TermVector.WITH_POSITIONS_OFFSETS);
+            field.SetBoost(2);
+            return field;
         }
 
         private Document PopDocument(IndexWriter writer, string sha1)
