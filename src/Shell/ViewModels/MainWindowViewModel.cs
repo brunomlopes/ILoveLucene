@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,10 +13,8 @@ using Core.Lucene;
 using ILoveLucene.AutoUpdate;
 using ILoveLucene.Infrastructure;
 using ILoveLucene.Views;
-using Lucene.Net.Search;
 using NAppUpdate.Framework;
-using Plugins.Shortcuts;
-using ILog = Caliburn.Micro.ILog;
+using NLog;
 
 namespace ILoveLucene.ViewModels
 {
@@ -25,14 +22,14 @@ namespace ILoveLucene.ViewModels
     {
         private readonly AutoCompleteBasedOnLucene _autoCompleteText;
         private readonly IGetActionsForItem _getActionsForItem;
-        private readonly ILog _log;
+        private readonly Logger _log;
         private readonly UpdateManagerAdapter _updateManager;
         private CancellationTokenSource _cancelationTokenSource;
 
         [Import]
         public StatusMessage Status { get; set; }
 
-        public MainWindowViewModel(AutoCompleteBasedOnLucene autoCompleteText, IGetActionsForItem getActionsForItem, ILog log, UpdateManagerAdapter updateManager)
+        public MainWindowViewModel(AutoCompleteBasedOnLucene autoCompleteText, IGetActionsForItem getActionsForItem, Logger log, UpdateManagerAdapter updateManager)
         {
             _autoCompleteText = autoCompleteText;
             _getActionsForItem = getActionsForItem;

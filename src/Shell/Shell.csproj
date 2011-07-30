@@ -84,6 +84,9 @@
     <Reference Include="NAppUpdate.Framework">
       <HintPath>..\..\lib\nappupdate\NAppUpdate.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="NLog">
+      <HintPath>..\..\lib\nlog\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="Quartz">
       <HintPath>..\..\lib\quartz.net\Quartz.dll</HintPath>
     </Reference>
@@ -133,7 +136,7 @@
     <Compile Include="Infrastructure\OnCaliburnMicroUiThread.cs" />
     <Compile Include="Infrastructure\TypedAutofacBootStrapper.cs" />
     <Compile Include="Loggers\DebugLogger.cs" />
-    <Compile Include="Loggers\FileLogger.cs" />
+    <Compile Include="Loggers\NLogAdapter.cs" />
     <Compile Include="Modules\LoggingModule.cs" />
     <Compile Include="Modules\SatisfyMefImports.cs" />
     <Compile Include="Commands\ExitApplication.cs" />
@@ -167,7 +170,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Configuration\ILoveLucene.AutoUpdate.AutoUpdateConfiguration, ILoveLucene">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

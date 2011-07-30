@@ -40,9 +40,7 @@ namespace ILoveLucene
 
             var catalogs = new List<ComposablePartCatalog>
                                {
-                                   new AggregateCatalog(
-                                       AssemblySource.Instance.Select(x => new AssemblyCatalog(x))
-                                           .OfType<ComposablePartCatalog>()),
+                                   new AggregateCatalog(AssemblySource.Instance.Select(x => new AssemblyCatalog(x))),
                                    new DirectoryCatalog(assemblyDirectory, "Plugins.*.dll"),
                                    new DirectoryCatalog(assemblyDirectory, "Plugins.dll"),
                                    new AssemblyCatalog(typeof (IItem).Assembly)
@@ -80,7 +78,7 @@ namespace ILoveLucene
             var batch = new CompositionBatch();
             batch.AddExportedValue(MefContainer);
             batch.AddExportedValue<ILoadConfiguration>(loadConfiguration);
-            batch.AddExportedValue<ILog>(new FileLogger(logFileLocation, tag: "mef"));
+            batch.AddExportedValue<ILog>(new NLogAdapter(NLog.LogManager.GetLogger("mef")));
             batch.AddExportedValue(coreConfiguration);
             batch.AddExportedValue(updateManagerAdapter);
             batch.AddExportedValue<IScheduler>(scheduler);
@@ -96,7 +94,8 @@ namespace ILoveLucene
             builder.RegisterInstance<IWindowManager>(new WindowManager());
             builder.RegisterInstance<IEventAggregator>(new EventAggregator());
 
-            builder.RegisterModule(new LoggingModule(t => new FileLogger(logFileLocation, t.Name)));
+            builder.RegisterModule(new LoggingModule(t => new NLogAdapter(NLog.LogManager.GetLogger(t.FullName)),
+                                                     t => NLog.LogManager.GetLogger(t.FullName)));
             builder.RegisterModule(new SatisfyMefImports(MefContainer));
 
             builder.RegisterType<MainWindowViewModel>().AsSelf();

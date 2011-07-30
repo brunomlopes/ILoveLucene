@@ -13,7 +13,6 @@ namespace ILoveLucene.Infrastructure
     /// </summary>
     public abstract class TypedAutofacBootStrapper<TRootViewModel> : Bootstrapper<TRootViewModel>
     {
-        private readonly ILog _logger = LogManager.GetLog(typeof (TypedAutofacBootStrapper<>));
         private IContainer _container;
 
         protected IContainer Container
