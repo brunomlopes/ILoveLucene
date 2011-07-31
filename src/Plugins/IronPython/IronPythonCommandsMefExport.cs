@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using Core;
 using Core.Abstractions;
 using IronPython.Hosting;
@@ -13,19 +13,9 @@ using System.Linq;
 using IronPython.Runtime;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
-using IronPython.Runtime.Types;
 
 namespace Plugins.IronPython
 {
-    public abstract class BasePythonItemSource : BaseItemSource
-    {
-        public override Task<IEnumerable<object>> GetItems()
-        {
-            return Task.Factory.StartNew(() => GetAllItems());
-        }
-
-        protected abstract IEnumerable<object> GetAllItems();
-    }
     //[Export(typeof(IStartupTask))]
     public class IronPythonCommandsMefExport : IStartupTask
     {
@@ -75,15 +65,10 @@ namespace Plugins.IronPython
 
                 try
                 {
-                    // TODO: fix this
-                    //var instances = new TypeExtractor(_engine).GetTypesFromScript(script);
-                    var instances = new Type[] {};
-
-                    var batch = new CompositionBatch();
-                    foreach (var instance in instances)
-                    {
-                        batch.AddExportedValue(instance);
-                    }
+                    var types = new ExtractTypesFromScript(_engine).GetTypesFromScript(script);
+                    var parts = new CreateExportsFromTypes().GetExports(types);
+                    
+                    var batch = new CompositionBatch(parts, new ComposablePart[]{});
                     _mefContainer.Compose(batch);
                 }
                 catch (SyntaxErrorException e)
@@ -94,7 +79,6 @@ namespace Plugins.IronPython
                 {
                     throw new PythonException(string.Format("Error executing '{0}'", _fileFullName), e);
                 }
-                
             }
         }
 
@@ -143,62 +127,6 @@ namespace Plugins.IronPython
                                          base.Message);
                 }
             }
-        }
-
-     
-    }
-
-    public class TypeExtractor
-    {
-        public class DefinedType
-        {
-            public string Name { get; set; }
-            public PythonType PythonType { get; set; }
-            public Type Type { get; set; }
-            public Func<object> Activator { get; set; }
-        }
-        private readonly ScriptEngine _engine;
-
-        public TypeExtractor(ScriptEngine engine)
-        {
-            _engine = engine;
-        }
-
-        public IEnumerable<DefinedType> GetTypesFromScript(ScriptSource script)
-        {
-            CompiledCode code = script.Compile();
-            var types = new[]
-                            {
-                                typeof (IItem), typeof (IConverter<>), typeof (BaseActOnTypedItem<>),
-                                typeof (BaseActOnTypedItemAndReturnTypedItem<,>), typeof (IItem),
-                                typeof (IItemSource),
-                                typeof (BaseItemSource),
-                                typeof (IConverter),
-                                typeof (IActOnItem),
-                                typeof (IActOnItemWithArguments),
-                                typeof (BasePythonItemSource)
-                            };
-            var scope = _engine.CreateScope();
-            foreach (Type type in types)
-            {
-                scope.InjectType(type);
-            }
-
-            scope.SetVariable("clr", _engine.GetClrModule());
-            code.Execute(scope);
-
-            var pluginClasses = scope.GetItems()
-                .Where(kvp => kvp.Value is PythonType)
-                .Select(kvp => new DefinedType()
-                                   {
-                                       Name = kvp.Key,
-                                       PythonType = (PythonType)kvp.Value,
-                                       Type = (PythonType)kvp.Value,
-                                       Activator = () => _engine.Operations.Invoke(kvp.Value, new object[] {})
-                                   })
-                .Where(kvp => !types.Contains(kvp.Type));
-
-            return pluginClasses;
         }
     }
 }
