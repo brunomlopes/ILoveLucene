@@ -114,6 +114,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\LogView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainWindowView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -136,17 +140,24 @@
     <Compile Include="Infrastructure\OnCaliburnMicroUiThread.cs" />
     <Compile Include="Infrastructure\TypedAutofacBootStrapper.cs" />
     <Compile Include="Loggers\DebugLogger.cs" />
+    <Compile Include="Loggers\BindableCollectionMemoryTarget.cs" />
     <Compile Include="Loggers\NLogAdapter.cs" />
     <Compile Include="Modules\LoggingModule.cs" />
     <Compile Include="Modules\SatisfyMefImports.cs" />
     <Compile Include="Commands\ExitApplication.cs" />
+    <Compile Include="ValueConverters\LogEventInfoConverter.cs" />
     <Compile Include="ValueConverters\PositionConverter.cs" />
     <Compile Include="ValueConverters\CommandResultToStringConverter.cs" />
     <Compile Include="ValueConverters\IItemToStringConverter.cs" />
+    <Compile Include="ValueConverters\TimestampConverter.cs" />
+    <Compile Include="ViewModels\LogViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\StatusMessage.cs" />
     <Compile Include="Views\ExplanationView.xaml.cs">
       <DependentUpon>ExplanationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LogView.xaml.cs">
+      <DependentUpon>LogView.xaml</DependentUpon>
     </Compile>
     <Compile Include="WindowsInterop\FocusHandler.cs" />
     <Compile Include="WindowsInterop\KeyboardHandler.cs" />

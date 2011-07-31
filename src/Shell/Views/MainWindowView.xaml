@@ -83,6 +83,11 @@
                     <TextBlock Name="StatusMessage" Text="{Binding Status.Message}"></TextBlock>
                 </StatusBarItem>
                 <StatusBarItem DockPanel.Dock="Right"  HorizontalAlignment="Right" >
+                    <Button Name="ShowLog" ToolTip="Show log window" >
+                        Log
+                    </Button>
+                </StatusBarItem>
+                <StatusBarItem DockPanel.Dock="Right"  HorizontalAlignment="Right" >
                     <Button Name="ExplainResult" ToolTip="Explain result" >
                         Explain Result
                     </Button>

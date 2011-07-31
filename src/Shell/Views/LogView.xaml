@@ -1,0 +1,30 @@
+﻿<Window x:Class="ILoveLucene.Views.LogView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:t="clr-namespace:ILoveLucene.ValueConverters"
+        Title="LogView" Height="124" Width="633">
+    <Grid>
+        <!--<ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
+            <ListView Name="Logs" >
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="100" Header="Timestamp" DisplayMemberBinding="{Binding Timestamp, Converter={t:TimestampConverter}}" />
+                        <GridViewColumn Width="60" Header="Level" DisplayMemberBinding="{Binding Level}" />
+                        <GridViewColumn Header="FormattedMessage" DisplayMemberBinding="{Binding FormattedMessage}" Width="400" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </ScrollViewer>-->
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
+            <ListBox Name="Logs"  >
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Item, Converter={t:LogEventInfoConverter}}" />
+                            <TextBlock Text="{Binding Converter={t:LogEventInfoConverter}}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </ScrollViewer>
+    </Grid>
+</Window>

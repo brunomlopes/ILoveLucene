@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
 using Caliburn.Micro;
 using Core.Abstractions;
@@ -12,9 +13,11 @@ using Core.Extensions;
 using Core.Lucene;
 using ILoveLucene.AutoUpdate;
 using ILoveLucene.Infrastructure;
+using ILoveLucene.Loggers;
 using ILoveLucene.Views;
 using NAppUpdate.Framework;
 using NLog;
+using LogManager = NLog.LogManager;
 
 namespace ILoveLucene.ViewModels
 {
@@ -24,18 +27,20 @@ namespace ILoveLucene.ViewModels
         private readonly IGetActionsForItem _getActionsForItem;
         private readonly Logger _log;
         private readonly UpdateManagerAdapter _updateManager;
+        private readonly IWindowManager _windowManager;
         private CancellationTokenSource _cancelationTokenSource;
 
         [Import]
         public StatusMessage Status { get; set; }
 
-        public MainWindowViewModel(AutoCompleteBasedOnLucene autoCompleteText, IGetActionsForItem getActionsForItem, Logger log, UpdateManagerAdapter updateManager)
+        public MainWindowViewModel(AutoCompleteBasedOnLucene autoCompleteText, IGetActionsForItem getActionsForItem, Logger log, UpdateManagerAdapter updateManager, IWindowManager windowManager)
         {
             _autoCompleteText = autoCompleteText;
             _getActionsForItem = getActionsForItem;
             _log = log;
 
             _updateManager = updateManager;
+            _windowManager = windowManager;
             _updateManager.UpdatesAvailable += (sender, args) =>
                                                    {
                                                        {
@@ -326,6 +331,13 @@ namespace ILoveLucene.ViewModels
 
                                       }, token)
                 .GuardForException(SetError);
+        }
+        
+        public void ShowLog()
+        {
+            var target = LogManager.Configuration.ConfiguredNamedTargets.OfType<BindableCollectionMemoryTarget>().FirstOrDefault();
+
+            _windowManager.ShowWindow(new LogViewModel(target));
         }
 
         private void UpdateCommandOptions(ListWithCurrentSelection<AutoCompletionResult.CommandResult> options)
