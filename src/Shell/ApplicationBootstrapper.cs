@@ -52,6 +52,10 @@ namespace ILoveLucene
                 catalogs.Add(new DirectoryCatalog(pluginsPath, "Plugins.*.dll"));
                 catalogs.Add(new DirectoryCatalog(pluginsPath, "Plugins.dll"));
             }
+            else
+            {
+                pluginsPath = assemblyDirectory;
+            }
 
             MefContainer =
                 CompositionHost.Initialize(catalogs.ToArray());
@@ -64,11 +68,10 @@ namespace ILoveLucene
             loadConfiguration.Load();
 
             var dataDirectory = Path.Combine(assemblyDirectory, "Data");
-            var coreConfiguration = new CoreConfiguration(dataDirectory);
+            var coreConfiguration = new CoreConfiguration(dataDirectory, pluginsPath);
 
             var learningStorageLocation = new DirectoryInfo(Path.Combine(coreConfiguration.DataDirectory, "Learnings"));
             var indexStorageLocation = new DirectoryInfo(Path.Combine(coreConfiguration.DataDirectory, "Index"));
-            var logFileLocation = new FileInfo(Path.Combine(coreConfiguration.DataDirectory, "log.txt"));
 
             var updateManagerAdapter = new UpdateManagerAdapter();
             

@@ -86,6 +86,8 @@
     <Compile Include="EmptyRecycleBin.cs" />
     <Compile Include="ExportLearnings.cs" />
     <Compile Include="Google.cs" />
+    <Compile Include="IronPython\IronPythonCommandsMefExport.cs" />
+    <Compile Include="IronPython\ScriptScopeExtensionMethods.cs" />
     <Compile Include="Processes\CloseProcess.cs" />
     <Compile Include="Processes\KillProcess.cs" />
     <Compile Include="Processes\LowerPriority.cs" />

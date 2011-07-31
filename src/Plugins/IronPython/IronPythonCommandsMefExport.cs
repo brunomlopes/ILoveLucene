@@ -6,6 +6,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Core;
 using Core.Abstractions;
 using IronPython.Hosting;
 using System.Linq;
@@ -16,16 +17,52 @@ using IronPython.Runtime.Types;
 
 namespace Plugins.IronPython
 {
-    [Export(typeof(IBackgroundStartTask))]
-    public class IronPythonCommandsMefExport : IBackgroundStartTask
+    public abstract class BasePythonItemSource : BaseItemSource
+    {
+        public override Task<IEnumerable<object>> GetItems()
+        {
+            return Task.Factory.StartNew(() => GetAllItems());
+        }
+
+        protected abstract IEnumerable<object> GetAllItems();
+    }
+    //[Export(typeof(IStartupTask))]
+    public class IronPythonCommandsMefExport : IStartupTask
     {
         private readonly CompositionContainer _mefContainer;
         private ScriptEngine _engine;
+
+        [Import]
+        public CoreConfiguration CoreConfiguration { get; set; }
 
         [ImportingConstructor]
         public IronPythonCommandsMefExport(CompositionContainer mefContainer)
         {
             _mefContainer = mefContainer;
+        }
+
+        public bool Executed { get; private set; }
+
+        public void Execute()
+        {
+            try
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(5));
+                _engine = Python.CreateEngine();
+
+                DirectoryInfo directory = GetIronPythonPluginsDirectory();
+
+                var pythonFiles =
+                    directory.GetFiles()
+                        .Where(f => f.Extension.ToLowerInvariant() == ".ipy");
+
+                ExportCommandsFromFilesIntoMef(pythonFiles);
+            }
+            finally
+            {
+                Executed = true;
+            }
+
         }
 
         private void ExportCommandsFromFilesIntoMef(IEnumerable<FileInfo> pythonFiles)
@@ -36,52 +73,35 @@ namespace Plugins.IronPython
 
                 var script = _engine.CreateScriptSourceFromFile(_fileFullName);
 
-                CompiledCode code;
                 try
                 {
-                    code = script.Compile();
+                    // TODO: fix this
+                    //var instances = new TypeExtractor(_engine).GetTypesFromScript(script);
+                    var instances = new Type[] {};
+
+                    var batch = new CompositionBatch();
+                    foreach (var instance in instances)
+                    {
+                        batch.AddExportedValue(instance);
+                    }
+                    _mefContainer.Compose(batch);
                 }
                 catch (SyntaxErrorException e)
                 {
                     throw new SyntaxErrorExceptionPrettyWrapper(string.Format("Error compiling '{0}", _fileFullName), e);
                 }
-
-                ScriptScope scope = _engine.CreateScope();
-                scope.InjectType<IItem>()
-                    .InjectType<ICommandWithArguments>()
-                    .InjectType<ICommandWithAutoCompletedArguments>();
-                scope.SetVariable("clr", _engine.GetClrModule());
-
-                try
-                {
-                    code.Execute(scope);
-                }
                 catch (UnboundNameException e)
                 {
                     throw new PythonException(string.Format("Error executing '{0}'", _fileFullName), e);
                 }
-
-                var pluginClasses = scope.GetItems()
-                    .Where(kvp => kvp.Value is PythonType)
-                    .Where(kvp => typeof (IItem).IsAssignableFrom(((PythonType) kvp.Value).__clrtype__()))
-                    .Where(kvp => !kvp.Key.StartsWith("ICommand"));
-                var instances =
-                    pluginClasses.Select<KeyValuePair<string, object>, object>(nameAndClass => _engine.Operations.Invoke(nameAndClass.Value, new object[] {}))
-                        .Cast<IItem>();
-
-                var batch = new CompositionBatch();
-                foreach (var instance in instances)
-                {
-                    batch.AddExportedValue(instance);
-                }
-                _mefContainer.Compose(batch);
+                
             }
         }
 
+
         private DirectoryInfo GetIronPythonPluginsDirectory()
         {
-            var location = new FileInfo(Assembly.GetExecutingAssembly().Location);
-            var directory = location.Directory;
+            var directory = new DirectoryInfo(CoreConfiguration.PluginsDirectory);;
             while (directory != null
                    && !directory.EnumerateDirectories().Any(d => d.Name.ToLowerInvariant() == "ironpythoncommands")
                    && directory.Root != directory)
@@ -90,7 +110,7 @@ namespace Plugins.IronPython
             }
             if (directory == null || directory.Root == directory)
             {
-                throw new InvalidOperationException(string.Format("No 'IronPythonCommands' directory found in tree of {0}", location));
+                throw new InvalidOperationException(string.Format("No 'IronPythonCommands' directory found in tree of {0}", directory));
             }
             return directory.EnumerateDirectories().Single(d => d.Name.ToLowerInvariant() == "ironpythoncommands");
         }
@@ -125,28 +145,60 @@ namespace Plugins.IronPython
             }
         }
 
-        public bool Executed { get; private set; }
+     
+    }
 
-        public void Execute()
+    public class TypeExtractor
+    {
+        public class DefinedType
         {
-            try
+            public string Name { get; set; }
+            public PythonType PythonType { get; set; }
+            public Type Type { get; set; }
+            public Func<object> Activator { get; set; }
+        }
+        private readonly ScriptEngine _engine;
+
+        public TypeExtractor(ScriptEngine engine)
+        {
+            _engine = engine;
+        }
+
+        public IEnumerable<DefinedType> GetTypesFromScript(ScriptSource script)
+        {
+            CompiledCode code = script.Compile();
+            var types = new[]
+                            {
+                                typeof (IItem), typeof (IConverter<>), typeof (BaseActOnTypedItem<>),
+                                typeof (BaseActOnTypedItemAndReturnTypedItem<,>), typeof (IItem),
+                                typeof (IItemSource),
+                                typeof (BaseItemSource),
+                                typeof (IConverter),
+                                typeof (IActOnItem),
+                                typeof (IActOnItemWithArguments),
+                                typeof (BasePythonItemSource)
+                            };
+            var scope = _engine.CreateScope();
+            foreach (Type type in types)
             {
-                Thread.Sleep(TimeSpan.FromSeconds(5));
-                _engine = Python.CreateEngine();
-
-                DirectoryInfo directory = GetIronPythonPluginsDirectory();
-
-                var pythonFiles =
-                    directory.GetFiles()
-                        .Where(f => f.Extension.ToLowerInvariant() == ".ipy");
-
-                ExportCommandsFromFilesIntoMef(pythonFiles);
+                scope.InjectType(type);
             }
-            finally
-            {
-                Executed = true;
-            }
-            
+
+            scope.SetVariable("clr", _engine.GetClrModule());
+            code.Execute(scope);
+
+            var pluginClasses = scope.GetItems()
+                .Where(kvp => kvp.Value is PythonType)
+                .Select(kvp => new DefinedType()
+                                   {
+                                       Name = kvp.Key,
+                                       PythonType = (PythonType)kvp.Value,
+                                       Type = (PythonType)kvp.Value,
+                                       Activator = () => _engine.Operations.Invoke(kvp.Value, new object[] {})
+                                   })
+                .Where(kvp => !types.Contains(kvp.Type));
+
+            return pluginClasses;
         }
     }
 }
