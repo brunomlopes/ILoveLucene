@@ -28,12 +28,15 @@ namespace ILoveLucene.ViewModels
         private readonly Logger _log;
         private readonly UpdateManagerAdapter _updateManager;
         private readonly IWindowManager _windowManager;
+        private readonly Shutdown _shutdown;
         private CancellationTokenSource _cancelationTokenSource;
 
         [Import]
         public StatusMessage Status { get; set; }
 
-        public MainWindowViewModel(AutoCompleteBasedOnLucene autoCompleteText, IGetActionsForItem getActionsForItem, Logger log, UpdateManagerAdapter updateManager, IWindowManager windowManager)
+        public MainWindowViewModel(AutoCompleteBasedOnLucene autoCompleteText, IGetActionsForItem getActionsForItem,
+                                   Logger log, UpdateManagerAdapter updateManager, IWindowManager windowManager,
+                                   Shutdown shutdown)
         {
             _autoCompleteText = autoCompleteText;
             _getActionsForItem = getActionsForItem;
@@ -41,6 +44,7 @@ namespace ILoveLucene.ViewModels
 
             _updateManager = updateManager;
             _windowManager = windowManager;
+            _shutdown = shutdown;
             _updateManager.UpdatesAvailable += (sender, args) =>
                                                    {
                                                        {
@@ -161,6 +165,8 @@ namespace ILoveLucene.ViewModels
         public void Update()
         {
             Status.SetMessage(this, "Applying update");
+            _shutdown.Now();
+
             _updateManager.ApplyUpdates();
         }
         

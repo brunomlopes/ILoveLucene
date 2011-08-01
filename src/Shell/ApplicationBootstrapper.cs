@@ -111,6 +111,8 @@ namespace ILoveLucene
             builder.RegisterType<ScheduleIndexJobs>().As<IStartupTask>();
             builder.RegisterType<ScheduleUpdateCheckJob>().As<IStartupTask>();
 
+            builder.RegisterType<Shutdown>().AsSelf();
+
             builder.RegisterType<SeparateIndexesDirectoryFactory>()
                 .As<IDirectoryFactory>().WithParameter("root", indexStorageLocation)
                 .SingleInstance();
@@ -130,10 +132,7 @@ namespace ILoveLucene
 
         protected override void OnExit(object sender, EventArgs e)
         {
-            Container.Resolve<IScheduler>().Shutdown();
-            var elevatedChannel = new ElevatedChannel<IStopTheElevationHelper>();
-            if (elevatedChannel.ElevationProcessExists())
-                elevatedChannel.GetElevatedHandler().Stop();
+            Container.Resolve<Shutdown>().Now();
 
             base.OnExit(sender, e);
         }
