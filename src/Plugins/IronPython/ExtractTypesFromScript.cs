@@ -1,46 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting;
 using Core.Abstractions;
 using IronPython.Hosting;
+using IronPython.Runtime;
 using IronPython.Runtime.Types;
+using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.Scripting.Hosting;
 
 namespace Plugins.IronPython
 {
     public class ExtractTypesFromScript
     {
-        public class DefinedType
-        {
-            private readonly ScriptEngine _engine;
-            private readonly ObjectHandle _classHandle;
-            private ObjectHandle _instanceHandle;
-            private object _instance;
-
-            public DefinedType(ScriptEngine engine, string name, PythonType pythonType, ObjectHandle classHandle)
-            {
-                Name = name;
-                PythonType = pythonType;
-                _engine = engine;
-                _classHandle = classHandle;
-            }
-            
-            public string Name { get; protected set; }
-            public PythonType PythonType { get; protected set; }
-            public Type Type { get { return PythonType; } }
-            public object Activator()
-            {
-                _instanceHandle = _engine.Operations.Invoke(_classHandle, new object[] {});
-                _instance = _engine.Operations.Unwrap<object>(_instanceHandle);
-                return _instance;
-            }
-
-            public void InvokeMethodWithArgument(string methodName, object argument)
-            {
-                _engine.Operations.InvokeMember(_instance, methodName, argument);
-            }
-        }
         private readonly ScriptEngine _engine;
 
         public ExtractTypesFromScript(ScriptEngine engine)
@@ -48,7 +19,12 @@ namespace Plugins.IronPython
             _engine = engine;
         }
 
-        public IEnumerable<DefinedType> GetTypesFromScript(ScriptSource script)
+        public IEnumerable<IronPythonComposablePart> GetPartsFromScript(ScriptSource script)
+        {
+            return GetParts(GetTypesFromScript(script));
+        }
+
+        public IEnumerable<IronPythonTypeWrapper> GetTypesFromScript(ScriptSource script)
         {
             CompiledCode code = script.Compile();
             var types = new[]
@@ -67,6 +43,7 @@ namespace Plugins.IronPython
             {
                 scope.InjectType(type);
             }
+
             // "force" all classes to be new style classes
             dynamic metaclass;
             if(!scope.TryGetVariable("__metaclass__", out metaclass))
@@ -74,27 +51,52 @@ namespace Plugins.IronPython
                 scope.SetVariable("__metaclass__", _engine.GetBuiltinModule().GetVariable("type"));
             }
             
-            
             scope.SetVariable("clr", _engine.GetClrModule());
             code.Execute(scope);
 
             var pluginClasses = scope.GetItems()
                 .Where(kvp => kvp.Value is PythonType && !kvp.Key.StartsWith("__"))
-                .Select(kvp => new DefinedType(_engine, kvp.Key, kvp.Value, scope.GetVariableHandle(kvp.Key)))
-                //.Concat(scope.GetItems()
-                //.Where(kvp => kvp.Value is OldClass)
-                //.Select(kvp => new DefinedType()
-                //{
-                //    Name = kvp.Key,
-                //    PythonType = new PythonType((OldClass)kvp.Value).,
-                //    Type = (OldClass)kvp.Value,
-                //    Activator = () => _engine.Operations.Invoke(kvp.Value, new object[] { })
-                //})
-                
-                //)
+                .Select(kvp => new IronPythonTypeWrapper(_engine, kvp.Key, kvp.Value, scope.GetVariableHandle(kvp.Key)))
                 .Where(kvp => !types.Contains(kvp.Type));
 
             return pluginClasses;
+        }
+        public IEnumerable<IronPythonComposablePart> GetParts(IEnumerable<IronPythonTypeWrapper> types)
+        {
+            foreach (var definedType in types)
+            {
+                dynamic type = definedType.PythonType;
+                IEnumerable<object> exportObjects = new List();
+                IDictionary<string, object> importObjects = new Dictionary<string, object>();
+                PythonDictionary pImportObjects = null;
+
+                try
+                {
+                    exportObjects = ((IEnumerable<object>)type.__exports__);
+                }
+                catch (RuntimeBinderException)
+                {
+                }
+                try
+                {
+                    pImportObjects = type.__imports__;
+                    importObjects = pImportObjects.ToDictionary(kvp => kvp.Key.ToString(), kvp => kvp.Value);
+                }
+                catch (RuntimeBinderException)
+                {
+                }
+
+                if (importObjects.Count + exportObjects.Count() == 0)
+                {
+                    continue;
+                }
+
+                var exports = exportObjects.Cast<PythonType>().Select(o => (Type)o);
+                var imports =
+                    importObjects.Keys
+                        .Select(key => new KeyValuePair<string, Type>(key, (PythonType)importObjects[key]));
+                yield return new IronPythonComposablePart(definedType, exports, imports);
+            }
         }
     }
 }

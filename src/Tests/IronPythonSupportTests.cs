@@ -53,10 +53,7 @@ class StringItemSource(BasePythonItemSource):
             var _engine = Python.CreateEngine();
             var script = _engine.CreateScriptSourceFromString(pythonCode);
             var typeExtractor = new ExtractTypesFromScript(_engine);
-            var types = typeExtractor.GetTypesFromScript(script).ToList();
-
-            var createExports = new CreatePartsFromTypes();
-            var exports = createExports.GetParts(types).ToList();
+            var exports = typeExtractor.GetPartsFromScript(script).ToList();
 
             var container = new CompositionContainer();
             var batch = new CompositionBatch(exports, new ComposablePart[] {});
@@ -84,10 +81,7 @@ StringItemSource.__imports__ = dict(import_actions=IActOnItem)
             var script = _engine.CreateScriptSourceFromString(pythonCode);
             
             var typeExtractor = new ExtractTypesFromScript(_engine);
-            var types = typeExtractor.GetTypesFromScript(script).ToList();
-
-            var parts = new CreatePartsFromTypes();
-            var exports = parts.GetParts(types).ToList();
+            var exports = typeExtractor.GetPartsFromScript(script).ToList();
 
             var container = new CompositionContainer(new TypeCatalog(typeof(MockExporter), typeof(MockImportActions)));
             
@@ -115,10 +109,8 @@ class StringItemSource(BasePythonItemSource):
             var _engine = Python.CreateEngine();
             var script = _engine.CreateScriptSourceFromString(pythonCode);
             var typeExtractor = new ExtractTypesFromScript(_engine);
-            var types = typeExtractor.GetTypesFromScript(script).ToList();
+            var exports = typeExtractor.GetPartsFromScript(script).ToList();
 
-            var createExports = new CreatePartsFromTypes();
-            var exports = createExports.GetParts(types).ToList();
             Assert.Equal(0, exports.Count());
         }
     }

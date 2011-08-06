@@ -8,37 +8,17 @@ using System.Linq.Expressions;
 
 namespace Plugins.IronPython
 {
-    public class IronPythonContractBasedImportDefinition : ContractBasedImportDefinition
-    {
-        public string MethodName { get; private set; }
-
-        protected IronPythonContractBasedImportDefinition()
-        {
-        }
-
-        public IronPythonContractBasedImportDefinition(string methodName, string contractName,
-                                                       string requiredTypeIdentity,
-                                                       IEnumerable<KeyValuePair<string, Type>> requiredMetadata,
-                                                       ImportCardinality cardinality, bool isRecomposable,
-                                                       bool isPrerequisite, CreationPolicy requiredCreationPolicy)
-            : base(
-                contractName, requiredTypeIdentity, requiredMetadata, cardinality, isRecomposable, isPrerequisite,
-                requiredCreationPolicy)
-        {
-            MethodName = methodName;
-        }
-    }
     public class IronPythonComposablePart : ComposablePart
     {
         private readonly dynamic _instance;
         private readonly Dictionary<string, ImportDefinition> _imports;
         private readonly IList<ExportDefinition> _exports;
-        private ExtractTypesFromScript.DefinedType _definedType;
+        private readonly IronPythonTypeWrapper _typeWrapper;
 
-        public IronPythonComposablePart(ExtractTypesFromScript.DefinedType definedType, IEnumerable<Type> exports, IEnumerable<KeyValuePair<string, Type>> imports)
+        public IronPythonComposablePart(IronPythonTypeWrapper typeWrapper, IEnumerable<Type> exports, IEnumerable<KeyValuePair<string, Type>> imports)
         {
-            _definedType = definedType;
-            _instance = definedType.Activator();
+            _typeWrapper = typeWrapper;
+            _instance = typeWrapper.Activator();
             _exports = new List<ExportDefinition>(exports.Count());
             _imports = new Dictionary<string, ImportDefinition>(imports.Count());
             foreach (var export in exports)
@@ -86,7 +66,7 @@ namespace Plugins.IronPython
             var importDefinition = definition as IronPythonContractBasedImportDefinition;
             if (importDefinition == null)
                 throw new InvalidOperationException("ImportDefinition should have been an IronPythonContractBasedImportDefinition");
-            _definedType.InvokeMethodWithArgument(importDefinition.MethodName, exports.Select(e => e.Value).ToList());
+            _typeWrapper.InvokeMethodWithArgument(importDefinition.MethodName, exports.Select(e => e.Value).ToList());
         }
 
         public override IEnumerable<ExportDefinition> ExportDefinitions
