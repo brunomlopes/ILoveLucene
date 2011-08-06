@@ -1,8 +1,11 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.Linq;
+using System.Threading.Tasks;
 using Core.Abstractions;
 using IronPython.Hosting;
 using Plugins.IronPython;
@@ -52,8 +55,8 @@ class StringItemSource(BasePythonItemSource):
             var typeExtractor = new ExtractTypesFromScript(_engine);
             var types = typeExtractor.GetTypesFromScript(script).ToList();
 
-            var createExports = new CreateExportsFromTypes();
-            var exports = createExports.GetExports(types).ToList();
+            var createExports = new CreatePartsFromTypes();
+            var exports = createExports.GetParts(types).ToList();
 
             var container = new CompositionContainer();
             var batch = new CompositionBatch(exports, new ComposablePart[] {});
@@ -63,6 +66,40 @@ class StringItemSource(BasePythonItemSource):
             container.SatisfyImportsOnce(instance);
 
             Assert.Equal(1, instance.ItemSources.Count());
+        }
+        
+        [Fact]
+        public void CanImportIntoPythonClass()
+        {
+            var pythonCode =
+                @"
+class StringItemSource:
+    def import_actions(self, actions):
+        self.actions = actions
+
+StringItemSource.__imports__ = dict(import_actions=IActOnItem)
+";
+
+            var _engine = Python.CreateEngine();
+            var script = _engine.CreateScriptSourceFromString(pythonCode);
+            
+            var typeExtractor = new ExtractTypesFromScript(_engine);
+            var types = typeExtractor.GetTypesFromScript(script).ToList();
+
+            var parts = new CreatePartsFromTypes();
+            var exports = parts.GetParts(types).ToList();
+
+            var container = new CompositionContainer(new TypeCatalog(typeof(MockExporter), typeof(MockImportActions)));
+            
+            var batch = new CompositionBatch(exports, new ComposablePart[] {});
+            
+            container.Compose(batch);
+
+            var value = container.GetExportedValue<MockImportActions>();
+            Assert.Equal(1, value.ActOnItems.Count());
+            IEnumerable actions = exports.First().Instance.actions;
+            Assert.Equal(1, actions.OfType<IActOnItem>().Count());
+            Assert.Equal(1, actions.OfType<MockExporter>().Count());
         }
         
         [Fact]
@@ -80,8 +117,8 @@ class StringItemSource(BasePythonItemSource):
             var typeExtractor = new ExtractTypesFromScript(_engine);
             var types = typeExtractor.GetTypesFromScript(script).ToList();
 
-            var createExports = new CreateExportsFromTypes();
-            var exports = createExports.GetExports(types).ToList();
+            var createExports = new CreatePartsFromTypes();
+            var exports = createExports.GetParts(types).ToList();
             Assert.Equal(0, exports.Count());
         }
     }
@@ -90,5 +127,26 @@ class StringItemSource(BasePythonItemSource):
     {
         [ImportMany]
         public IEnumerable<IItemSource> ItemSources { get; set; }
+    }
+
+    [Export(typeof(MockImportActions))]
+    public class MockImportActions
+    {
+        [ImportMany]
+        public IEnumerable<IActOnItem> ActOnItems { get; set; }
+    }
+
+    [Export(typeof(IActOnItem))]
+    public class MockExporter : IActOnItem
+    {
+        public string Text
+        {
+            get { return "Act"; }
+        }
+
+        public Type TypedItemType
+        {
+            get { return typeof(string); }
+        }
     }
 }

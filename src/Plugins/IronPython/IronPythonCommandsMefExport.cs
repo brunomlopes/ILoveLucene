@@ -66,7 +66,7 @@ namespace Plugins.IronPython
                 try
                 {
                     var types = new ExtractTypesFromScript(_engine).GetTypesFromScript(script);
-                    var parts = new CreateExportsFromTypes().GetExports(types);
+                    var parts = new CreatePartsFromTypes().GetParts(types);
                     
                     var batch = new CompositionBatch(parts, new ComposablePart[]{});
                     _mefContainer.Compose(batch);

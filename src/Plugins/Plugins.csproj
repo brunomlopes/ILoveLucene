@@ -87,7 +87,7 @@
     <Compile Include="ExportLearnings.cs" />
     <Compile Include="Google.cs" />
     <Compile Include="IronPython\BasePythonItemSource.cs" />
-    <Compile Include="IronPython\CreateExportsFromTypes.cs" />
+    <Compile Include="IronPython\CreatePartsFromTypes.cs" />
     <Compile Include="IronPython\ExtractTypesFromScript.cs" />
     <Compile Include="IronPython\IronPythonCommandsMefExport.cs" />
     <Compile Include="IronPython\IronPythonComposablePart.cs" />
