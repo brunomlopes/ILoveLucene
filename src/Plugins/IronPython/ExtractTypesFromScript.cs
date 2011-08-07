@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Core.Abstractions;
 using IronPython.Hosting;
@@ -27,6 +29,8 @@ namespace Plugins.IronPython
         public IEnumerable<IronPythonTypeWrapper> GetTypesFromScript(ScriptSource script)
         {
             CompiledCode code = script.Compile();
+            var scope = _engine.CreateScope();
+
             var types = new[]
                             {
                                 typeof (IItem), typeof (IConverter<>), typeof (BaseActOnTypedItem<>),
@@ -36,13 +40,20 @@ namespace Plugins.IronPython
                                 typeof (IConverter),
                                 typeof (IActOnItem),
                                 typeof (IActOnItemWithArguments),
-                                typeof (BasePythonItemSource)
+                                typeof (BasePythonItemSource),
+                                typeof (IronPythonImportDefinition)
                             };
-            var scope = _engine.CreateScope();
             foreach (Type type in types)
             {
                 scope.InjectType(type);
             }
+            using (var libStream = GetType().Assembly.GetManifestResourceStream(GetType(), "lib.py"))
+            using (var libText = new StreamReader(libStream))
+            {
+                var libSource = _engine.CreateScriptSourceFromString(libText.ReadToEnd());
+                libSource.Execute(scope);
+            }
+
 
             // "force" all classes to be new style classes
             dynamic metaclass;
@@ -79,8 +90,20 @@ namespace Plugins.IronPython
                 }
                 try
                 {
-                    pImportObjects = type.__imports__;
-                    importObjects = pImportObjects.ToDictionary(kvp => kvp.Key.ToString(), kvp => kvp.Value);
+                    foreach (var callable in ((IEnumerable)_engine.Operations.GetMemberNames(type)).Cast<string>()
+                        .Select(m => new {name = m, member = _engine.Operations.GetMember(type, m)})
+                        .Where(d => d.member != null)
+                        .Where(d => _engine.Operations.IsCallable(d.member)))
+                    {
+                        try
+                        {
+                            if(callable.member.im_func.func_dict.has_key("imports"))
+                            {
+                                var import = callable.member.im_func.func_dict["imports"];
+                                importObjects.Add(callable.name, import);
+                            }
+                        }catch(RuntimeBinderException){}
+                    }
                 }
                 catch (RuntimeBinderException)
                 {
@@ -94,7 +117,7 @@ namespace Plugins.IronPython
                 var exports = exportObjects.Cast<PythonType>().Select(o => (Type)o);
                 var imports =
                     importObjects.Keys
-                        .Select(key => new KeyValuePair<string, Type>(key, (PythonType)importObjects[key]));
+                        .Select(key => new KeyValuePair<string, IronPythonImportDefinition>(key, (IronPythonImportDefinition)importObjects[key]));
                 yield return new IronPythonComposablePart(definedType, exports, imports);
             }
         }

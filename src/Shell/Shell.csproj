@@ -77,6 +77,12 @@
     <Reference Include="Ionic.Zip.Reduced">
       <HintPath>..\..\lib\DotNetZipLib-DevKit-v1.9\DotNetZip-v1.9-Reduced\Ionic.Zip.Reduced.dll</HintPath>
     </Reference>
+    <Reference Include="IronPython">
+      <HintPath>..\..\lib\ironpython\IronPython.dll</HintPath>
+    </Reference>
+    <Reference Include="IronPython.Modules">
+      <HintPath>..\..\lib\ironpython\IronPython.Modules.dll</HintPath>
+    </Reference>
     <Reference Include="Lucene.Net, Version=2.9.2.2, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.ComponentModel.Composition.Initialization.Desktop">
       <HintPath>..\..\lib\composition.initialization.desktop\Microsoft.ComponentModel.Composition.Initialization.Desktop.dll</HintPath>

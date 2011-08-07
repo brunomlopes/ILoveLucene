@@ -39,6 +39,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\ironpython\IronPython.dll</HintPath>
     </Reference>
+    <Reference Include="IronPython.Modules">
+      <HintPath>..\..\lib\ironpython\IronPython.Modules.dll</HintPath>
+    </Reference>
     <Reference Include="Lucene.Net">
       <HintPath>..\..\lib\lucene\Lucene.Net.dll</HintPath>
     </Reference>
@@ -88,6 +91,7 @@
     <Compile Include="Google.cs" />
     <Compile Include="IronPython\BasePythonItemSource.cs" />
     <Compile Include="IronPython\ExtractTypesFromScript.cs" />
+    <Compile Include="IronPython\ImportDefinition.cs" />
     <Compile Include="IronPython\IronPythonCommandsMefExport.cs" />
     <Compile Include="IronPython\IronPythonComposablePart.cs" />
     <Compile Include="IronPython\IronPythonContractBasedImportDefinition.cs" />
@@ -128,6 +132,9 @@
       <Project>{5397046B-020B-45D0-9779-388F12FCE744}</Project>
       <Name>ElevationHelper.Services</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="IronPython\lib.py" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

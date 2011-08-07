@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Primitives;
-using System.Dynamic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace Plugins.IronPython
 {
@@ -15,7 +13,7 @@ namespace Plugins.IronPython
         private readonly IList<ExportDefinition> _exports;
         private readonly IronPythonTypeWrapper _typeWrapper;
 
-        public IronPythonComposablePart(IronPythonTypeWrapper typeWrapper, IEnumerable<Type> exports, IEnumerable<KeyValuePair<string, Type>> imports)
+        public IronPythonComposablePart(IronPythonTypeWrapper typeWrapper, IEnumerable<Type> exports, IEnumerable<KeyValuePair<string, IronPythonImportDefinition>> imports)
         {
             _typeWrapper = typeWrapper;
             _instance = typeWrapper.Activator();
@@ -33,21 +31,16 @@ namespace Plugins.IronPython
             }
             foreach (var import in imports)
             {
-                var contractName = AttributedModelServices.GetContractName(import.Value);
-                var cardinality = ImportCardinality.ZeroOrMore; // TODO
-                var isRecomposable = true;
-                var isPrerequisite = true;
-
+                var contractName = AttributedModelServices.GetContractName(import.Value.Type);
                 var metadata = new Dictionary<string, Type>();
 
                 _imports[import.Key] = new IronPythonContractBasedImportDefinition(
                     import.Key,
                     contractName,
-                    AttributedModelServices.GetTypeIdentity(import.Value),
+                    AttributedModelServices.GetTypeIdentity(import.Value.Type),
                     metadata.ToList(),
-                    cardinality, isRecomposable, isPrerequisite,
+                    import.Value.Cardinality, import.Value.IsRecomposable, import.Value.IsPrerequisite,
                     CreationPolicy.Any);
-                
             }
         }
 
@@ -66,7 +59,11 @@ namespace Plugins.IronPython
             var importDefinition = definition as IronPythonContractBasedImportDefinition;
             if (importDefinition == null)
                 throw new InvalidOperationException("ImportDefinition should have been an IronPythonContractBasedImportDefinition");
-            _typeWrapper.InvokeMethodWithArgument(importDefinition.MethodName, exports.Select(e => e.Value).ToList());
+            
+            _typeWrapper.InvokeMethodWithArgument(importDefinition.MethodName,
+                                                  importDefinition.Cardinality == ImportCardinality.ExactlyOne
+                                                      ? exports.Select(e => e.Value).SingleOrDefault()
+                                                      : exports.Select(e => e.Value).ToList());
         }
 
         public override IEnumerable<ExportDefinition> ExportDefinitions

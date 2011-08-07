@@ -66,15 +66,17 @@ class StringItemSource(BasePythonItemSource):
         }
         
         [Fact]
-        public void CanImportIntoPythonClass()
+        public void CanImportListIntoPythonClass()
         {
             var pythonCode =
                 @"
 class StringItemSource:
     def import_actions(self, actions):
         self.actions = actions
+    def normal_method(self):
+        pass
 
-StringItemSource.__imports__ = dict(import_actions=IActOnItem)
+StringItemSource.import_actions.func_dict['imports'] = IronPythonImportDefinition('import_action', IActOnItem, 'ZeroOrOne', True, True)
 ";
 
             var _engine = Python.CreateEngine();
@@ -94,6 +96,70 @@ StringItemSource.__imports__ = dict(import_actions=IActOnItem)
             IEnumerable actions = exports.First().Instance.actions;
             Assert.Equal(1, actions.OfType<IActOnItem>().Count());
             Assert.Equal(1, actions.OfType<MockExporter>().Count());
+        }
+        
+        [Fact]
+        public void CanImportIntoPythonClassUsingDecorator()
+        {
+            var pythonCode =
+                @"
+class StringItemSource:
+    @import_many(IActOnItem)
+    def import_actions(self, actions):
+        self.actions = actions
+";
+
+            var _engine = Python.CreateEngine();
+            var paths = _engine.GetSearchPaths();
+            paths.Add(@"D:\documents\dev\ILoveLucene\lib\ironpython\Lib");
+            _engine.SetSearchPaths(paths);
+            var script = _engine.CreateScriptSourceFromString(pythonCode);
+            
+            var typeExtractor = new ExtractTypesFromScript(_engine);
+            var exports = typeExtractor.GetPartsFromScript(script).ToList();
+
+            var container = new CompositionContainer(new TypeCatalog(typeof(MockExporter), typeof(MockImportActions)));
+            
+            var batch = new CompositionBatch(exports, new ComposablePart[] {});
+            
+            container.Compose(batch);
+
+            var value = container.GetExportedValue<MockImportActions>();
+            Assert.Equal(1, value.ActOnItems.Count());
+            IEnumerable actions = exports.First().Instance.actions;
+            Assert.Equal(1, actions.OfType<IActOnItem>().Count());
+            Assert.Equal(1, actions.OfType<MockExporter>().Count());
+        }
+        
+        [Fact]
+        public void CanImportJustOneItemIntoPythonClassUsingDecorator()
+        {
+            var pythonCode =
+                @"
+class StringItemSource:
+    @import_one(IActOnItem)
+    def import_action(self, action):
+        self.action = action
+";
+
+            var _engine = Python.CreateEngine();
+            var paths = _engine.GetSearchPaths();
+            paths.Add(@"D:\documents\dev\ILoveLucene\lib\ironpython\Lib");
+            _engine.SetSearchPaths(paths);
+            var script = _engine.CreateScriptSourceFromString(pythonCode);
+            
+            var typeExtractor = new ExtractTypesFromScript(_engine);
+            var exports = typeExtractor.GetPartsFromScript(script).ToList();
+
+            var container = new CompositionContainer(new TypeCatalog(typeof(MockExporter), typeof(MockImportActions)));
+            
+            var batch = new CompositionBatch(exports, new ComposablePart[] {});
+            
+            container.Compose(batch);
+
+            object action = exports.First().Instance.action;
+            Assert.NotNull(action);
+            Assert.IsAssignableFrom<IActOnItem>(action);
         }
         
         [Fact]
