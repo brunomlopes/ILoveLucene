@@ -21,7 +21,9 @@ namespace Plugins.IronPython
     {
         private readonly CompositionContainer _mefContainer;
         private ScriptEngine _engine;
-
+        private Dictionary<string, IronPythonFile> _files = new Dictionary<string, IronPythonFile>();
+        private FileSystemWatcher _watcher;
+            
         [Import]
         public CoreConfiguration CoreConfiguration { get; set; }
 
@@ -43,10 +45,12 @@ namespace Plugins.IronPython
                 DirectoryInfo directory = GetIronPythonPluginsDirectory();
 
                 var pythonFiles =
-                    directory.GetFiles()
-                        .Where(f => f.Extension.ToLowerInvariant() == ".ipy");
+                    directory.GetFiles().Where(f => f.Extension.ToLowerInvariant() == ".ipy");
 
                 ExportCommandsFromFilesIntoMef(pythonFiles);
+                _watcher = new FileSystemWatcher(directory.FullName, "*.ipy");
+                _watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
+                                        | NotifyFilters.FileName | NotifyFilters.DirectoryName;
             }
             finally
             {
@@ -59,25 +63,9 @@ namespace Plugins.IronPython
         {
             foreach (var pythonFile in pythonFiles)
             {
-                var _fileFullName = pythonFile.FullName;
-
-                var script = _engine.CreateScriptSourceFromFile(_fileFullName);
-
-                try
-                {
-                    var parts = new ExtractTypesFromScript(_engine).GetPartsFromScript(script);
-                    
-                    var batch = new CompositionBatch(parts, new ComposablePart[]{});
-                    _mefContainer.Compose(batch);
-                }
-                catch (SyntaxErrorException e)
-                {
-                    throw new SyntaxErrorExceptionPrettyWrapper(string.Format("Error compiling '{0}", _fileFullName), e);
-                }
-                catch (UnboundNameException e)
-                {
-                    throw new PythonException(string.Format("Error executing '{0}'", _fileFullName), e);
-                }
+                var file = new IronPythonFile(pythonFile, _engine, _mefContainer, new ExtractTypesFromScript(_engine));
+                _files[pythonFile.FullName] = file;
+                file.Compose();
             }
         }
 

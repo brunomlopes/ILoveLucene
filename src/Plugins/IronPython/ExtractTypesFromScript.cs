@@ -34,7 +34,7 @@ namespace Plugins.IronPython
             var types = new[]
                             {
                                 typeof (IItem), typeof (IConverter<>), typeof (BaseActOnTypedItem<>),
-                                typeof (BaseActOnTypedItemAndReturnTypedItem<,>), typeof (IItem),
+                                typeof (BaseActOnTypedItemAndReturnTypedItem<,>),
                                 typeof (IItemSource),
                                 typeof (BaseItemSource),
                                 typeof (IConverter),

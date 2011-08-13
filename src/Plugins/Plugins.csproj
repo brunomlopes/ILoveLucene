@@ -95,6 +95,7 @@
     <Compile Include="IronPython\IronPythonCommandsMefExport.cs" />
     <Compile Include="IronPython\IronPythonComposablePart.cs" />
     <Compile Include="IronPython\IronPythonContractBasedImportDefinition.cs" />
+    <Compile Include="IronPython\IronPythonFile.cs" />
     <Compile Include="IronPython\IronPythonTypeWrapper.cs" />
     <Compile Include="IronPython\ScriptScopeExtensionMethods.cs" />
     <Compile Include="Processes\CloseProcess.cs" />

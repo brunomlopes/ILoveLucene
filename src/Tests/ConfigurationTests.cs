@@ -5,6 +5,7 @@ using Core;
 using Core.Abstractions;
 using Newtonsoft.Json;
 using Plugins.Shortcuts;
+using Tests.Helpers;
 using Xunit;
 
 namespace Tests
@@ -43,12 +44,7 @@ namespace Tests
         {
             var container = new CompositionContainer(new AssemblyCatalog(this.GetType().Assembly));
 
-            var configurationDirectory = new DirectoryInfo(@"temp-configuration");
-            if (configurationDirectory.Exists)
-            {
-                configurationDirectory.Delete(true);
-            }
-            configurationDirectory.Create();
+            var configurationDirectory = "temp-configuration".AsNewDirectoryInfo();
 
             var configurationCatalog = new LoadConfiguration(configurationDirectory, container);
             configurationCatalog.Load();
@@ -60,14 +56,9 @@ namespace Tests
         [Fact]
         public void ShouldIgnoreReadmeFile()
         {
+            var configurationDirectory = "temp-configuration".AsNewDirectoryInfo();
             var container = new CompositionContainer(new AssemblyCatalog(this.GetType().Assembly));
 
-            var configurationDirectory = new DirectoryInfo(@"temp-configuration");
-            if (configurationDirectory.Exists)
-            {
-                configurationDirectory.Delete(true);
-            }
-            configurationDirectory.Create();
             File.WriteAllText(Path.Combine(configurationDirectory.FullName,"readme.txt"), "Text");
             var configurationCatalog = new LoadConfiguration(configurationDirectory, container);
             configurationCatalog.Load();
@@ -79,12 +70,7 @@ namespace Tests
         [Fact]
         public void RequestingStoredConfigurationWithADefaultTypeAlreadyRegisteredShouldReturnStoredConfiguration()
         {
-            var configurationDirectory = new DirectoryInfo(@"temp-configuration");
-            if (configurationDirectory.Exists)
-            {
-                configurationDirectory.Delete(true);
-            }
-            configurationDirectory.Create();
+            var configurationDirectory = "temp-configuration".AsNewDirectoryInfo();
             var conf = new SampleConfigurationWithDefaultValues() {Value = 10};
             WriteConfiguration<SampleConfigurationWithDefaultValues>(configurationDirectory, conf);
 
@@ -99,19 +85,8 @@ namespace Tests
         [Fact]
         public void CanLoadConfigurationFromGlobalAndUserRepository()
         {
-            var userConfigurationDirectory = new DirectoryInfo("user-configuration");
-            var systemConfigurationDirectory = new DirectoryInfo("temp-configuration");
-
-            if(userConfigurationDirectory.Exists)
-            {
-                userConfigurationDirectory.Delete(true);
-            }
-            userConfigurationDirectory.Create();
-            if(systemConfigurationDirectory.Exists)
-            {
-                systemConfigurationDirectory.Delete(true);
-            }
-            systemConfigurationDirectory.Create();
+            var userConfigurationDirectory = "user-configuration".AsNewDirectoryInfo();
+            var systemConfigurationDirectory = "temp-configuration".AsNewDirectoryInfo();
 
             var systemConfiguration = new SampleConfigurationWithDefaultValues() {Value = 10, SecondValue = 200};
             var userConfiguration = new {Value = 20};
@@ -131,19 +106,8 @@ namespace Tests
         [Fact]
         public void CanLoadConfigurationFromGlobalAndUserRepositoryUsingShortName()
         {
-            var userConfigurationDirectory = new DirectoryInfo("user-configuration");
-            var systemConfigurationDirectory = new DirectoryInfo("temp-configuration");
-
-            if(userConfigurationDirectory.Exists)
-            {
-                userConfigurationDirectory.Delete(true);
-            }
-            userConfigurationDirectory.Create();
-            if(systemConfigurationDirectory.Exists)
-            {
-                systemConfigurationDirectory.Delete(true);
-            }
-            systemConfigurationDirectory.Create();
+            var userConfigurationDirectory = "user-configuration".AsNewDirectoryInfo();
+            var systemConfigurationDirectory = "temp-configuration".AsNewDirectoryInfo();
 
             var systemConfiguration = new SampleConfigurationWithDefaultValues() {Value = 10, SecondValue = 200};
             var userConfiguration = new {Value = 20};
@@ -163,19 +127,8 @@ namespace Tests
         [Fact]
         public void CanLoadConfigurationFromGlobalAndUserRepositoryUsingShortAndLongName()
         {
-            var userConfigurationDirectory = new DirectoryInfo("user-configuration");
-            var systemConfigurationDirectory = new DirectoryInfo("temp-configuration");
-
-            if(userConfigurationDirectory.Exists)
-            {
-                userConfigurationDirectory.Delete(true);
-            }
-            userConfigurationDirectory.Create();
-            if(systemConfigurationDirectory.Exists)
-            {
-                systemConfigurationDirectory.Delete(true);
-            }
-            systemConfigurationDirectory.Create();
+            var userConfigurationDirectory = "user-configuration".AsNewDirectoryInfo();
+            var systemConfigurationDirectory = "temp-configuration".AsNewDirectoryInfo();
 
             var systemConfiguration = new SampleConfigurationWithDefaultValues() {Value = 10, SecondValue = 200};
             var userConfiguration = new {Value = 20};
@@ -222,7 +175,6 @@ namespace Tests
                 JsonConvert.SerializeObject(conf));
         }
     }
-
 
     [PluginConfiguration]
     public class SampleConfigurationWithDefaultValues
