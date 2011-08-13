@@ -244,7 +244,7 @@ class StringItemSource(BasePythonItemSource):
             var importer = container.GetExportedValue<MockImporter>();
             Assert.Equal(1, importer.ItemSources.Count());
 
-            @"
+            var newCode = @"
 @exports(IItemSource)
 class StringItemSource(BasePythonItemSource):
     def GetAllItems(self):
@@ -255,7 +255,11 @@ class SecondStringItemSource(BasePythonItemSource):
     def GetAllItems(self):
         return [""Item 1"", ""Item 2"", ""Item 3""]
 
-".WriteToFileInPath(ironpythonDir, "python.ipy");
+";
+
+            EventHelper.WaitForEvent(e => commands.RefreshedFiles += e,
+                e => commands.RefreshedFiles -= e,
+                () => newCode.WriteToFileInPath(ironpythonDir, "python.ipy"));
 
             importer = container.GetExportedValue<MockImporter>();
             Assert.Equal(2, importer.ItemSources.Count());

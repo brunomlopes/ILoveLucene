@@ -5,6 +5,7 @@ using System.ComponentModel.Composition.Primitives;
 using IronPython.Runtime;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
+using System.Linq;
 
 namespace Plugins.IronPython
 {
@@ -32,7 +33,7 @@ namespace Plugins.IronPython
             IEnumerable<IronPythonComposablePart> newParts = new List<IronPythonComposablePart>();
             try
             {
-                newParts = _extractTypesFromScript.GetPartsFromScript(script);
+                newParts = _extractTypesFromScript.GetPartsFromScript(script).ToList();
             }
             catch (SyntaxErrorException e)
             {

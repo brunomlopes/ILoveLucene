@@ -73,6 +73,7 @@
     <Compile Include="CalculatorTests.cs" />
     <Compile Include="ConfigurationTests.cs" />
     <Compile Include="FileNameTests.cs" />
+    <Compile Include="Helpers\EventHelper.cs" />
     <Compile Include="Helpers\PathHelper.cs" />
     <Compile Include="IndexerTests.cs" />
     <Compile Include="IronPythonSupportTests.cs" />

@@ -23,7 +23,9 @@ namespace Plugins.IronPython
         private ScriptEngine _engine;
         private Dictionary<string, IronPythonFile> _files = new Dictionary<string, IronPythonFile>();
         private FileSystemWatcher _watcher;
-            
+
+        public EventHandler RefreshedFiles;
+
         [Import]
         public CoreConfiguration CoreConfiguration { get; set; }
 
@@ -31,6 +33,7 @@ namespace Plugins.IronPython
         public IronPythonCommandsMefExport(CompositionContainer mefContainer)
         {
             _mefContainer = mefContainer;
+            RefreshedFiles += (e, s) => { };
         }
 
         public bool Executed { get; private set; }
@@ -51,6 +54,12 @@ namespace Plugins.IronPython
                 _watcher = new FileSystemWatcher(directory.FullName, "*.ipy");
                 _watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
                                         | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+                _watcher.Created += new FileSystemEventHandler(_watcher_Created);
+                _watcher.Deleted += new FileSystemEventHandler(_watcher_Deleted);
+                _watcher.Changed += new FileSystemEventHandler(_watcher_Changed);
+                _watcher.Renamed += new RenamedEventHandler(_watcher_Renamed);
+                _watcher.InternalBufferSize = pythonFiles.Count() + 10; // TODO: make this a bit smaller, or cleverer..
+                _watcher.EnableRaisingEvents = true;
             }
             finally
             {
@@ -59,14 +68,70 @@ namespace Plugins.IronPython
 
         }
 
+        void _watcher_Renamed(object sender, RenamedEventArgs e)
+        {
+            if (_files.ContainsKey(e.OldFullPath))
+            {
+                _files[e.OldFullPath].Decompose();
+                _files.Remove(e.OldFullPath);
+                return;
+            }
+            if (_files.ContainsKey(e.FullPath))
+            {
+                // TODO: log warning
+                _files[e.FullPath].Decompose();
+                _files.Remove(e.FullPath);
+                return;
+            }
+            AddIronPythonFile(new FileInfo(e.FullPath));
+            RefreshedFiles(this, new EventArgs());
+        }
+
+        void _watcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            if(!_files.ContainsKey(e.FullPath))
+            {
+                // TODO: log warning
+                return;
+            }
+            _files[e.FullPath].Compose();
+            RefreshedFiles(this, new EventArgs());
+
+        }
+
+        void _watcher_Deleted(object sender, FileSystemEventArgs e)
+        {
+            if(!_files.ContainsKey(e.FullPath))
+            {
+                // TODO: log warning
+                return;
+            }
+            var f = _files[e.FullPath];
+            _files.Remove(e.FullPath);
+            f.Decompose();
+            RefreshedFiles(this, new EventArgs());
+
+        }
+
+        void _watcher_Created(object sender, FileSystemEventArgs e)
+        {
+            AddIronPythonFile(new FileInfo(e.FullPath));
+            RefreshedFiles(this, new EventArgs());
+        }
+
         private void ExportCommandsFromFilesIntoMef(IEnumerable<FileInfo> pythonFiles)
         {
             foreach (var pythonFile in pythonFiles)
             {
-                var file = new IronPythonFile(pythonFile, _engine, _mefContainer, new ExtractTypesFromScript(_engine));
-                _files[pythonFile.FullName] = file;
-                file.Compose();
+                AddIronPythonFile(pythonFile);
             }
+        }
+
+        private void AddIronPythonFile(FileInfo pythonFile)
+        {
+            var file = new IronPythonFile(pythonFile, _engine, _mefContainer, new ExtractTypesFromScript(_engine));
+            _files[pythonFile.FullName] = file;
+            file.Compose();
         }
 
 
