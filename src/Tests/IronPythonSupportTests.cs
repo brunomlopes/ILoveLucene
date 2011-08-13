@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core;
 using Core.Abstractions;
+using ILoveLucene.Loggers;
 using IronPython.Hosting;
 using Plugins.IronPython;
 using Xunit;
@@ -237,7 +238,7 @@ class StringItemSource(BasePythonItemSource):
 
             var container = new CompositionContainer(new TypeCatalog(typeof(MockImporter)));
 
-            var commands = new IronPythonCommandsMefExport(container);
+            var commands = new IronPythonCommandsMefExport(container, new DebugLogger());
             commands.CoreConfiguration = new CoreConfiguration("data".AsNewDirectoryInfo().FullName, ".");
             commands.Execute();
 

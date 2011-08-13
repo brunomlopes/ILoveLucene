@@ -20,6 +20,7 @@ namespace Plugins.IronPython
     public class IronPythonCommandsMefExport : IStartupTask
     {
         private readonly CompositionContainer _mefContainer;
+        private readonly ILog _log;
         private ScriptEngine _engine;
         private Dictionary<string, IronPythonFile> _files = new Dictionary<string, IronPythonFile>();
         private FileSystemWatcher _watcher;
@@ -30,9 +31,10 @@ namespace Plugins.IronPython
         public CoreConfiguration CoreConfiguration { get; set; }
 
         [ImportingConstructor]
-        public IronPythonCommandsMefExport(CompositionContainer mefContainer)
+        public IronPythonCommandsMefExport(CompositionContainer mefContainer, ILog log)
         {
             _mefContainer = mefContainer;
+            _log = log;
             RefreshedFiles += (e, s) => { };
         }
 
@@ -74,14 +76,15 @@ namespace Plugins.IronPython
             {
                 _files[e.OldFullPath].Decompose();
                 _files.Remove(e.OldFullPath);
-                return;
+            }
+            else
+            {
+                _log.Warn("File {0} not found in the ironpython cache but got notified it was renamed");
             }
             if (_files.ContainsKey(e.FullPath))
             {
-                // TODO: log warning
                 _files[e.FullPath].Decompose();
                 _files.Remove(e.FullPath);
-                return;
             }
             AddIronPythonFile(new FileInfo(e.FullPath));
             RefreshedFiles(this, new EventArgs());
@@ -91,7 +94,7 @@ namespace Plugins.IronPython
         {
             if(!_files.ContainsKey(e.FullPath))
             {
-                // TODO: log warning
+                _log.Warn("File {0} not found in the ironpython cache but got notified it changed");
                 return;
             }
             _files[e.FullPath].Compose();
@@ -103,7 +106,7 @@ namespace Plugins.IronPython
         {
             if(!_files.ContainsKey(e.FullPath))
             {
-                // TODO: log warning
+                _log.Warn("File {0} not found in the ironpython cache but got notified it was deleted");
                 return;
             }
             var f = _files[e.FullPath];
@@ -149,36 +152,6 @@ namespace Plugins.IronPython
                 throw new InvalidOperationException(string.Format("No 'IronPythonCommands' directory found in tree of {0}", directory));
             }
             return directory.EnumerateDirectories().Single(d => d.Name.ToLowerInvariant() == "ironpythoncommands");
-        }
-
-        public class PythonException : Exception
-        {
-            public PythonException(string message, Exception innerException)
-                : base(message, innerException)
-            {
-            }
-        }
-
-        public class SyntaxErrorExceptionPrettyWrapper : PythonException
-        {
-            private readonly SyntaxErrorException _innerException;
-            public SyntaxErrorExceptionPrettyWrapper(string message, SyntaxErrorException innerException)
-                : base(message, innerException)
-            {
-                _innerException = innerException;
-            }
-
-            public override string Message
-            {
-                get
-                {
-                    return string.Format("{4}\nLine {0}\n{1}\n{2}^---{3}", _innerException.Line,
-                        _innerException.GetCodeLine(),
-                                         string.Join("", Enumerable.Repeat(" ", _innerException.Column).ToArray()),
-                                         _innerException.Message,
-                                         base.Message);
-                }
-            }
         }
     }
 }
