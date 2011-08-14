@@ -240,6 +240,7 @@ class StringItemSource(BasePythonItemSource):
 
             var commands = new IronPythonCommandsMefExport(container, new DebugLogger());
             commands.CoreConfiguration = new CoreConfiguration("data".AsNewDirectoryInfo().FullName, ".");
+            commands.Configuration = new Configuration {ScriptDirectories = new List<string> {ironpythonDir.FullName}};
             commands.Execute();
 
             var importer = container.GetExportedValue<MockImporter>();

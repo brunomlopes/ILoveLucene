@@ -23,12 +23,15 @@ namespace Plugins.IronPython
         private readonly ILog _log;
         private ScriptEngine _engine;
         private Dictionary<string, IronPythonFile> _files = new Dictionary<string, IronPythonFile>();
-        private FileSystemWatcher _watcher;
+        private Dictionary<string,FileSystemWatcher> _watchers = new Dictionary<string, FileSystemWatcher>();
 
         public EventHandler RefreshedFiles;
 
-        [Import]
+        [ImportConfiguration]
         public CoreConfiguration CoreConfiguration { get; set; }
+
+        [ImportConfiguration]
+        public Configuration Configuration { get; set; }
 
         [ImportingConstructor]
         public IronPythonCommandsMefExport(CompositionContainer mefContainer, ILog log)
@@ -47,21 +50,31 @@ namespace Plugins.IronPython
                 Thread.Sleep(TimeSpan.FromSeconds(5));
                 _engine = Python.CreateEngine();
 
-                DirectoryInfo directory = GetIronPythonPluginsDirectory();
+                foreach (var directory in GetIronPythonPluginsDirectories())
+                {
+                    var pythonFiles =
+                        directory.GetFiles().Where(f => f.Extension.ToLowerInvariant() == ".ipy");
 
-                var pythonFiles =
-                    directory.GetFiles().Where(f => f.Extension.ToLowerInvariant() == ".ipy");
+                    foreach (var pythonFile in pythonFiles)
+                    {
+                        AddIronPythonFile(pythonFile);
+                    }
 
-                ExportCommandsFromFilesIntoMef(pythonFiles);
-                _watcher = new FileSystemWatcher(directory.FullName, "*.ipy");
-                _watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
-                                        | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-                _watcher.Created += new FileSystemEventHandler(_watcher_Created);
-                _watcher.Deleted += new FileSystemEventHandler(_watcher_Deleted);
-                _watcher.Changed += new FileSystemEventHandler(_watcher_Changed);
-                _watcher.Renamed += new RenamedEventHandler(_watcher_Renamed);
-                _watcher.InternalBufferSize = pythonFiles.Count() + 10; // TODO: make this a bit smaller, or cleverer..
-                _watcher.EnableRaisingEvents = true;
+                    var watcher = new FileSystemWatcher(directory.FullName, "*.ipy");
+                    watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
+                                           | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+                    watcher.Created += new FileSystemEventHandler(_watcher_Created);
+                    watcher.Deleted += new FileSystemEventHandler(_watcher_Deleted);
+                    watcher.Changed += new FileSystemEventHandler(_watcher_Changed);
+                    watcher.Renamed += new RenamedEventHandler(_watcher_Renamed);
+                    watcher.InternalBufferSize = pythonFiles.Count() + 10; // TODO: make this a bit smaller, or cleverer..
+                    _watchers[directory.FullName] = watcher;
+                }
+                foreach (var watcher in _watchers.Values)
+                {
+                    watcher.EnableRaisingEvents = true;
+                }
+                
             }
             finally
             {
@@ -122,14 +135,6 @@ namespace Plugins.IronPython
             RefreshedFiles(this, new EventArgs());
         }
 
-        private void ExportCommandsFromFilesIntoMef(IEnumerable<FileInfo> pythonFiles)
-        {
-            foreach (var pythonFile in pythonFiles)
-            {
-                AddIronPythonFile(pythonFile);
-            }
-        }
-
         private void AddIronPythonFile(FileInfo pythonFile)
         {
             var file = new IronPythonFile(pythonFile, _engine, _mefContainer, new ExtractTypesFromScript(_engine));
@@ -138,20 +143,18 @@ namespace Plugins.IronPython
         }
 
 
-        private DirectoryInfo GetIronPythonPluginsDirectory()
+        private IEnumerable<DirectoryInfo> GetIronPythonPluginsDirectories()
         {
-            var directory = new DirectoryInfo(CoreConfiguration.PluginsDirectory);;
-            while (directory != null
-                   && !directory.EnumerateDirectories().Any(d => d.Name.ToLowerInvariant() == "ironpythoncommands")
-                   && directory.Root != directory)
+            foreach (var directoryPath in CoreConfiguration.ExpandPaths(Configuration.ScriptDirectories))
             {
-                directory = directory.Parent;
+                var directory = new DirectoryInfo(directoryPath);
+                if(!directory.Exists)
+                {
+                    _log.Warn("Directory {0} doesn't exist", directoryPath);
+                    continue;
+                }
+                yield return directory;
             }
-            if (directory == null || directory.Root == directory)
-            {
-                throw new InvalidOperationException(string.Format("No 'IronPythonCommands' directory found in tree of {0}", directory));
-            }
-            return directory.EnumerateDirectories().Single(d => d.Name.ToLowerInvariant() == "ironpythoncommands");
         }
     }
 }

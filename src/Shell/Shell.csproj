@@ -190,6 +190,9 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Configuration\Plugins.IronPython.Configuration, Plugins">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Configuration\ILoveLucene.AutoUpdate.AutoUpdateConfiguration, ILoveLucene">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

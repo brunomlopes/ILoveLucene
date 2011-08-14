@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
@@ -158,6 +159,20 @@ namespace Tests
             configurationCatalog.Load();
             conf = container.GetExportedValue<Configuration>();
             Assert.Contains(@"%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu", conf.Directories);
+        }
+
+        [Fact]
+        public void CanExpandPathsInConfigurationInstances()
+        {
+            var ironpythonConfiguration = new Plugins.IronPython.Configuration()
+                                              {
+                                                  ScriptDirectories = new List<string>(){@"$plugins$\Ironpython", @"$user_data$\Ironpython"}
+                                              };
+
+            var coreConfiguration = new CoreConfiguration("c:\\data", "c:\\plugins");
+            var expanded = coreConfiguration.ExpandPaths(ironpythonConfiguration.ScriptDirectories).ToList();
+            Assert.Contains(@"c:\data\Ironpython", expanded);
+            Assert.Contains(@"c:\plugins\Ironpython", expanded);
         }
 
         private void WriteConfiguration<T>(DirectoryInfo configurationDirectory, object conf,
