@@ -16,7 +16,7 @@ class MustScream(ICommand):
 
 @export(IActOnItem)
 class ActOnString(BaseActOnTypedItem[str]):
-    def ActOn(text):
+    def ActOn(self, text):
         System.Windows.Forms.MessageBox.Show(text, "Shout!", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning)
 
 #def MustScreamFunction(args):
