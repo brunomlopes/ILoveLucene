@@ -15,6 +15,7 @@ namespace ILoveLucene.AutoUpdate
         string _tempFile = null;
         string _tempDecompressedDir = null;
         Dictionary<string,string> _coldUpdates;
+        Dictionary<string,string> _warmUpdates;
         List<string> _directoriesToCreate;
         private string _appPath; 
 
@@ -22,8 +23,9 @@ namespace ILoveLucene.AutoUpdate
         {
             Attributes = new Dictionary<string, string>();
             _coldUpdates = new Dictionary<string, string>();
+            _warmUpdates = new Dictionary<string, string>();
             _directoriesToCreate = new List<string>();
-            UpdateConditions = new NAppUpdate.Framework.Conditions.BooleanCondition();
+            UpdateConditions = new BooleanCondition();
             // TODO: replace this with something from the updatemanager
             _appPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location); 
         }
@@ -62,10 +64,13 @@ namespace ILoveLucene.AutoUpdate
                             _directoriesToCreate.Add(appDirectoryName);
                         }
                     }
+                    else if(Attributes.ContainsKey("warm-update") && Attributes["warm-update"] == "true")
+                    {
+                        _warmUpdates[e.FileName] = Path.Combine(_tempDecompressedDir, e.FileName);
+                    }
                     else
                     {
-                        _coldUpdates[e.FileName] = Path.Combine(_tempDecompressedDir,
-                                                                e.FileName);
+                        _coldUpdates[e.FileName] = Path.Combine(_tempDecompressedDir, e.FileName);
                     }
                 }
             }
@@ -80,6 +85,25 @@ namespace ILoveLucene.AutoUpdate
             {
                 Directory.CreateDirectory(dir);
             }
+
+            foreach (var warmUpdate in _warmUpdates)
+            {
+                var destinationFile = Path.Combine(_appPath, warmUpdate.Key);
+
+                try
+                {
+                    if (File.Exists(destinationFile))
+                        File.Delete(destinationFile);
+                    File.Move(warmUpdate.Value, destinationFile);
+                }
+                catch (Exception ex)
+                {
+                    throw new UpdateProcessFailedException(
+                        string.Format("Couldn't move hot-swap file {0} into position {1}", warmUpdate.Value,
+                                      destinationFile), ex);
+                }
+            }
+         
             return true;
         }
 

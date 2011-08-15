@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using Core;
 using Core.Abstractions;
 using NAppUpdate.Framework;
 using NAppUpdate.Framework.Sources;
@@ -16,6 +17,9 @@ namespace ILoveLucene.AutoUpdate
         [ImportConfiguration]
         public AutoUpdateConfiguration Configuration { get; set; }
 
+        [Import]
+        public ModuleVersionRegistry Registry { get; set; }
+
         public UpdateManagerAdapter()
         {
             UpdatesAvailable += (sender, e) => { };
@@ -26,13 +30,13 @@ namespace ILoveLucene.AutoUpdate
 
         public void OnImportsSatisfied()
         {
-            _updateManager.UpdateFeedReader = new ZippedAppcastReader();
+            _updateManager.UpdateFeedReader = new ZippedAppcastReader(Registry);
             _updateManager.UpdateSource = new SimpleWebSource(Configuration.AppcastFeedUrl);
         }
 
         public void CheckForUpdates()
         {
-            if(!Configuration.CheckForUpdates)
+            if (!Configuration.CheckForUpdates || ProgramVersionInformation.Version == "devel")
             {
                 State = UpdateManager.UpdateProcessState.NotChecked;
                 return;

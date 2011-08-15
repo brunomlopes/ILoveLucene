@@ -134,7 +134,9 @@
     <Compile Include="ApplicationBootstrapper.cs" />
     <Compile Include="AutoUpdate\AutoUpdateConfiguration.cs" />
     <Compile Include="AutoUpdate\CheckForUpdatesJob.cs" />
-    <Compile Include="AutoUpdate\ProgramVersionCondition.cs" />
+    <Compile Include="AutoUpdate\IModuleVersion.cs" />
+    <Compile Include="AutoUpdate\ModuleVersionRegistry.cs" />
+    <Compile Include="AutoUpdate\VersionCondition.cs" />
     <Compile Include="AutoUpdate\ScheduleUpdateCheckJob.cs" />
     <Compile Include="AutoUpdate\UpdateManagerAdapter.cs" />
     <Compile Include="AutoUpdate\ZippedFilesUpdateTask.cs" />
