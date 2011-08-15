@@ -2,9 +2,9 @@
 #ignore thumbnails created by windows
 Thumbs.db
 #Ignore files build by Visual Studio
-*.obj
-*.exe
-*.pdb
+src/*/*.obj
+src/*/*.exe
+src/*/*.pdb
 *.user
 *.aps
 *.pch
@@ -19,11 +19,11 @@ Thumbs.db
 *.cache
 *.ilk
 *.log
-[Bb]in
-[Dd]ebug*/
+src/*/[Bb]in
+src/*/[Dd]ebug*/
 *.lib
 *.sbr
-obj/
+src/*/obj/
 [Rr]elease*/
 _ReSharper*/
 [Tt]est[Rr]esult*

@@ -25,7 +25,6 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
         Remove-Item $outputDir -recurse -force
     }
     $packageDir = $package_path
-    $appcast_path = "$packageDir\appcast.xml"
     
     Exec { msbuild /t:clean /p:Configuration=Release /p:OutDir=$outputDir\ }
     Exec { msbuild /t:build /p:Configuration=Release /p:OutDir=$outputDir\ }
@@ -48,7 +47,8 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
     $zip = Write-Zip .\* $package_path -level 9
     Pop-Location
     Write-Host "File is up at $zip"
-    
+
+    $appcast_path = "$packageDir\appcast.xml"    
     Generate-Appcast-Item `
         -version $version `
         -package_url $dropbox_base_url `
@@ -181,7 +181,12 @@ function Get-Next-Version
     
     $last_versions = $last_version_tag.split("_")[1].split(".") | foreach { [int]$_} 
     if ($description.Length -eq 3) {
-        $last_versions[$version_index_to_increase]++
+        $last_versions[$version_index_to_increase] += 1
+        $i = $version_index_to_increase+1
+        while($i -lt 4){
+            $last_versions[$i] = 0
+            $i += 1
+        }
     }
     
     return [string]::join(".", $last_versions)
