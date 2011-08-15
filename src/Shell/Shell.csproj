@@ -205,7 +205,6 @@
     <None Include="Configuration\Plugins.Shortcuts.Configuration, Plugins">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="IronPythonCommands\Sample.ipy" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

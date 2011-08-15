@@ -73,7 +73,7 @@ class StringItemSource(BasePythonItemSource):
         {
             var pythonCode =
                 @"
-@exports(IItemSource)
+@export(IItemSource)
 class StringItemSource(BasePythonItemSource):
     def GetAllItems(self):
         return [""Item 1"", ""Item 2"", ""Item 3""]
@@ -99,8 +99,8 @@ class StringItemSource(BasePythonItemSource):
         {
             var pythonCode =
                 @"
-@exports(IItemSource)
-@exports(IActOnItem)
+@export(IItemSource)
+@export(IActOnItem)
 class StringItemSource(BasePythonItemSource, IActOnItem):
     def GetAllItems(self):
         return [""Item 1"", ""Item 2"", ""Item 3""]
@@ -197,6 +197,31 @@ class StringItemSource:
         }
         
         [Fact]
+        public void GenericTypesAreIncludedWithCorrectName()
+        {
+            var pythonCode =
+                @"
+class Something(GenericClass[str]):
+    def GetString(self, something):
+        return str(something)
+";
+
+            var _engine = Python.CreateEngine();
+            var script = _engine.CreateScriptSourceFromString(pythonCode);
+            var scope = _engine.CreateScope();
+
+            scope.InjectType(typeof(GenericClass<>));
+            Assert.True(scope.ContainsVariable("GenericClass"));
+
+            script.Execute(scope);
+            var cls = scope.GetVariable("Something");
+            var instance = cls();
+            Assert.IsAssignableFrom<GenericClass<String>>(instance);
+            var e = (GenericClass<string>) instance;
+            Assert.Equal("Babalu", e.GetString("Babalu"));
+        }
+        
+        [Fact]
         public void CanImportJustOneItemIntoPythonClassUsingDecorator()
         {
             var pythonCode =
@@ -208,7 +233,6 @@ class StringItemSource:
 ";
 
             var _engine = Python.CreateEngine();
-            var paths = _engine.GetSearchPaths();
             var script = _engine.CreateScriptSourceFromString(pythonCode);
             
             var typeExtractor = new ExtractTypesFromScript(_engine);
@@ -230,11 +254,11 @@ class StringItemSource:
         {
             var ironpythonDir = "IronPythonCommands".AsNewDirectoryInfo();
             @"
-@exports(IItemSource)
+@export(IItemSource)
 class StringItemSource(BasePythonItemSource):
     def GetAllItems(self):
         return [""Item 1"", ""Item 2"", ""Item 3""]
-".WriteToFileInPath(ironpythonDir, "python.ipy");
+".WriteToFileInPath(ironpythonDir, "python.py");
 
             var container = new CompositionContainer(new TypeCatalog(typeof(MockImporter)));
 
@@ -247,12 +271,12 @@ class StringItemSource(BasePythonItemSource):
             Assert.Equal(1, importer.ItemSources.Count());
 
             var newCode = @"
-@exports(IItemSource)
+@export(IItemSource)
 class StringItemSource(BasePythonItemSource):
     def GetAllItems(self):
         return [""Item 1"", ""Item 2"", ""Item 3""]
 
-@exports(IItemSource)
+@export(IItemSource)
 class SecondStringItemSource(BasePythonItemSource):
     def GetAllItems(self):
         return [""Item 1"", ""Item 2"", ""Item 3""]
@@ -261,7 +285,7 @@ class SecondStringItemSource(BasePythonItemSource):
 
             EventHelper.WaitForEvent(e => commands.RefreshedFiles += e,
                 e => commands.RefreshedFiles -= e,
-                () => newCode.WriteToFileInPath(ironpythonDir, "python.ipy"));
+                () => newCode.WriteToFileInPath(ironpythonDir, "python.py"));
 
             importer = container.GetExportedValue<MockImporter>();
             Assert.Equal(2, importer.ItemSources.Count());
@@ -286,6 +310,11 @@ class StringItemSource(BasePythonItemSource):
         }
 
         
+    }
+
+    public abstract class GenericClass<T>
+    {
+        public abstract string GetString(T t);
     }
 
     [Export(typeof(MockImporter))]

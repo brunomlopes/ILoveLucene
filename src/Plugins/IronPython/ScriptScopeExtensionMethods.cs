@@ -8,7 +8,10 @@ namespace Plugins.IronPython
     {
         public static void InjectType(this ScriptScope scope, Type t)
         {
-            scope.SetVariable(t.Name, ClrModule.GetPythonType(t));
+            string name = t.Name;
+            if (t.IsGenericTypeDefinition)
+                name = name.Substring(0, name.IndexOf('`'));
+            scope.SetVariable(name, ClrModule.GetPythonType(t));
         }
     }
 }

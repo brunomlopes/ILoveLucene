@@ -9,6 +9,7 @@ using IronPython.Runtime;
 using IronPython.Runtime.Types;
 using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.Scripting.Hosting;
+using Plugins.Commands;
 
 namespace Plugins.IronPython
 {
@@ -38,6 +39,8 @@ namespace Plugins.IronPython
                                 typeof (IItemSource),
                                 typeof (BaseItemSource),
                                 typeof (IConverter),
+                                typeof (ICommand),
+                                typeof (IRequest),
                                 typeof (IActOnItem),
                                 typeof (IActOnItemWithArguments),
                                 typeof (BasePythonItemSource),

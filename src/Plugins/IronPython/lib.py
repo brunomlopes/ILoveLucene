@@ -10,7 +10,7 @@ def import_one(type, is_recomposable = True):
         return method
     return _
 
-def exports(type):
+def export(type):
     def _(cls):
         exports = []
         try:

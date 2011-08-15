@@ -18,6 +18,7 @@ namespace Plugins.IronPython
 {
     public class IronPythonCommandsMefExport : IStartupTask
     {
+        private const string IronPythonScriptExtension = ".py";
         private readonly CompositionContainer _mefContainer;
         private readonly ILog _log;
         private ScriptEngine _engine;
@@ -51,14 +52,14 @@ namespace Plugins.IronPython
                 foreach (var directory in GetIronPythonPluginsDirectories())
                 {
                     var pythonFiles =
-                        directory.GetFiles().Where(f => f.Extension.ToLowerInvariant() == ".ipy");
+                        directory.GetFiles().Where(f => f.Extension.ToLowerInvariant() == IronPythonScriptExtension);
 
                     foreach (var pythonFile in pythonFiles)
                     {
                         AddIronPythonFile(pythonFile);
                     }
 
-                    var watcher = new FileSystemWatcher(directory.FullName, "*.ipy");
+                    var watcher = new FileSystemWatcher(directory.FullName, "*"+IronPythonScriptExtension);
                     watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
                                            | NotifyFilters.FileName | NotifyFilters.DirectoryName;
                     watcher.Created += new FileSystemEventHandler(_watcher_Created);
@@ -85,8 +86,9 @@ namespace Plugins.IronPython
         {
             if (_files.ContainsKey(e.OldFullPath))
             {
-                _files[e.OldFullPath].Decompose();
+                _log.Info("Removing and decomposing file {0}", e.OldFullPath);
                 _files.Remove(e.OldFullPath);
+                _files[e.OldFullPath].Decompose();
             }
             else
             {
@@ -94,6 +96,7 @@ namespace Plugins.IronPython
             }
             if (_files.ContainsKey(e.FullPath))
             {
+                _log.Info("Removing and decomposing file {0}", e.FullPath);
                 _files[e.FullPath].Decompose();
                 _files.Remove(e.FullPath);
             }
@@ -108,6 +111,7 @@ namespace Plugins.IronPython
                 _log.Warn("File {0} not found in the ironpython cache but got notified it changed");
                 return;
             }
+            _log.Info("Reloading file {0}", e.FullPath);
             _files[e.FullPath].Compose();
             RefreshedFiles(this, new EventArgs());
 
@@ -121,6 +125,7 @@ namespace Plugins.IronPython
                 return;
             }
             var f = _files[e.FullPath];
+            _log.Info("Removing and decomposing file {0}", e.FullPath);
             _files.Remove(e.FullPath);
             f.Decompose();
             RefreshedFiles(this, new EventArgs());
@@ -135,15 +140,32 @@ namespace Plugins.IronPython
 
         private void AddIronPythonFile(FileInfo pythonFile)
         {
+            _log.Debug("Loading ironpython file {0}", pythonFile.FullName);
             var file = new IronPythonFile(pythonFile, _engine, _mefContainer, new ExtractTypesFromScript(_engine));
             _files[pythonFile.FullName] = file;
-            file.Compose();
+            try
+            {
+                file.Compose();
+            }
+            catch (Plugins.IronPython.IronPythonFile.PythonException e)
+            {
+                _log.Error(e, "Error executing file {0}:{1}", pythonFile.FullName, e.Message);
+            }
+            catch (Exception e)
+            {
+                _log.Error(e, "Error executing file {0}:{1}", pythonFile.FullName, e.Message);
+            }
         }
 
 
         private IEnumerable<DirectoryInfo> GetIronPythonPluginsDirectories()
         {
-            foreach (var directory in CoreConfiguration.ExpandPaths(Configuration.ScriptDirectories).Select(p => new DirectoryInfo(p)))
+            IEnumerable<DirectoryInfo> directoryInfos = CoreConfiguration
+                .ExpandPaths(Configuration.ScriptDirectories)
+                .Select(p => Path.GetFullPath(p))
+                .Distinct()
+                .Select(p => new DirectoryInfo(p));
+            foreach (var directory in directoryInfos)
             {
                 if(!directory.Exists)
                 {
