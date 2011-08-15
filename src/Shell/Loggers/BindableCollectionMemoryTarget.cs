@@ -8,6 +8,8 @@ namespace ILoveLucene.Loggers
     public class BindableCollectionMemoryTarget : Target
     {
         private readonly int _limit;
+        private object _messagesLock = new object();
+
         public BindableCollectionMemoryTarget()
         {
             _messages = new BindableCollection<LogEventInfo>();
@@ -16,14 +18,19 @@ namespace ILoveLucene.Loggers
 
         protected override void Write(LogEventInfo logEvent)
         {
-            Messages.Add(logEvent);
-            if (Messages.Count > _limit)
+            lock (_messagesLock)
             {
-                while (Messages.Count > _limit) Messages.RemoveAt(0);
+                Messages.Add(logEvent);
+                if (Messages.Count > _limit)
+                {
+                    while (Messages.Count > _limit) Messages.RemoveAt(0);
+                }
             }
+
         }
 
         private readonly IObservableCollection<LogEventInfo> _messages;
+
         public IObservableCollection<LogEventInfo> Messages
         {
             get { return _messages; }

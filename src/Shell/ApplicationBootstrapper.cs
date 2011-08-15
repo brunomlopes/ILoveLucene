@@ -21,10 +21,14 @@ using ILoveLucene.Infrastructure;
 using ILoveLucene.Loggers;
 using ILoveLucene.Modules;
 using ILoveLucene.ViewModels;
+using Plugins.IronPython;
+using Plugins.Tasks;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Simpl;
 using ILog = Core.Abstractions.ILog;
+using LogManager = NLog.LogManager;
+using Task = System.Threading.Tasks.Task;
 
 namespace ILoveLucene
 {
@@ -113,6 +117,7 @@ namespace ILoveLucene
             builder.RegisterType<FileSystemLearningRepository>().As<ILearningRepository>().WithParameter("input", learningStorageLocation);
             builder.RegisterType<ScheduleIndexJobs>().As<IStartupTask>();
             builder.RegisterType<ScheduleUpdateCheckJob>().As<IStartupTask>();
+            builder.RegisterType<IronPythonCommandsMefExport>().As<IStartupTask>();
 
             builder.RegisterType<SeparateIndexesDirectoryFactory>()
                 .As<IDirectoryFactory>().WithParameter("root", indexStorageLocation)
@@ -128,7 +133,21 @@ namespace ILoveLucene
             MefContainer.Compose(hack);
 
             Container.Resolve<IScheduler>().Start();
-            Container.Resolve<IEnumerable<IStartupTask>>().AsParallel().ForAll(t => t.Execute());
+            Task.Factory.StartNew(ExecuteStartupTasks);
+        }
+
+        private void ExecuteStartupTasks()
+        {
+            var log = LogManager.GetLogger("StartupTasks");
+            Container
+                .Resolve<IEnumerable<IStartupTask>>()
+                .AsParallel()
+                .ForAll(t =>
+                            {
+                                log.Info("Startup task {0} starting", t.GetType().FullName);
+                                t.Execute();
+                                log.Info("Startup task {0} done", t.GetType().FullName);
+                            });
         }
 
         protected override void OnExit(object sender, EventArgs e)

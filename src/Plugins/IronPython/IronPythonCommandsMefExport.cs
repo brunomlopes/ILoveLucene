@@ -16,7 +16,6 @@ using Microsoft.Scripting.Hosting;
 
 namespace Plugins.IronPython
 {
-    //[Export(typeof(IStartupTask))]
     public class IronPythonCommandsMefExport : IStartupTask
     {
         private readonly CompositionContainer _mefContainer;
@@ -33,7 +32,6 @@ namespace Plugins.IronPython
         [ImportConfiguration]
         public Configuration Configuration { get; set; }
 
-        [ImportingConstructor]
         public IronPythonCommandsMefExport(CompositionContainer mefContainer, ILog log)
         {
             _mefContainer = mefContainer;
@@ -145,12 +143,11 @@ namespace Plugins.IronPython
 
         private IEnumerable<DirectoryInfo> GetIronPythonPluginsDirectories()
         {
-            foreach (var directoryPath in CoreConfiguration.ExpandPaths(Configuration.ScriptDirectories))
+            foreach (var directory in CoreConfiguration.ExpandPaths(Configuration.ScriptDirectories).Select(p => new DirectoryInfo(p)))
             {
-                var directory = new DirectoryInfo(directoryPath);
                 if(!directory.Exists)
                 {
-                    _log.Warn("Directory {0} doesn't exist", directoryPath);
+                    _log.Warn("Directory {0} doesn't exist", directory.FullName);
                     continue;
                 }
                 yield return directory;
