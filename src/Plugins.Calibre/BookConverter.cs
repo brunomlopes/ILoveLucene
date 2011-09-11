@@ -31,7 +31,8 @@ namespace Plugins.Calibre
             coreDoc.Store("title", t.Title)
                 .Store("authors", t.Authors)
                 .Store("id", t.Id.ToString())
-                .Store("format", t.Formats.ToArray());
+                .Store("format", t.Formats.ToArray())
+                .SetItemIdForLearning(ToName(t));
 
             return coreDoc;
         }

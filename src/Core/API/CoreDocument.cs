@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Extensions;
 using Lucene.Net.Documents;
 
 namespace Core.API
@@ -59,6 +60,14 @@ namespace Core.API
             return Store(SpecialFields.LearningId, id);
         }
 
+        /// <summary>
+        /// Use this value in the learning hash instead of the item id.
+        /// Used by process source to learn based on window title instead of process identifier
+        /// </summary>
+        public CoreDocument SetItemIdForLearning(string id)
+        {
+            return Store(SpecialFields.LearningId, Hash.HashStrings(ConverterId, id, SourceId));
+        }
 
         public CoreDocument Tag(string tag)
         {

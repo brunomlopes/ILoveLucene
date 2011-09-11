@@ -2,7 +2,6 @@
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using Core.API;
-using Core.Extensions;
 
 namespace Plugins.Processes
 {
@@ -24,7 +23,7 @@ namespace Plugins.Processes
         {
             var document = new CoreDocument(itemSource, this, ToId(t), ToName(t), ToType(t))
                 .Store("id", t.Id.ToString())
-                .SetLearningId(Hash.HashStrings(this.GetId(), ToName(t), itemSource.Id));
+                .SetItemIdForLearning(ToName(t));
             return document;
         }
 
