@@ -6,6 +6,7 @@ using Core;
 
 namespace ILoveLucene.AutoUpdate
 {
+    [Export(typeof(ModuleVersionRegistry))]
     public class ModuleVersionRegistry
     {
         private Dictionary<string, IModuleVersion> _moduleVersions;
