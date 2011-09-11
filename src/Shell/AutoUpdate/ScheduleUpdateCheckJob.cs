@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using Core.API;
 using Core.Abstractions;
 using Quartz;
 

@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Core.API;
 using Core.Abstractions;
 using Microsoft.Win32;
 

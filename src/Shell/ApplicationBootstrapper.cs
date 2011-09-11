@@ -11,6 +11,7 @@ using System.Windows;
 using Autofac;
 using Caliburn.Micro;
 using Core;
+using Core.API;
 using Core.Abstractions;
 using Core.Lucene;
 using Core.Scheduler;

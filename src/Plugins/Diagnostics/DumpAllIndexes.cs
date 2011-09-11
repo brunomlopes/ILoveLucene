@@ -1,6 +1,7 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using Core;
+using Core.API;
 using Core.Abstractions;
 using Core.Lucene;
 using Lucene.Net.Analysis;

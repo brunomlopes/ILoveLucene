@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Core.API;
 using Core.Abstractions;
 
 namespace Plugins.Calibre

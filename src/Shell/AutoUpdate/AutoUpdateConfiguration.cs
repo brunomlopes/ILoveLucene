@@ -1,3 +1,4 @@
+using Core.API;
 using Core.Abstractions;
 
 namespace ILoveLucene.AutoUpdate

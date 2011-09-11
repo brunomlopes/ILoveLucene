@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
-namespace Core.Abstractions
+namespace Core.API
 {
     public class ArgumentAutoCompletionResult
     {

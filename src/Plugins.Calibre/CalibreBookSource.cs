@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Core.API;
 using Core.Abstractions;
 using System.Xml.XPath;
 

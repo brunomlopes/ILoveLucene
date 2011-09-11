@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using Core.API;
 using Core.Abstractions;
 using Lucene.Net.Documents;
 
@@ -12,9 +13,9 @@ namespace Plugins.Commands
         [ImportMany(AllowRecomposition = true)]
         public IEnumerable<T> Items { get; set; }
 
-        public IItem FromDocumentToItem(Document document)
+        public IItem FromDocumentToItem(CoreDocument document)
         {
-            var fullname = document.GetField("fullname").StringValue();
+            var fullname = document.GetString("fullname");
             var export =
                 Items.SingleOrDefault(c => c.GetType().FullName == fullname);
 
@@ -28,10 +29,10 @@ namespace Plugins.Commands
             return t.GetType().FullName;
         }
 
-        public Document ToDocument(T t)
+        public CoreDocument ToDocument(IItemSource itemSource, T t)
         {
-            var document = new Document();
-            document.Add(new Field("fullname", t.GetType().FullName, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
+            var document = new CoreDocument(itemSource, this, ToId(t), ToName(t), ToType(t));
+            document.Store("fullname", t.GetType().FullName);
             return document;
         }
 

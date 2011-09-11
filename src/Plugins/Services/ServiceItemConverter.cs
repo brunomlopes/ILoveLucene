@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.Composition;
 using System.Linq;
 using System.ServiceProcess;
+using Core.API;
 using Core.Abstractions;
 using Core.Extensions;
 using Lucene.Net.Documents;
@@ -10,9 +11,9 @@ namespace Plugins.Services
     [Export(typeof(IConverter))]
     public class ServiceItemConverter : IConverter<ServiceController>
     {
-        public IItem FromDocumentToItem(Document document)
+        public IItem FromDocumentToItem(CoreDocument document)
         {
-            var name = document.String("id");
+            var name = document.GetString("id");
             return new ServiceTypedItem(ServiceController.GetServices().Single(s => s.ServiceName == name));
         }
 
@@ -21,9 +22,11 @@ namespace Plugins.Services
             return t.ServiceName;
         }
 
-        public Document ToDocument(ServiceController t)
+        public CoreDocument ToDocument(IItemSource itemSource, ServiceController t)
         {
-            return this.Document().Store("id", t.ServiceName);
+            var document = new CoreDocument(itemSource, this, ToId(t), ToName(t), ToType(t));
+            document.Store("id", t.ServiceName.ToString());
+            return document;
         }
 
         public string ToName(ServiceController t)

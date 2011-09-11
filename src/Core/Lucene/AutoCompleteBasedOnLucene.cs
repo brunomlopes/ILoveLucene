@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using Core.API;
 using Core.Abstractions;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.QueryParsers;

@@ -78,6 +78,7 @@
     <Compile Include="IndexerTests.cs" />
     <Compile Include="IronPythonSupportTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TasksTests.cs" />
     <Compile Include="TokenizingTests.cs" />
   </ItemGroup>
   <ItemGroup>

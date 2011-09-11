@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using Core.API;
 using Core.Abstractions;
 using Lucene.Net.Documents;
 using Core.Extensions;
@@ -10,9 +11,9 @@ namespace Plugins.Processes
     [Export(typeof (IConverter))]
     public class ProcessConverter : IConverter<Process>
     {
-        public IItem FromDocumentToItem(Document document)
+        public IItem FromDocumentToItem(CoreDocument document)
         {
-            var id = int.Parse(document.GetField("id").StringValue());
+            var id = int.Parse(document.GetString("id"));
             return new ProcessItem(Process.GetProcessById(id));
         }
 
@@ -21,9 +22,11 @@ namespace Plugins.Processes
             return t.Id.ToString();
         }
 
-        public Document ToDocument(Process t)
+        public CoreDocument ToDocument(IItemSource itemSource, Process t)
         {
-            return this.Document().Store("id", t.Id.ToString());
+            var document = new CoreDocument(itemSource, this, ToId(t), ToName(t), ToType(t));
+            document.Store("id", t.Id.ToString());
+            return document;
         }
 
         public string ToName(Process t)

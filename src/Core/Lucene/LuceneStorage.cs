@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Core.API;
 using Core.Abstractions;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
@@ -30,83 +32,46 @@ namespace Core.Lucene
         public void UpdateDocumentForItem<T>(IndexWriter writer, IItemSource source, string tag, T item)
         {
             var converter = _converterRepository.GetConverterForType<T>();
-            var converterId = converter.GetId();
-            var id = converter.ToId(item);
-            var name = converter.ToName(item);
-            var document = converter.ToDocument(item);
-            var type = converter.ToType(item);
-            var sourceId = source.Id;
+            var document = converter.ToDocument(source, item);
 
-            var documentId = new DocumentId(converterId, id, sourceId);
-            var hash = documentId.GetSha1();
+            var id = document.GetDocumentId();
+            var documentId = id.GetId();
+            var learningId = id.GetLearningId();
 
-            PopDocument(writer, hash); //deleting the old version of the doc
+            PopDocument(writer, documentId); //deleting the old version of the doc
 
-            var learnings = _learningRepository.LearningsFor(hash);
+            document.SetLearnings(_learningRepository.LearningsFor(learningId));
+            document.Tag(tag);
 
-            document.Add(new Field(SpecialFields.Id, id, Field.Store.YES,
-                                   Field.Index.NOT_ANALYZED_NO_NORMS,
-                                   Field.TermVector.NO));
-            document.Add(new Field(SpecialFields.Name, name, Field.Store.YES,
-                                   Field.Index.ANALYZED,
-                                   Field.TermVector.WITH_POSITIONS_OFFSETS));
-            document.Add(new Field(SpecialFields.Type, type, Field.Store.YES,
-                                   Field.Index.ANALYZED,
-                                   Field.TermVector.WITH_POSITIONS_OFFSETS));
-            foreach (string learning in learnings.Where(learning => !string.IsNullOrWhiteSpace(learning)))
-            {
-                document.Add(FieldForLearning(learning));
-            }
-           
-            document.Add(new Field(SpecialFields.ConverterId, converterId, Field.Store.YES,
-                                   Field.Index.NOT_ANALYZED_NO_NORMS,
-                                   Field.TermVector.NO));
-            document.Add(new Field(SpecialFields.SourceId, sourceId, Field.Store.YES,
-                                   Field.Index.NOT_ANALYZED_NO_NORMS,
-                                   Field.TermVector.NO));
-            document.Add(new Field(SpecialFields.Tag, tag, Field.Store.YES,
-                                   Field.Index.NOT_ANALYZED_NO_NORMS,
-                                   Field.TermVector.NO));
-            document.Add(new Field(SpecialFields.Sha1, hash, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS,
-                                   Field.TermVector.NO));
             writer.AddDocument(document);
         }
 
-
+   
         public AutoCompletionResult.CommandResult GetCommandResultForDocument(Document document, Explanation explanation)
         {
-            var converterId = document.GetField(SpecialFields.ConverterId).StringValue();
-           
-            var command = _converterRepository.GetConverterForId(converterId).FromDocumentToItem(document);
+            var coreDoc = CoreDocument.Rehydrate(document);
+            var command = _converterRepository.GetConverterForId(coreDoc.ConverterId).FromDocumentToItem(coreDoc);
 
-            return new AutoCompletionResult.CommandResult(command, new DocumentId(document), explanation);
+            return new AutoCompletionResult.CommandResult(command, coreDoc.GetDocumentId(), explanation);
         }
 
-        public void LearnCommandForInput(IndexWriter writer, DocumentId commandId, string input)
+        public void LearnCommandForInput(IndexWriter writer, DocumentId completionId, string input)
         {
             // fickle command, isn't learnable
-            if (commandId == null) return;
+            if (completionId == null) return;
 
-            string commandIdHash = commandId.GetSha1();
-            var document = PopDocument(writer, commandIdHash);
+            var document = CoreDocument.Rehydrate(PopDocument(writer, completionId.GetId()));
 
             if (document == null)
-                throw new InvalidOperationException(string.Format("Didn't find command {0}", commandId));
+                throw new InvalidOperationException(string.Format("Didn't find command {0}", completionId));
 
-            var learnings = _learningRepository.LearnFor(input, commandIdHash);
+            var learnings = _learningRepository.LearnFor(input, completionId.GetLearningId());
             
-            var field = document.GetFields(SpecialFields.Learnings);
-            
-            if (field != null && field.Length > 0)
-            {
-                document.RemoveFields(SpecialFields.Learnings);
-            }
-            foreach (string learning in learnings.Where(learning => !string.IsNullOrWhiteSpace(learning)))
-            {
-                document.Add(FieldForLearning(learning));
-            }
+            document.SetLearnings(learnings);
+
             writer.AddDocument(document);
         }
+
 
         public void DeleteDocumentsForSourceWithoutTag(IndexWriter indexWriter, IItemSource source, string tag)
         {
@@ -116,15 +81,6 @@ namespace Core.Lucene
             query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.Tag, tag)),
                                         BooleanClause.Occur.MUST_NOT));
             indexWriter.DeleteDocuments(query);
-        }
-
-        private static Field FieldForLearning(string learning)
-        {
-            var field = new Field(SpecialFields.Learnings, learning, Field.Store.YES,
-                                  Field.Index.ANALYZED,
-                                  Field.TermVector.WITH_POSITIONS_OFFSETS);
-            field.SetBoost(2);
-            return field;
         }
 
         private Document PopDocument(IndexWriter writer, string sha1)

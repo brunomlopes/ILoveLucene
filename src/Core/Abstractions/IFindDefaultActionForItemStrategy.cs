@@ -1,3 +1,5 @@
+using Core.API;
+
 namespace Core.Abstractions
 {
     public interface IFindDefaultActionForItemStrategy

@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.API;
 using Core.Abstractions;
 
 namespace Plugins.Processes

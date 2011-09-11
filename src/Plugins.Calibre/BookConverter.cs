@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Composition;
+using Core.API;
 using Core.Abstractions;
 using Lucene.Net.Documents;
 
@@ -7,37 +8,32 @@ namespace Plugins.Calibre
     [Export(typeof(IConverter))]
     public class BookConverter : IConverter<Book>
     {
-        public IItem FromDocumentToItem(Document document)
+        public IItem FromDocumentToItem(CoreDocument document)
         {
             var book = new Book();
-            book.Title = document.GetField("title").StringValue();
-            book.Authors = document.GetField("authors").StringValue();
-            book.Id = int.Parse(document.GetField("id").StringValue());
-            foreach (var field in document.GetFields("format"))
-            {
-                book.Formats.Add(field.StringValue());
-            }
+            book.Title = document.GetString("title");
+            book.Authors = document.GetString("authors");
+            book.Id = int.Parse(document.GetString("id"));
+            book.Formats.AddRange(document.GetStringList("formats"));
+            
             return book;
         }
-
 
         public string ToId(Book t)
         {
             return t.Id.ToString();
         }
 
-        public Document ToDocument(Book t)
+        public CoreDocument ToDocument(IItemSource itemSource, Book t)
         {
-            var document = new Document();
-            document.Add(new Field("title", t.Title, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
-            document.Add(new Field("authors", t.Authors, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
-            document.Add(new Field("id", t.Id.ToString(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
+            var coreDoc = new CoreDocument(itemSource, this, ToId(t), ToName(t), ToType(t));
 
-            foreach (var format in t.Formats)
-            {
-                document.Add(new Field("format", format, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));                
-            }
-            return document;
+            coreDoc.Store("title", t.Title)
+                .Store("authors", t.Authors)
+                .Store("id", t.Id.ToString())
+                .Store("format", t.Formats.ToArray());
+
+            return coreDoc;
         }
 
         public string ToName(Book t)

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.IO;
 using Core;
+using Core.API;
 using Core.Abstractions;
 
 namespace Plugins.Shortcuts

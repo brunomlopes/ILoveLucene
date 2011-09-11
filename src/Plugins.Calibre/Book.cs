@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.API;
 using Core.Abstractions;
 
 namespace Plugins.Calibre

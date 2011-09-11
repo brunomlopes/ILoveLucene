@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using Core.Abstractions;
-using Lucene.Net.Store;
 using Quartz;
 using Core.Extensions;
 

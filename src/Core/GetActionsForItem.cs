@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using Core.API;
 using Core.Abstractions;
+using Core.Extensions;
 
 namespace Core
 {
@@ -82,7 +84,7 @@ namespace Core
 
         private void LearnForResult(AutoCompletionResult.CommandResult result, IActOnItem selectedAction)
         {
-            _learnings[result.CompletionId.GetSha1()] = selectedAction;
+            _learnings[result.CompletionId.GetLearningId()] = selectedAction;
         }
 
         private void LearnForType(Type type, IActOnItem selectedAction)
@@ -109,7 +111,7 @@ namespace Core
             IActOnItem actionForResult = null;
             if (result.CompletionId != null)
             {
-                var sha1 = result.CompletionId.GetSha1();
+                var sha1 = result.CompletionId.GetLearningId();
                 if (_learnings.ContainsKey(sha1))
                 {
                     actionForResult = _learnings[sha1];

@@ -50,27 +50,46 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Abstractions\ArgumentAutoCompletionResult.cs" />
     <Compile Include="Abstractions\AutoCompletionResult.cs" />
-    <Compile Include="Abstractions\DocumentId.cs" />
-    <Compile Include="Abstractions\IActOnItem.cs" />
-    <Compile Include="Abstractions\IActOnItemExtension.cs" />
+    <Compile Include="API\ArgumentAutoCompletionResult.cs" />
+    <Compile Include="API\BaseActOnTypedItem.cs" />
+    <Compile Include="API\BaseActOnTypedItemAndReturnTypedItem.cs" />
+    <Compile Include="API\BaseItemSource.cs" />
+    <Compile Include="API\CoreDocument.cs" />
+    <Compile Include="API\DocumentId.cs" />
+    <Compile Include="API\IActOnItem.cs" />
+    <Compile Include="API\SpecialFields.cs" />
+    <Compile Include="Extensions\IActOnItemExtension.cs" />
     <Compile Include="Abstractions\IFindDefaultActionForItemStrategy.cs" />
     <Compile Include="Abstractions\IGetActionsForItem.cs" />
-    <Compile Include="Abstractions\IItem.cs" />
-    <Compile Include="Abstractions\IConverter.cs" />
-    <Compile Include="Abstractions\IItemSource.cs" />
+    <Compile Include="API\IActOnItemWithArguments.cs" />
+    <Compile Include="API\IActOnItemWithAutoCompletedArguments.cs" />
+    <Compile Include="API\IActOnTypedItem.cs" />
+    <Compile Include="API\IActOnTypedItemAndReturnItem.cs" />
+    <Compile Include="API\IActOnTypedItemAndReturnTypedItem.cs" />
+    <Compile Include="API\IActOnTypedItemWithArguments.cs" />
+    <Compile Include="API\IActOnTypedItemWithArgumentsAndReturnTypedItem.cs" />
+    <Compile Include="API\IActOnTypedItemWithAutoCompletedArguments.cs" />
+    <Compile Include="API\ICanActOnItem.cs" />
+    <Compile Include="API\ICanActOnTypedItem.cs" />
+    <Compile Include="API\IConverterExtensions.cs" />
+    <Compile Include="API\IItem.cs" />
+    <Compile Include="API\IConverter.cs" />
+    <Compile Include="API\IItemSource.cs" />
     <Compile Include="Abstractions\ILoadConfiguration.cs" />
     <Compile Include="Abstractions\ILog.cs" />
-    <Compile Include="Abstractions\ImportConfigurationAttribute.cs" />
+    <Compile Include="API\ImportConfigurationAttribute.cs" />
     <Compile Include="Abstractions\IOnUiThread.cs" />
     <Compile Include="Abstractions\IStartupTask.cs" />
-    <Compile Include="Abstractions\PluginConfigurationAttribute.cs" />
+    <Compile Include="API\InvalidActionException.cs" />
+    <Compile Include="API\ITypedItem.cs" />
+    <Compile Include="API\NoReturnValue.cs" />
+    <Compile Include="API\PluginConfigurationAttribute.cs" />
     <Compile Include="Abstractions\TextItem.cs" />
-    <Compile Include="CoreConfiguration.cs" />
+    <Compile Include="ConverterRepository.cs" />
+    <Compile Include="API\CoreConfiguration.cs" />
     <Compile Include="DefaultActionAttribute.cs" />
     <Compile Include="Extensions\AnalyzerExtension.cs" />
-    <Compile Include="Extensions\DocumentExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="GetActionsForItem.cs" />
     <Compile Include="GetDefaultActionBasedOnAttributeForType.cs" />
@@ -79,8 +98,6 @@
     <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Lucene\AutoCompleteBasedOnLucene.cs" />
     <Compile Include="Lucene\AutoCompleteConfiguration.cs" />
-    <Compile Include="Lucene\ConverterRepository.cs" />
-    <Compile Include="Lucene\FsStaticDirectoryFactory.cs" />
     <Compile Include="Lucene\IConverterRepository.cs" />
     <Compile Include="Lucene\IDirectoryFactory.cs" />
     <Compile Include="Lucene\ILearningRepository.cs" />
@@ -92,13 +109,11 @@
     <Compile Include="Lucene\LuceneStorage.cs" />
     <Compile Include="Lucene\ScheduleIndexJobs.cs" />
     <Compile Include="Lucene\SourceStorageFactory.cs" />
-    <Compile Include="Lucene\SpecialFields.cs" />
     <Compile Include="Lucene\StaticDirectoryFactory.cs" />
     <Compile Include="ProgramVersionInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scheduler\MefJobFactory.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

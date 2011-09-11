@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.API;
 
 namespace Core.Abstractions
 {

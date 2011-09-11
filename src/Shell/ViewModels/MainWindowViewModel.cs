@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
 using Caliburn.Micro;
+using Core.API;
 using Core.Abstractions;
 using Core.Extensions;
 using Core.Lucene;

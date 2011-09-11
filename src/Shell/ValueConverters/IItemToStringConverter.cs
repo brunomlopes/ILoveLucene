@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
+using Core.API;
 using Core.Abstractions;
 
 namespace ILoveLucene.ValueConverters

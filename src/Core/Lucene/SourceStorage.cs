@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Core.API;
 using Core.Abstractions;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;

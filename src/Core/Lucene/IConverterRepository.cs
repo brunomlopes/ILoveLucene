@@ -1,4 +1,4 @@
-﻿using Core.Abstractions;
+﻿using Core.API;
 
 namespace Core.Lucene
 {

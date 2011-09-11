@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows;
+using Core.API;
 using Core.Abstractions;
 
 namespace Plugins.Calibre.Actions

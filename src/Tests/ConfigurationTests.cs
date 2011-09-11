@@ -3,6 +3,7 @@ using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
 using Core;
+using Core.API;
 using Core.Abstractions;
 using Newtonsoft.Json;
 using Plugins.Shortcuts;

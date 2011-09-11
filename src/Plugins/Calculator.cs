@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using Core.API;
 using Core.Abstractions;
 using IronPython.Hosting;
 using Microsoft.Scripting;

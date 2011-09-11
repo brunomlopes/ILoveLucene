@@ -7,6 +7,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using Core;
+using Core.API;
 using Core.Abstractions;
 using IronPython.Hosting;
 using System.Linq;

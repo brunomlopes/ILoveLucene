@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Core;
+using Core.API;
 using Core.Abstractions;
 using Core.Lucene;
 using ILoveLucene;
@@ -246,9 +248,9 @@ namespace Tests
 
     class Converter : IConverter<TextItem>
     {
-        public IItem FromDocumentToItem(Document document)
+        public IItem FromDocumentToItem(CoreDocument document)
         {
-            return new TextItem(document.GetField("id").StringValue());
+            return new TextItem(document.GetString("id"));
         }
 
         public string ToId(TextItem t)
@@ -256,10 +258,10 @@ namespace Tests
             return t.Text;
         }
 
-        public Document ToDocument(TextItem t)
+        public CoreDocument ToDocument(IItemSource itemSource, TextItem t)
         {
-            var document = new Document();
-            document.Add(new Field("id", t.Text, Field.Store.YES, Field.Index.NO));
+            var document = new CoreDocument(itemSource, this, ToId(t), ToName(t), ToType(t));
+            document.Store("id", t.Text);
             return document;
         }
 

@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Core.API;
 using Core.Abstractions;
 
 namespace Plugins.Processes

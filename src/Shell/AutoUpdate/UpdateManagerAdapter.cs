@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.Composition;
 using Core;
+using Core.API;
 using Core.Abstractions;
 using NAppUpdate.Framework;
 using NAppUpdate.Framework.Sources;

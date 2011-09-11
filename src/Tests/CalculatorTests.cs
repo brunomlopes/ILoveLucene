@@ -1,4 +1,5 @@
 using Core.Abstractions;
+using Core.Extensions;
 using Plugins;
 using Xunit;
 

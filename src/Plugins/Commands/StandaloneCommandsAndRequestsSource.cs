@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.API;
 using Core.Abstractions;
 
 namespace Plugins.Commands

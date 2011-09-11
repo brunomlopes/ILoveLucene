@@ -7,6 +7,7 @@ using System.ComponentModel.Composition.Primitives;
 using System.Linq;
 using System.Threading.Tasks;
 using Core;
+using Core.API;
 using Core.Abstractions;
 using ILoveLucene.Loggers;
 using IronPython.Hosting;

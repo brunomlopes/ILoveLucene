@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using System.ServiceProcess;
+using Core.API;
 using Core.Abstractions;
 
 namespace Plugins.Services

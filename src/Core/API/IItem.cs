@@ -1,6 +1,4 @@
-using System;
-
-namespace Core.Abstractions
+namespace Core.API
 {
     public interface IItem
     {
@@ -12,10 +10,5 @@ namespace Core.Abstractions
         string Description { get; }
 
         object Item { get; }
-    }
-
-    public interface ITypedItem<out T> : IItem
-    {
-        T TypedItem { get; }
     }
 }

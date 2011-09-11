@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Linq;
+using Core.API;
 using Core.Abstractions;
 using Newtonsoft.Json;
 

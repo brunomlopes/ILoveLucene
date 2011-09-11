@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Core;
+using Core.API;
 using Core.Abstractions;
 using Lucene.Net.Documents;
 using Newtonsoft.Json;
@@ -110,9 +111,9 @@ namespace Plugins.Tasks
         [Import]
         public TaskRepository Repository { get; set; }
 
-        public IItem FromDocumentToItem(Document document)
+        public IItem FromDocumentToItem(CoreDocument document)
         {
-            return Repository.FromFileName(document.GetField("filename").StringValue());
+            return Repository.FromFileName(document.GetString("filename"));
         }
 
         public string ToId(Task t)
@@ -120,10 +121,10 @@ namespace Plugins.Tasks
             return t.FileName;
         }
 
-        public Document ToDocument(Task t)
+        public CoreDocument ToDocument(IItemSource itemSource, Task t)
         {
-            var document = new Document();
-            document.Add(new Field("filename", t.FileName, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
+            var document = new CoreDocument(itemSource, this, ToId(t), ToName(t), ToType(t));
+            document.Store("filename", t.FileName);
             return document;
         }
 

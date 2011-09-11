@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using Core.API;
 using Core.Abstractions;
+using Core.Lucene;
 
-namespace Core.Lucene
+namespace Core
 {
     public class ConverterRepository : IConverterRepository
     {
@@ -19,7 +21,7 @@ namespace Core.Lucene
             set
             {
                 _converters = value;
-                _convertersPerId = _converters.ToDictionary(c => c.GetId());
+                _convertersPerId = _converters.ToDictionary(c => c.GetType().FullName);
             }
         }
 

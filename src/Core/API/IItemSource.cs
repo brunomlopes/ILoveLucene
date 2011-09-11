@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Lucene.Net.Store;
 
-namespace Core.Abstractions
+namespace Core.API
 {
     public interface IItemSource
     {
@@ -14,20 +12,5 @@ namespace Core.Abstractions
         /// Otherwise we use an in memory directory
         /// </summary>
         bool Persistent { get; }
-    }
-
-    public abstract class BaseItemSource : IItemSource
-    {
-        public abstract Task<IEnumerable<object>> GetItems();
-
-        public virtual string Id
-        {
-            get { return GetType().FullName; }
-        }
-
-        public virtual bool Persistent
-        {
-            get { return true; }
-        }
     }
 }

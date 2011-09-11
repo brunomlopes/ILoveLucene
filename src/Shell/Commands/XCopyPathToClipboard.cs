@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Windows;
+using Core.API;
 using Core.Abstractions;
 
 namespace ILoveLucene.Commands

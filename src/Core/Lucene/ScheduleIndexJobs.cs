@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Reflection;
+using Core.API;
 using Core.Abstractions;
 using Quartz;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace Core.Lucene
             [Export("IIndexer.JobGroup")]
             public static string JobGroup = "Indexers";
         }
+
         private readonly SourceStorageFactory _sourceStorageFactory;
         private readonly IScheduler _scheduler;
 

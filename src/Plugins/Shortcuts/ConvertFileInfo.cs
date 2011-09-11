@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.IO;
+using Core.API;
 using Core.Abstractions;
 using Core.Extensions;
 using Lucene.Net.Documents;
@@ -25,20 +26,17 @@ namespace Plugins.Shortcuts
             return t.FriendlyTypeName();
         }
 
-        public Document ToDocument(FileInfo fileInfo)
+        public CoreDocument ToDocument(IItemSource itemSource, FileInfo fileInfo)
         {
-            var name = new Field("filename", Path.GetFileNameWithoutExtension(fileInfo.Name), Field.Store.YES,
-                                 Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
-            var path = new Field("filepath", fileInfo.FullName, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS);
-            var document = new Document();
-            document.Add(name);
-            document.Add(path);
+            var document = new CoreDocument(itemSource, this, ToId(fileInfo), ToName(fileInfo), ToType(fileInfo));
+            document.Store("filename", Path.GetFileNameWithoutExtension(fileInfo.Name));
+            document.Store("filepath", fileInfo.FullName);
             return document;
         }
 
-        public IItem FromDocumentToItem(Document document)
+        public IItem FromDocumentToItem(CoreDocument document)
         {
-            return new FileInfoItem(new FileInfo(document.GetField("filepath").StringValue()));
+            return new FileInfoItem(new FileInfo(document.GetString("filepath")));
         }
     }
 }

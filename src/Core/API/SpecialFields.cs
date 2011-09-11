@@ -1,4 +1,4 @@
-﻿namespace Core.Lucene
+namespace Core.API
 {
     public static class SpecialFields
     {
@@ -10,6 +10,7 @@
         public const string Sha1 = "_sha1";
         public const string Name = "_name";
         public const string Learnings = "_learnings";
+        public const string LearningId = "_learningId";
         public const string Type = "_type";
     }
 }

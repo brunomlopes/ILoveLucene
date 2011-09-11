@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.IO;
+using Core.API;
 using Core.Abstractions;
 
 namespace Plugins.Shortcuts

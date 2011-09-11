@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.API;
 using Core.Lucene;
 using Lucene.Net.Search;
 

@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.ServiceProcess;
 using System.Threading.Tasks;
+using Core.API;
 using Core.Abstractions;
 using System.Linq;
 using ElevationHelper.Services;
