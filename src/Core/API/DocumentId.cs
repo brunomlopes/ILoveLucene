@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
+using Core.Extensions;
 
 namespace Core.API
 {
@@ -37,16 +35,7 @@ namespace Core.API
 
         private string GetSha1()
         {
-            var sha1 = SHA1.Create();
-            sha1.Initialize();
-
-            return
-                BitConverter.ToString(
-                    sha1.ComputeHash(Encoding.UTF8.GetBytes(_converterId)
-                                         .Concat(Encoding.UTF8.GetBytes(Id))
-                                         .Concat(Encoding.UTF8.GetBytes(SourceId))
-                                         .ToArray()))
-                    .Replace("-", "");
+            return Hash.HashStrings(_converterId, Id, SourceId);
         }
     }
 }

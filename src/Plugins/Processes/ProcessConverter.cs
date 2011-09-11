@@ -2,8 +2,6 @@
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using Core.API;
-using Core.Abstractions;
-using Lucene.Net.Documents;
 using Core.Extensions;
 
 namespace Plugins.Processes
@@ -24,8 +22,9 @@ namespace Plugins.Processes
 
         public CoreDocument ToDocument(IItemSource itemSource, Process t)
         {
-            var document = new CoreDocument(itemSource, this, ToId(t), ToName(t), ToType(t));
-            document.Store("id", t.Id.ToString());
+            var document = new CoreDocument(itemSource, this, ToId(t), ToName(t), ToType(t))
+                .Store("id", t.Id.ToString())
+                .SetLearningId(Hash.HashStrings(this.GetId(), ToName(t), itemSource.Id));
             return document;
         }
 

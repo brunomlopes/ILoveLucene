@@ -54,10 +54,15 @@ namespace Core.API
             return this;
         }
 
-
-        public void Tag(string tag)
+        public CoreDocument SetLearningId(string id)
         {
-            Store(SpecialFields.Tag, tag);
+            return Store(SpecialFields.LearningId, id);
+        }
+
+
+        public CoreDocument Tag(string tag)
+        {
+            return Store(SpecialFields.Tag, tag);
         }
 
         public static implicit operator Document(CoreDocument document)

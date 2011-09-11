@@ -59,6 +59,7 @@
     <Compile Include="API\DocumentId.cs" />
     <Compile Include="API\IActOnItem.cs" />
     <Compile Include="API\SpecialFields.cs" />
+    <Compile Include="Extensions\Hash.cs" />
     <Compile Include="Extensions\IActOnItemExtension.cs" />
     <Compile Include="Abstractions\IFindDefaultActionForItemStrategy.cs" />
     <Compile Include="Abstractions\IGetActionsForItem.cs" />
