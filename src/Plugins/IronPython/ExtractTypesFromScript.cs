@@ -44,6 +44,13 @@ namespace Plugins.IronPython
                                 typeof (IRequest),
                                 typeof (IActOnItem),
                                 typeof (IActOnItemWithArguments),
+                                typeof (IActOnTypedItemWithArguments<>),
+                                typeof (IActOnTypedItemWithAutoCompletedArguments<>),
+                                typeof (ICanActOnTypedItem<>),
+                                typeof (IActOnTypedItemAndReturnItem<>),
+                                typeof (IActOnTypedItemAndReturnTypedItem<,>),
+                                typeof (IActOnTypedItemWithArgumentsAndReturnTypedItem<,>),
+                                typeof (ArgumentAutoCompletionResult),
                                 typeof (BasePythonItemSource),
                                 typeof (IronPythonImportDefinition)
                             };
