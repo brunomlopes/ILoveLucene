@@ -25,7 +25,15 @@ namespace Plugins.Diagnostics
         public override void Act()
         {
             var indexDirectory = Path.Combine(CoreConfiguration.DataDirectory, "MergedIndexes");
-            var mergedDirectory = new SimpleFSDirectory(new DirectoryInfo(indexDirectory));
+
+            var directoryInfo = new DirectoryInfo(indexDirectory);
+            if(directoryInfo.Exists)
+            {
+                directoryInfo.Delete(true);
+                directoryInfo.Refresh();
+            }
+
+            var mergedDirectory = new SimpleFSDirectory(directoryInfo);
             var mergedIndex = new IndexWriter(mergedDirectory, new SimpleAnalyzer(), true,
                                               IndexWriter.MaxFieldLength.UNLIMITED);
 

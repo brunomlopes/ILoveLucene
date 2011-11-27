@@ -38,7 +38,7 @@ namespace Core.Lucene
             var documentId = id.GetId();
             var learningId = id.GetLearningId();
 
-            PopDocument(writer, documentId); //deleting the old version of the doc
+            PopDocumentIfExists(writer, documentId); //deleting the old version of the doc
 
             document.SetLearnings(_learningRepository.LearningsFor(learningId));
             document.Tag(tag);
@@ -60,7 +60,7 @@ namespace Core.Lucene
             // fickle command, isn't learnable
             if (completionId == null) return;
 
-            var document = CoreDocument.Rehydrate(PopDocument(writer, completionId.GetId()));
+            var document = CoreDocument.Rehydrate(PopDocumentIfExists(writer, completionId.GetId()));
 
             if (document == null)
                 throw new InvalidOperationException(string.Format("Didn't find command {0}", completionId));
@@ -83,7 +83,7 @@ namespace Core.Lucene
             indexWriter.DeleteDocuments(query);
         }
 
-        private Document PopDocument(IndexWriter writer, string sha1)
+        private Document PopDocumentIfExists(IndexWriter writer, string sha1)
         {
             var searcher = new IndexSearcher(writer.GetDirectory(), false);
             try
