@@ -65,6 +65,7 @@ namespace Plugins.IronPython
             }
         }
 
+        [Serializable]
         public class SyntaxErrorExceptionPrettyWrapper : PythonException
         {
             private readonly SyntaxErrorException _innerException;

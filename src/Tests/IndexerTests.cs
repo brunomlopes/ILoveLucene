@@ -2,14 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Core;
 using Core.API;
 using Core.Abstractions;
 using Core.Lucene;
-using ILoveLucene;
 using ILoveLucene.Loggers;
-using Lucene.Net.Documents;
 using Lucene.Net.Store;
 using Xunit;
 using Directory = Lucene.Net.Store.Directory;
@@ -33,7 +32,14 @@ namespace Tests
 
             _learningRepository = new FileSystemLearningRepository(_storageLocation);
 
-            _directory = new RAMDirectory();
+            var indexLocation = new DirectoryInfo("index");
+            if(indexLocation.Exists)
+            {
+                indexLocation.Delete(true);
+                indexLocation.Refresh();
+            }
+
+            _directory = FSDirectory.Open(indexLocation);
         }
 
         [Fact]
@@ -189,6 +195,34 @@ namespace Tests
             Assert.Null(results.AutoCompletedCommand);
         }
 
+        [Fact]
+        public void CanFindPreviousItemsEvenWhenInTheMiddleOfAnIndex()
+        {
+            var storage = new LuceneStorage(_learningRepository, new ConverterRepository(new Converter()));
+            {
+                var source = new Source { Items = new  []{new TextItem("Firefox")} };
+                new SourceStorage(source, _directory, storage).IndexItems().Wait();
+            }
+            {
+                var source = new StepSource {Items = new[] {new TextItem("Firewall")}};
+
+                var task = new SourceStorage(source, _directory, storage).IndexItems();
+
+                var searcher = GetAutocompleter(storage);
+                var results = searcher.Autocomplete("Fire");
+                Assert.True(results.HasAutoCompletion);
+                Assert.Equal("Firefox",results.AutoCompletedCommand.Item.Text);
+
+                Assert.True(source.ReleaseNextItemAndWait(TimeSpan.FromSeconds(5)));
+                Assert.True(task.Wait(TimeSpan.FromSeconds(10)));
+
+                searcher = GetAutocompleter(storage);
+                results = searcher.Autocomplete("Fire");
+                Assert.True(results.HasAutoCompletion);
+                Assert.Equal("Firewall", results.AutoCompletedCommand.Item.Text);
+            }
+        }
+
         private AutoCompleteBasedOnLucene GetAutocompleter()
         {
             return GetAutocompleter(new LuceneStorage(_learningRepository, new ConverterRepository(new Converter())));
@@ -244,6 +278,51 @@ namespace Tests
         {
             return Task.Factory.StartNew(() => Items.Cast<object>());
         }
+
+        public override string Id
+        {
+            get { return "Tests.Source"; }
+        }
+    }
+
+    class StepSource : BaseItemSource
+    {
+        public IEnumerable<IItem> Items { get; set; }
+        private readonly SemaphoreSlim _itemsWaiter;
+        private readonly SemaphoreSlim _releasedANewItem;
+
+
+        public StepSource()
+        {
+            _itemsWaiter = new SemaphoreSlim(0);
+            _releasedANewItem = new SemaphoreSlim(0);
+        }
+
+        public override Task<IEnumerable<object>> GetItems()
+        {
+            return Task.Factory.StartNew(() => StepIterateItems());
+        }
+
+        public bool ReleaseNextItemAndWait(TimeSpan waitTimeout)
+        {
+            _itemsWaiter.Release();
+            return _releasedANewItem.Wait(waitTimeout);
+        }
+
+        public override string Id
+        {
+            get { return "Tests.Source"; } // Fake to be the same as the source
+        }
+
+        private IEnumerable<object> StepIterateItems()
+        {
+            foreach (var item in Items)
+            {
+                _itemsWaiter.Wait();
+                yield return item;
+                _releasedANewItem.Release();
+            }
+        } 
     }
 
     class Converter : IConverter<TextItem>
