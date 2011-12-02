@@ -50,14 +50,16 @@ namespace Core.Lucene
         private void IndexItems(IItemSource source, IEnumerable<object> items)
         {
             IndexWriter indexWriter = null;
+            IndexReader indexReader = null;
             try
             {
                 indexWriter = GetIndexWriter();
+                indexReader = indexWriter.GetReader();
                 var newTag = Guid.NewGuid().ToString();
 
                 foreach (var item in items)
                 {
-                    _storage.UpdateDocumentForObject(indexWriter, source, newTag, item);
+                    _storage.UpdateDocumentForObject(indexWriter, indexReader, source, newTag, item);
                 }
 
                 _storage.DeleteDocumentsForSourceWithoutTag(indexWriter, source, newTag);
@@ -66,6 +68,7 @@ namespace Core.Lucene
             }
             finally
             {
+                if (indexReader != null) indexReader.Close();
                 if (indexWriter != null) indexWriter.Close();
             }
         }
@@ -78,14 +81,18 @@ namespace Core.Lucene
 
         public void LearnCommandForInput(DocumentId completionId, string input)
         {
-            var indexWriter = GetIndexWriter();
+            IndexWriter indexWriter = null;
+            IndexReader indexReader = null;
             try
             {
-                _storage.LearnCommandForInput(indexWriter, completionId, input);
+                indexWriter = GetIndexWriter();
+                indexReader = indexWriter.GetReader();
+                _storage.LearnCommandForInput(indexWriter, indexReader, completionId, input);
             }
             finally
             {
-                indexWriter.Close();
+                if (indexReader != null) indexReader.Close();
+                if (indexWriter != null) indexWriter.Close();
             }
         }
     }

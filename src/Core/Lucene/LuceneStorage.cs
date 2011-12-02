@@ -21,15 +21,15 @@ namespace Core.Lucene
             _converterRepository = converterRepository;
         }
 
-        public void UpdateDocumentForObject(IndexWriter writer, IItemSource source, string tag, object item)
+        public void UpdateDocumentForObject(IndexWriter writer, IndexReader reader, IItemSource source, string tag, object item)
         {
             var type = item.GetType();
             GetType().GetMethod("UpdateDocumentForItem")
                 .MakeGenericMethod(type)
-                .Invoke(this, new[] {writer, source, tag, item});
+                .Invoke(this, new[] {writer, reader, source, tag, item});
         }
 
-        public void UpdateDocumentForItem<T>(IndexWriter writer, IItemSource source, string tag, T item)
+        public void UpdateDocumentForItem<T>(IndexWriter writer, IndexReader indexReader, IItemSource source, string tag, T item)
         {
             var converter = _converterRepository.GetConverterForType<T>();
             var document = converter.ToDocument(source, item);
@@ -38,7 +38,7 @@ namespace Core.Lucene
             var documentId = id.GetId();
             var learningId = id.GetLearningId();
 
-            PopDocument(writer, documentId); //deleting the old version of the doc
+            PopDocument(writer, indexReader, documentId); //deleting the old version of the doc
 
             document.SetLearnings(_learningRepository.LearningsFor(learningId));
             document.Tag(tag);
@@ -55,12 +55,12 @@ namespace Core.Lucene
             return new AutoCompletionResult.CommandResult(command, coreDoc.GetDocumentId(), explanation);
         }
 
-        public void LearnCommandForInput(IndexWriter writer, DocumentId completionId, string input)
+        public void LearnCommandForInput(IndexWriter writer, IndexReader reader, DocumentId completionId, string input)
         {
             // fickle command, isn't learnable
             if (completionId == null) return;
 
-            var document = CoreDocument.Rehydrate(PopDocument(writer, completionId.GetId()));
+            var document = CoreDocument.Rehydrate(PopDocument(writer, reader, completionId.GetId()));
 
             if (document == null)
                 throw new InvalidOperationException(string.Format("Didn't find command {0}", completionId));
@@ -83,9 +83,9 @@ namespace Core.Lucene
             indexWriter.DeleteDocuments(query);
         }
 
-        private Document PopDocument(IndexWriter writer, string sha1)
+        private Document PopDocument(IndexWriter writer, IndexReader reader, string sha1)
         {
-            var searcher = new IndexSearcher(writer.GetDirectory(), false);
+            var searcher = new IndexSearcher(reader);
             try
             {
                 var query = new TermQuery(new Term(SpecialFields.Sha1, sha1));
