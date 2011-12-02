@@ -83,7 +83,10 @@
     <Reference Include="IronPython.Modules">
       <HintPath>..\..\lib\ironpython\IronPython.Modules.dll</HintPath>
     </Reference>
-    <Reference Include="Lucene.Net, Version=2.9.2.2, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="Lucene.Net, Version=2.9.4.1, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\lucene\Lucene.Net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.ComponentModel.Composition.Initialization.Desktop">
       <HintPath>..\..\lib\composition.initialization.desktop\Microsoft.ComponentModel.Composition.Initialization.Desktop.dll</HintPath>
     </Reference>
