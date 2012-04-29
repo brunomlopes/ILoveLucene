@@ -56,7 +56,9 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="Actions\OpenPdfBook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestItemSource.cs" />
+    <Compile Include="Tests\MockLog.cs" />
+    <Compile Include="Tests\TestBookConverter.cs" />
+    <Compile Include="Tests\TestItemSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">
