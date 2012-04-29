@@ -14,13 +14,18 @@ namespace Plugins
                          IActOnTypedItemWithArguments<FileInfo>,
                          IActOnTypedItemWithAutoCompletedArguments<FileInfo>
     {
-        private readonly string[] _sessionNames;
+        private string[] _sessionNames = new string[] {};
 
         public Putty()
         {
+            LoadSessions();
+        }
+
+        private void LoadSessions()
+        {
             var sessionsKey = Registry.CurrentUser.OpenSubKey(@"Software\SimonTatham\PuTTY\Sessions");
             if (sessionsKey == null) _sessionNames = new string[] {};
-            else _sessionNames = sessionsKey.GetSubKeyNames();
+            else _sessionNames = sessionsKey.GetSubKeyNames().Select(System.Web.HttpUtility.UrlDecode).ToArray();
         }
 
         public override void ActOn(FileInfo item)
@@ -54,15 +59,11 @@ namespace Plugins
             get { return "Launch putty session"; }
         }
 
-        public string Description
-        {
-            get { return "Putty launcher"; }
-        }
-
         public bool CanActOn(FileInfo item)
         {
-            return Path.GetFileNameWithoutExtension(item.Name)
-                .Equals("putty", StringComparison.InvariantCultureIgnoreCase);
+            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(item.Name);
+            return fileNameWithoutExtension != null &&
+                fileNameWithoutExtension.Equals("putty", StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }
