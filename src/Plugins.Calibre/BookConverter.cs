@@ -14,7 +14,7 @@ namespace Plugins.Calibre
             book.Title = document.GetString("title");
             book.Authors = document.GetString("authors");
             book.Id = int.Parse(document.GetString("id"));
-            book.Formats.AddRange(document.GetStringList("formats"));
+            book.Formats.AddRange(document.GetStringList("format"));
             
             return book;
         }
