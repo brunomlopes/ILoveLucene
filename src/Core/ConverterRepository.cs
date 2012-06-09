@@ -5,6 +5,7 @@ using System.Linq;
 using Core.API;
 using Core.Abstractions;
 using Core.Lucene;
+using Lucene.Net.Documents;
 
 namespace Core
 {
@@ -25,32 +26,38 @@ namespace Core
             }
         }
 
-        public ConverterRepository()
-        {
-        }
-
         public ConverterRepository(params IConverter[] converters)
         {
             Converters = converters;
         }
 
-        public IConverter<T> GetConverterForType<T>()
+        public IItem FromDocumentToItem(CoreDocument coreDoc)
         {
-            var converter = _convertersPerId.Select(kvp => kvp.Value).OfType<IConverter<T>>().FirstOrDefault();
-            if (converter == null)
-            {
-                throw new NotImplementedException(string.Format("No converter for {0} found ", typeof(T)));
-            }
-            return converter;
+            return GetConverterForId(coreDoc.ConverterId).FromDocumentToItem(coreDoc);
         }
 
-        public IConverter GetConverterForId(string id)
+        private IConverter GetConverterForId(string id)
         {
             if (!_convertersPerId.ContainsKey(id))
             {
                 throw new NotImplementedException(string.Format("No converter for id {0} found", id));
             }
             return _convertersPerId[id];
+        }
+
+        public CoreDocument ToDocument(IItemSource source, dynamic item)
+        {
+            return (CoreDocument)((dynamic)this).InternalToDocument(source, item); ;
+        }
+
+        private CoreDocument InternalToDocument<T>(IItemSource source, T item)
+        {
+            var converter = _convertersPerId.Select(kvp => kvp.Value).OfType<IConverter<T>>().FirstOrDefault();
+            if (converter == null)
+            {
+                throw new NotImplementedException(string.Format("No converter for {0} found ", typeof(T)));
+            }
+            return converter.ToDocument(source, item);
         }
     }
 }

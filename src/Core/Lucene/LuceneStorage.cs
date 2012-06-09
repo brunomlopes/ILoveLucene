@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Core.API;
@@ -23,34 +22,24 @@ namespace Core.Lucene
 
         public void UpdateDocumentForObject(IndexWriter writer, IndexReader reader, IItemSource source, string tag, object item)
         {
-            var type = item.GetType();
-            GetType().GetMethod("UpdateDocumentForItem")
-                .MakeGenericMethod(type)
-                .Invoke(this, new[] {writer, reader, source, tag, item});
-        }
-
-        public void UpdateDocumentForItem<T>(IndexWriter writer, IndexReader indexReader, IItemSource source, string tag, T item)
-        {
-            var converter = _converterRepository.GetConverterForType<T>();
-            var document = converter.ToDocument(source, item);
+            var document = _converterRepository.ToDocument(source, item);
 
             var id = document.GetDocumentId();
             var documentId = id.GetId();
             var learningId = id.GetLearningId();
 
-            PopDocument(writer, indexReader, documentId); //deleting the old version of the doc
+            PopDocument(writer, reader, documentId); //deleting the old version of the doc
 
             document.SetLearnings(_learningRepository.LearningsFor(learningId));
             document.Tag(tag);
 
             writer.AddDocument(document);
         }
-
    
         public AutoCompletionResult.CommandResult GetCommandResultForDocument(Document document, Explanation explanation)
         {
             var coreDoc = CoreDocument.Rehydrate(document);
-            var command = _converterRepository.GetConverterForId(coreDoc.ConverterId).FromDocumentToItem(coreDoc);
+            var command = _converterRepository.FromDocumentToItem(coreDoc);
 
             return new AutoCompletionResult.CommandResult(command, coreDoc.GetDocumentId(), explanation);
         }
