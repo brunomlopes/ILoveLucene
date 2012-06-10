@@ -229,6 +229,54 @@ namespace Tests
         }
 
 
+
+        [Fact]
+        public void DoesNotDeleteItemsWithNoTagsWhenIndexing()
+        {
+            {
+                var source = new Source { Items = new TextItem[] { } };
+                new SourceStorage(_directory, _learningRepository, _converterRepository).AppendItems(source, new TextItem("Firewall"));
+            }
+            {
+                var source = new Source { Items = new[] { new TextItem("Firefox") } };
+                new SourceStorage(_directory, _learningRepository, _converterRepository).IndexItems(source, source.GetItems().Result);
+            }
+            {
+                var searcher = GetAutocompleter();
+
+                var results = searcher.Autocomplete("Firewall");
+                Assert.True(results.HasAutoCompletion);
+                Assert.Equal("Firewall", results.AutoCompletedCommand.Item.Text);
+            }
+        }
+
+
+        [Fact]
+        public void CanDeleteItemsFromSource()
+        {
+            {
+                var source = new Source { Items = new TextItem[] { } };
+                new SourceStorage(_directory, _learningRepository, _converterRepository).AppendItems(source, new TextItem("Firewall"));
+            }
+            {
+                var searcher = GetAutocompleter();
+
+                var results = searcher.Autocomplete("Firewall");
+                Assert.True(results.HasAutoCompletion);
+                Assert.Equal("Firewall", results.AutoCompletedCommand.Item.Text);
+            }
+            {
+                var source = new Source { Items = new TextItem[] { } };
+                new SourceStorage(_directory, _learningRepository, _converterRepository).RemoveItems(source, new TextItem("Firewall"));
+            }
+            {
+                var searcher = GetAutocompleter();
+
+                var results = searcher.Autocomplete("Firewall");
+                Assert.False(results.HasAutoCompletion);
+            }
+        }
+
         private AutoCompleteBasedOnLucene GetAutocompleter(params IItem[] items)
         {
             if (items == null) items = new IItem[] {};

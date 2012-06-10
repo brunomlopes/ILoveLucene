@@ -15,9 +15,9 @@ namespace Core.Lucene
     public class SourceStorage
     {
         private readonly Directory _indexDirectory;
-
         private readonly ILearningRepository _learningRepository;
         private readonly IConverterRepository _converterRepository;
+        private const string EmptyTag = "THIS_IS_AN_EMPTY_TAG";
 
         public SourceStorage(Directory indexDirectory,
                              ILearningRepository learningRepository,
@@ -33,7 +33,74 @@ namespace Core.Lucene
 
         public void IndexItems(IItemSource source, IEnumerable<object> items)
         {
-            InternalIndexItems(source, items);
+            IndexWriter indexWriter = null;
+            IndexReader indexReader = null;
+            try
+            {
+                indexWriter = GetIndexWriter();
+                indexReader = indexWriter.GetReader();
+                var newTag = Guid.NewGuid().ToString();
+
+                foreach (var item in items)
+                {
+                    UpdateDocumentForObject(indexWriter, indexReader, source, newTag, item);
+                }
+
+                DeleteDocumentsForSourceWithoutTag(indexWriter, source, newTag);
+
+                indexWriter.Commit();
+            }
+            finally
+            {
+                if (indexReader != null) indexReader.Close();
+                if (indexWriter != null) indexWriter.Close();
+            }
+        }
+
+        public void AppendItems(IItemSource source, params object[] items)
+        {
+            IndexWriter indexWriter = null;
+            IndexReader indexReader = null;
+            try
+            {
+                indexWriter = GetIndexWriter();
+                indexReader = indexWriter.GetReader();
+
+                foreach (var item in items)
+                {
+                    UpdateDocumentForObject(indexWriter, indexReader, source, EmptyTag, item);
+                }
+
+                indexWriter.Commit();
+            }
+            finally
+            {
+                if (indexReader != null) indexReader.Close();
+                if (indexWriter != null) indexWriter.Close();
+            }
+        }
+
+        public void RemoveItems(IItemSource source, params object[] items)
+        {
+            IndexWriter indexWriter = null;
+            IndexReader indexReader = null;
+            try
+            {
+                indexWriter = GetIndexWriter();
+                indexReader = indexWriter.GetReader();
+
+                foreach (var item in items)
+                {
+                    DeleteDocumentForObject(indexWriter, indexReader, source, item);
+                }
+
+                indexWriter.Commit();
+            }
+            finally
+            {
+                if (indexReader != null) indexReader.Close();
+                if (indexWriter != null) indexWriter.Close();
+            }
         }
 
         public void LearnCommandForInput(DocumentId completionId, string input)
@@ -61,32 +128,6 @@ namespace Core.Lucene
                                 IndexWriter.MaxFieldLength.UNLIMITED).Close();
         }
 
-        private void InternalIndexItems(IItemSource source, IEnumerable<object> items)
-        {
-            IndexWriter indexWriter = null;
-            IndexReader indexReader = null;
-            try
-            {
-                indexWriter = GetIndexWriter();
-                indexReader = indexWriter.GetReader();
-                var newTag = Guid.NewGuid().ToString();
-
-                foreach (var item in items)
-                {
-                    UpdateDocumentForObject(indexWriter, indexReader, source, newTag, item);
-                }
-
-                DeleteDocumentsForSourceWithoutTag(indexWriter, source, newTag);
-
-                indexWriter.Commit();
-            }
-            finally
-            {
-                if (indexReader != null) indexReader.Close();
-                if (indexWriter != null) indexWriter.Close();
-            }
-        }
-
         private void UpdateDocumentForObject(IndexWriter writer, IndexReader reader, IItemSource source, string tag, object item)
         {
             var document = _converterRepository.ToDocument(source, item);
@@ -98,9 +139,21 @@ namespace Core.Lucene
             PopDocument(writer, reader, documentId); //deleting the old version of the doc
 
             document.SetLearnings(_learningRepository.LearningsFor(learningId));
-            document.Tag(tag);
+            if (tag != null)
+            {
+                document.Tag(tag);
+            }
 
             writer.AddDocument(document);
+        }
+
+        public void DeleteDocumentForObject(IndexWriter writer, IndexReader indexReader, IItemSource source, object item)
+        {
+            var document = _converterRepository.ToDocument(source, item);
+
+            var id = document.GetDocumentId();
+            var documentId = id.GetId();
+            PopDocument(writer, indexReader, documentId);
         }
 
 
@@ -115,6 +168,8 @@ namespace Core.Lucene
             var query = new BooleanQuery();
             query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.SourceId, source.Id)),
                                         BooleanClause.Occur.MUST));
+            query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.Tag, EmptyTag)),
+                           BooleanClause.Occur.MUST_NOT));
             query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.Tag, tag)),
                                         BooleanClause.Occur.MUST_NOT));
             indexWriter.DeleteDocuments(query);
