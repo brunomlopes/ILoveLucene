@@ -7,6 +7,7 @@ using Core.API;
 using Core.Abstractions;
 using Quartz;
 using System.Linq;
+using Quartz.Impl.Matchers;
 
 namespace Core.Lucene
 {
@@ -42,9 +43,10 @@ namespace Core.Lucene
         {
             if (!_scheduler.IsStarted) return;
 
-            foreach (var jobName in _scheduler.GetJobNames(JobGroupExporter.JobGroup))
+
+            foreach (var jobKey in _scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals(JobGroupExporter.JobGroup)))
             {
-                _scheduler.DeleteJob(jobName, JobGroupExporter.JobGroup);
+                _scheduler.DeleteJob(jobKey);
             }
 
             foreach (var sourceAndStorage in _sourceStorageFactory.Sources.Select(s => new {Storage = _sourceStorageFactory.SourceStorageFor(s.Id), Source = s}))
@@ -60,17 +62,18 @@ namespace Core.Lucene
                 }
 
                 var itemSourceName = itemSource.Id;
-                var jobDetail = new JobDetail("IndexerFor" + itemSourceName, JobGroupExporter.JobGroup, typeof(IndexerJob));
+                var jobDetail = JobBuilder.Create<IndexerJob>()
+                    .WithIdentity("IndexerFor" + itemSourceName, JobGroupExporter.JobGroup)
+                    .Build();
 
                 jobDetail.JobDataMap[IndexerJob.SourceStorageKey] = sourceStorage;
                 jobDetail.JobDataMap[IndexerJob.SourceKey] = itemSource;
 
-                var trigger = TriggerUtils.MakeSecondlyTrigger(frequency);
 
-                // add 2 seconds to "try" and ensure the first time gets executed always
-                trigger.StartTimeUtc = DateTime.UtcNow.AddSeconds(2);
-                trigger.Name = "Each" + frequency + "SecondsFor" + itemSource.Id;
-                trigger.MisfireInstruction = MisfireInstruction.SimpleTrigger.RescheduleNextWithExistingCount;
+                var trigger = TriggerBuilder.Create()
+                    .StartAt(DateBuilder.FutureDate(2, IntervalUnit.Second))
+                    .WithIdentity("Each" + frequency + "SecondsFor" + itemSource.Id)
+                    .Build();
 
                 _scheduler.ScheduleJob(jobDetail, trigger);
             }

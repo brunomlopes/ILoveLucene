@@ -2,16 +2,16 @@ using System;
 using System.Diagnostics;
 using Core.API;
 using Quartz;
-using Core.Extensions;
 
 namespace Core.Lucene
 {
-    public class IndexerJob : IStatefulJob
+    [DisallowConcurrentExecution]
+    public class IndexerJob : IJob
     {
         public const string SourceStorageKey = "sourcestorage";
         public const string SourceKey = "source";
 
-        public void Execute(JobExecutionContext context)
+        public void Execute(IJobExecutionContext context)
         {
             var sourceStorage = (SourceStorage)context.MergedJobDataMap[SourceStorageKey];
             var source = (IItemSource)context.MergedJobDataMap[SourceKey];

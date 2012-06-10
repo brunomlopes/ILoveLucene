@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Core.Abstractions;
+using Core.Lucene;
 using Plugins.Commands;
 using Quartz;
 using System.Linq;
+using Quartz.Impl.Matchers;
 
 namespace Plugins
 {
@@ -66,9 +68,9 @@ namespace Plugins
 
         public override void Act()
         {
-            foreach (var jobName in Scheduler.GetJobNames(JobGroup))
+            foreach (var jobName in Scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals(ScheduleIndexJobs.JobGroupExporter.JobGroup)))
             {
-                Scheduler.TriggerJobWithVolatileTrigger(jobName, JobGroup);
+                Scheduler.TriggerJob(jobName);
             }
         }
     }
