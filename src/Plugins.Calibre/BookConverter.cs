@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel.Composition;
 using Core.API;
-using Core.Abstractions;
-using Lucene.Net.Documents;
 
 namespace Plugins.Calibre
 {

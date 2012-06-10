@@ -56,7 +56,7 @@ namespace Core.Lucene
                 BooleanQuery query = GetQueryForText(text);
                 
                 var results = searcher.Search(query, 10);
-                var commands = results.scoreDocs
+                var commands = results.ScoreDocs
                     .Select(d =>
                                 {
                                     var document = searcher.Doc(d.doc);

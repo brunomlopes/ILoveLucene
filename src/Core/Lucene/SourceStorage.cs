@@ -200,11 +200,11 @@ namespace Core.Lucene
                 var query = new TermQuery(new Term(SpecialFields.Sha1, sha1));
                 var documents = searcher.Search(query, 1);
 
-                Debug.Assert(documents.totalHits <= 1, string.Format("Sha1 '{0}' matched more than one document", sha1));
+                Debug.Assert(documents.TotalHits <= 1, string.Format("Sha1 '{0}' matched more than one document", sha1));
 
-                if (documents.totalHits == 0) return null;
+                if (documents.TotalHits == 0) return null;
 
-                var document = searcher.Doc(documents.scoreDocs.First().doc);
+                var document = searcher.Doc(documents.ScoreDocs.First().doc);
                 writer.DeleteDocuments(new Term(SpecialFields.Sha1, sha1));
                 return document;
             }
