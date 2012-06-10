@@ -108,7 +108,6 @@
     <Compile Include="Lucene\IndexerJob.cs" />
     <Compile Include="Lucene\IndexerConfiguration.cs" />
     <Compile Include="Lucene\FileSystemLearningRepository.cs" />
-    <Compile Include="Lucene\LuceneStorage.cs" />
     <Compile Include="Lucene\ScheduleIndexJobs.cs" />
     <Compile Include="Lucene\SourceStorageFactory.cs" />
     <Compile Include="Lucene\StaticDirectoryFactory.cs" />

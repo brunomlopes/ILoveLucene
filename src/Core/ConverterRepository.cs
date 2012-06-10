@@ -36,6 +36,11 @@ namespace Core
             return GetConverterForId(coreDoc.ConverterId).FromDocumentToItem(coreDoc);
         }
 
+        public CoreDocument ToDocument(IItemSource source, dynamic item)
+        {
+            return (CoreDocument)((dynamic)this).InternalToDocument(source, item); ;
+        }
+
         private IConverter GetConverterForId(string id)
         {
             if (!_convertersPerId.ContainsKey(id))
@@ -43,11 +48,6 @@ namespace Core
                 throw new NotImplementedException(string.Format("No converter for id {0} found", id));
             }
             return _convertersPerId[id];
-        }
-
-        public CoreDocument ToDocument(IItemSource source, dynamic item)
-        {
-            return (CoreDocument)((dynamic)this).InternalToDocument(source, item); ;
         }
 
         private CoreDocument InternalToDocument<T>(IItemSource source, T item)

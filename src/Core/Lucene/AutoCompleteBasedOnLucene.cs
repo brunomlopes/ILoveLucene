@@ -15,8 +15,8 @@ namespace Core.Lucene
     {
         private readonly SourceStorageFactory _sourceStorageFactory;
         private readonly ILog _log;
+        private readonly IConverterRepository _converterRepository;
         private readonly IDirectoryFactory _directoryFactory;
-        private readonly LuceneStorage _storage;
 
         [ImportMany]
         public IEnumerable<IConverter> Converters { get; set; }
@@ -24,12 +24,12 @@ namespace Core.Lucene
         [ImportConfiguration]
         public AutoCompleteConfiguration Configuration { get; set; }
 
-        public AutoCompleteBasedOnLucene(IDirectoryFactory directoryFactory, LuceneStorage luceneStorage, SourceStorageFactory sourceStorageFactory, ILog log)
+        public AutoCompleteBasedOnLucene(IDirectoryFactory directoryFactory, SourceStorageFactory sourceStorageFactory, ILog log, IConverterRepository converterRepository)
         {
             _sourceStorageFactory = sourceStorageFactory;
             _log = log;
+            _converterRepository = converterRepository;
             _directoryFactory = directoryFactory;
-            _storage = luceneStorage;
         }
 
         public AutoCompletionResult Autocomplete(string text, bool includeExplanation = false)
@@ -67,7 +67,10 @@ namespace Core.Lucene
                                         {
                                             explanation = searcher.Explain(query, d.doc);
                                         }
-                                        return _storage.GetCommandResultForDocument(document, explanation);
+                                        var coreDoc = CoreDocument.Rehydrate(document);
+                                        var command = _converterRepository.FromDocumentToItem(coreDoc);
+
+                                        return new AutoCompletionResult.CommandResult(command, coreDoc.GetDocumentId(), explanation);
                                     }
                                     catch (Exception e)
                                     {
