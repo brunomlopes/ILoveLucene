@@ -1,7 +1,7 @@
 $framework = "4.0x86"
 properties {
     $dropbox_base_url = "http://dl.dropbox.com/u/118385/ilovelucene/"
-    $package_path = "D:\documents\My Dropbox\Public\ilovelucene"
+    $package_path = "D:\documents\Dropbox\Public\ilovelucene"
     $version_index_to_increase = 3
 }
 
