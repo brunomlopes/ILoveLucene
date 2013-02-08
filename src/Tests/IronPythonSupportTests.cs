@@ -11,6 +11,7 @@ using Core.API;
 using Core.Abstractions;
 using ILoveLucene.Loggers;
 using IronPython.Hosting;
+using IronPythonMef;
 using Plugins.IronPython;
 using Xunit;
 using Xunit.Extensions;

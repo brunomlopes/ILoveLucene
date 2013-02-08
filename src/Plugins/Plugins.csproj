@@ -52,27 +52,36 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="IronPython, Version=2.6.10920.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\ironpython\IronPython.dll</HintPath>
+    <Reference Include="IronPython">
+      <HintPath>..\..\packages\IronPython.2.7.3\lib\Net40\IronPython.dll</HintPath>
     </Reference>
     <Reference Include="IronPython.Modules">
-      <HintPath>..\..\lib\ironpython\IronPython.Modules.dll</HintPath>
+      <HintPath>..\..\packages\IronPython.2.7.3\lib\Net40\IronPython.Modules.dll</HintPath>
+    </Reference>
+    <Reference Include="IronPython.SQLite">
+      <HintPath>..\..\packages\IronPython.2.7.3\lib\Net40\IronPython.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="IronPython.Wpf">
+      <HintPath>..\..\packages\IronPython.2.7.3\lib\Net40\IronPython.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="IronPythonMef">
+      <HintPath>..\..\packages\IronPythonMef.1.0.0.0\lib\net40\IronPythonMef.dll</HintPath>
     </Reference>
     <Reference Include="Lucene.Net, Version=2.9.4.1, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Lucene.Net.2.9.4.1\lib\net40\Lucene.Net.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Dynamic, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\ironpython\Microsoft.Dynamic.dll</HintPath>
+    <Reference Include="Microsoft.Dynamic">
+      <HintPath>..\..\packages\IronPython.2.7.3\lib\Net40\Microsoft.Dynamic.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Scripting, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\ironpython\Microsoft.Scripting.dll</HintPath>
+    <Reference Include="Microsoft.Scripting">
+      <HintPath>..\..\packages\IronPython.2.7.3\lib\Net40\Microsoft.Scripting.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Scripting.Debugging">
-      <HintPath>..\..\lib\ironpython\Microsoft.Scripting.Debugging.dll</HintPath>
+    <Reference Include="Microsoft.Scripting.AspNet">
+      <HintPath>..\..\packages\IronPython.2.7.3\lib\Net40\Microsoft.Scripting.AspNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Scripting.Metadata">
+      <HintPath>..\..\packages\IronPython.2.7.3\lib\Net40\Microsoft.Scripting.Metadata.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.4.5.7\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -109,15 +118,8 @@
     <Compile Include="ExportLearnings.cs" />
     <Compile Include="Google.cs" />
     <Compile Include="IronPython\BasePythonItemSource.cs" />
-    <Compile Include="IronPython\ExtractTypesFromScript.cs" />
-    <Compile Include="IronPython\ImportDefinition.cs" />
     <Compile Include="IronPython\IronPythonCommandsMefExport.cs" />
-    <Compile Include="IronPython\IronPythonComposablePart.cs" />
     <Compile Include="IronPython\Configuration.cs" />
-    <Compile Include="IronPython\IronPythonContractBasedImportDefinition.cs" />
-    <Compile Include="IronPython\IronPythonFile.cs" />
-    <Compile Include="IronPython\IronPythonTypeWrapper.cs" />
-    <Compile Include="IronPython\ScriptScopeExtensionMethods.cs" />
     <Compile Include="Processes\CloseProcess.cs" />
     <Compile Include="Processes\KillProcess.cs" />
     <Compile Include="Processes\LowerPriority.cs" />

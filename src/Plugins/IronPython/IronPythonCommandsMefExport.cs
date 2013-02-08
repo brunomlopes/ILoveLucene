@@ -12,6 +12,7 @@ using Core.Abstractions;
 using IronPython.Hosting;
 using System.Linq;
 using IronPython.Runtime;
+using IronPythonMef;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 
@@ -148,7 +149,7 @@ namespace Plugins.IronPython
             {
                 file.Compose();
             }
-            catch (Plugins.IronPython.IronPythonFile.PythonException e)
+            catch (IronPythonFile.PythonException e)
             {
                 _log.Error(e, "Error executing file {0}:{1}", pythonFile.FullName, e.Message);
             }
