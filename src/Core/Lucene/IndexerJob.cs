@@ -1,20 +1,30 @@
+using System;
 using System.Diagnostics;
+using Core.API;
 using Quartz;
-using Core.Extensions;
 
 namespace Core.Lucene
 {
-    public class IndexerJob : IStatefulJob
+    [DisallowConcurrentExecution]
+    public class IndexerJob : IJob
     {
         public const string SourceStorageKey = "sourcestorage";
+        public const string SourceKey = "source";
 
-        public void Execute(JobExecutionContext context)
+        public void Execute(IJobExecutionContext context)
         {
             var sourceStorage = (SourceStorage)context.MergedJobDataMap[SourceStorageKey];
-            Debug.WriteLine("Indexing item source " + sourceStorage.Source);
+            var source = (IItemSource)context.MergedJobDataMap[SourceKey];
+            Debug.WriteLine("Indexing item source " + source);
 
-            sourceStorage.IndexItems()
-                .GuardForException(e => Debug.WriteLine("Exception while indexing {0}:{1}", sourceStorage, e));
+            try
+            {
+                sourceStorage.IndexItems(source, source.GetItems().Result);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Exception while indexing {0}:{1}", source, e);
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using Core.API;
 using Core.Abstractions;
 using Quartz;
+using Quartz.Impl.Matchers;
 
 namespace ILoveLucene.AutoUpdate
 {
@@ -25,16 +26,20 @@ namespace ILoveLucene.AutoUpdate
         {
             if (!Scheduler.IsStarted) return;
 
-            foreach (var jobName in Scheduler.GetJobNames(JobGroup))
+            foreach (var jobName in Scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals(JobGroup)))
             {
-                Scheduler.DeleteJob(jobName, JobGroup);
+                Scheduler.DeleteJob(jobName);
             }
 
-            var jobDetail = new JobDetail(JobName, JobGroup, typeof (CheckForUpdatesJob));
-            var trigger = TriggerUtils.MakeMinutelyTrigger(Configuration.PeriodicityInMinutes);
-            trigger.StartTimeUtc = DateTime.UtcNow.AddMinutes(2);
-            trigger.Name = "TriggerAutoUpdateEach" + Configuration.PeriodicityInMinutes + "Minutes";
-            trigger.MisfireInstruction = MisfireInstruction.SimpleTrigger.RescheduleNextWithExistingCount;
+            var jobDetail = JobBuilder.Create<CheckForUpdatesJob>()
+                .WithIdentity(JobName, JobGroup)
+                .Build();
+
+            var trigger = TriggerBuilder.Create()
+                .WithSimpleSchedule(b => b.WithIntervalInMinutes(Configuration.PeriodicityInMinutes))
+                .WithIdentity("TriggerAutoUpdateEach" + Configuration.PeriodicityInMinutes + "Minutes")
+                .Build();
+
             Scheduler.ScheduleJob(jobDetail, trigger);
         }
 

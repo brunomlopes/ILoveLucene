@@ -9,24 +9,23 @@ namespace Core.Lucene
 {
     public class SourceStorageFactory
     {
-        private readonly LuceneStorage _luceneStorage;
         private readonly IDirectoryFactory _directoryFactory;
+        private readonly IConverterRepository _converterRepository;
+        private readonly ILearningRepository _learningRepository;
 
         [ImportMany]
         public IEnumerable<IItemSource> Sources { get; set; }
 
-        public SourceStorageFactory(LuceneStorage luceneStorage, IDirectoryFactory directoryFactory)
+        public SourceStorageFactory(IDirectoryFactory directoryFactory, IConverterRepository converterRepository, ILearningRepository learningRepository)
         {
-            _luceneStorage = luceneStorage;
             _directoryFactory = directoryFactory;
+            _converterRepository = converterRepository;
+            _learningRepository = learningRepository;
         }
 
         public IEnumerable<SourceStorage> GetAllSourceStorages()
         {
-            return Sources.Select(source => new SourceStorage(source,
-                                                              _directoryFactory.DirectoryFor(source.Id,
-                                                                                             source.Persistent),
-                                                              _luceneStorage));
+            return Sources.Select(For);
         }
 
         public SourceStorage SourceStorageFor(string sourceId)
@@ -36,7 +35,15 @@ namespace Core.Lucene
             {
                 throw new InvalidOperationException(string.Format("No source found for id {0}", sourceId));
             }
-            return new SourceStorage(source, _directoryFactory.DirectoryFor(source.Id, source.Persistent), _luceneStorage);
+            return For(source);
+        }
+
+        private SourceStorage For(IItemSource source)
+        {
+            return new SourceStorage(_directoryFactory.DirectoryFor(source.Id,
+                                                                    source.Persistent),
+                                     _learningRepository,
+                                     _converterRepository);
         }
     }
 }

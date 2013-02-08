@@ -19,6 +19,7 @@ namespace Tests
     {
         private readonly DirectoryInfo _storageLocation;
         private readonly FileSystemLearningRepository _learningRepository;
+        private readonly ConverterRepository _converterRepository;
         private readonly Directory _directory;
 
         public IndexerTests()
@@ -39,6 +40,8 @@ namespace Tests
                 indexLocation.Refresh();
             }
 
+            _converterRepository= new ConverterRepository(new TextItemConverter());
+            
             _directory = FSDirectory.Open(indexLocation);
         }
 
@@ -160,17 +163,16 @@ namespace Tests
         [Fact]
         public void CannotFindItemWhenItIsRemovedAfterBeingIndexed()
         {
-            var storage = new LuceneStorage(_learningRepository, new ConverterRepository(new Converter()));
-
             var source = new Source();
-            var indexer = new SourceStorage(source, _directory, storage);
+            var indexer = new SourceStorage(_directory, _learningRepository, _converterRepository);
 
             source.Items = new[] {new TextItem ("simple")};
-            indexer.IndexItems().Wait();
+            indexer.IndexItems(source, source.GetItems().Result);
             source.Items = new TextItem[] {};
-            indexer.IndexItems().Wait();
+            indexer.IndexItems(source, source.GetItems().Result);
 
-            var searcher = GetAutocompleter(storage);
+
+            var searcher = GetAutocompleter();
 
             var results = searcher.Autocomplete("simple");
             Assert.False(results.HasAutoCompletion);
@@ -180,15 +182,13 @@ namespace Tests
         [Fact]
         public void CannotFindItemWhenIndexIsEmpty()
         {
-            var storage = new LuceneStorage(_learningRepository, new ConverterRepository(new Converter()));
-
             var source = new Source();
-            var indexer = new SourceStorage(source, _directory, storage);
+            var indexer = new SourceStorage(_directory, _learningRepository, _converterRepository);
 
             source.Items = new TextItem[] {};
-            indexer.IndexItems().Wait();
+            indexer.IndexItems(source, source.GetItems().Result);
 
-            var searcher = GetAutocompleter(storage);
+            var searcher = GetAutocompleter();
 
             var results = searcher.Autocomplete("simple");
             Assert.False(results.HasAutoCompletion);
@@ -198,63 +198,106 @@ namespace Tests
         [Fact]
         public void CanFindPreviousItemsEvenWhenInTheMiddleOfAnIndex()
         {
-            var storage = new LuceneStorage(_learningRepository, new ConverterRepository(new Converter()));
             {
                 var source = new Source { Items = new  []{new TextItem("Firefox")} };
-                new SourceStorage(source, _directory, storage).IndexItems().Wait();
+                new SourceStorage(_directory, _learningRepository, _converterRepository)
+                    .IndexItems(source, source.GetItems().Result);
             }
             {
                 var source = new StepSource {Items = new[] {new TextItem("Firewall")}};
 
-                var task = new SourceStorage(source, _directory, storage).IndexItems();
+                var task = Task.Factory.StartNew(() =>
+                    {
+                        IEnumerable<object> enumerable = source.GetItems().Result;
+                        new SourceStorage(_directory, _learningRepository, _converterRepository)
+                            .IndexItems(source, enumerable);
+                    });
 
-                var searcher = GetAutocompleter(storage);
+                var searcher = GetAutocompleter();
                 var results = searcher.Autocomplete("Fire");
                 Assert.True(results.HasAutoCompletion);
                 Assert.Equal("Firefox",results.AutoCompletedCommand.Item.Text);
 
                 Assert.True(source.ReleaseNextItemAndWait(TimeSpan.FromSeconds(5)));
-                Assert.True(task.Wait(TimeSpan.FromSeconds(10)));
+                task.Wait(TimeSpan.FromSeconds(5));
 
-                searcher = GetAutocompleter(storage);
+                searcher = GetAutocompleter();
                 results = searcher.Autocomplete("Fire");
                 Assert.True(results.HasAutoCompletion);
                 Assert.Equal("Firewall", results.AutoCompletedCommand.Item.Text);
             }
         }
 
-        private AutoCompleteBasedOnLucene GetAutocompleter()
+
+
+        [Fact]
+        public void DoesNotDeleteItemsWithNoTagsWhenIndexing()
         {
-            return GetAutocompleter(new LuceneStorage(_learningRepository, new ConverterRepository(new Converter())));
+            {
+                var source = new Source { Items = new TextItem[] { } };
+                new SourceStorage(_directory, _learningRepository, _converterRepository).AppendItems(source, new TextItem("Firewall"));
+            }
+            {
+                var source = new Source { Items = new[] { new TextItem("Firefox") } };
+                new SourceStorage(_directory, _learningRepository, _converterRepository).IndexItems(source, source.GetItems().Result);
+            }
+            {
+                var searcher = GetAutocompleter();
+
+                var results = searcher.Autocomplete("Firewall");
+                Assert.True(results.HasAutoCompletion);
+                Assert.Equal("Firewall", results.AutoCompletedCommand.Item.Text);
+            }
         }
 
-        private AutoCompleteBasedOnLucene GetAutocompleter(params TextItem[] items)
+
+        [Fact]
+        public void CanDeleteItemsFromSource()
         {
-            return GetAutocompleter(new LuceneStorage(_learningRepository, new ConverterRepository(new Converter())), items);
+            {
+                var source = new Source { Items = new TextItem[] { } };
+                new SourceStorage(_directory, _learningRepository, _converterRepository).AppendItems(source, new TextItem("Firewall"));
+            }
+            {
+                var searcher = GetAutocompleter();
+
+                var results = searcher.Autocomplete("Firewall");
+                Assert.True(results.HasAutoCompletion);
+                Assert.Equal("Firewall", results.AutoCompletedCommand.Item.Text);
+            }
+            {
+                var source = new Source { Items = new TextItem[] { } };
+                new SourceStorage(_directory, _learningRepository, _converterRepository).RemoveItems(source, new TextItem("Firewall"));
+            }
+            {
+                var searcher = GetAutocompleter();
+
+                var results = searcher.Autocomplete("Firewall");
+                Assert.False(results.HasAutoCompletion);
+            }
         }
 
-        private AutoCompleteBasedOnLucene GetAutocompleter(LuceneStorage storage, IEnumerable<IItem> items = null)
+        private AutoCompleteBasedOnLucene GetAutocompleter(params IItem[] items)
         {
-            if (items == null) items = new TextItem[] {};
+            if (items == null) items = new IItem[] {};
 
             var directoryFactory = new StaticDirectoryFactory(_directory);
             var source = new Source {Items = items};
-            var sourceStorage = new SourceStorageFactory(storage, directoryFactory)
+            var sourceStorage = new SourceStorageFactory(directoryFactory, _converterRepository, _learningRepository)
                                     {Sources = new[] {source}};
 
-            var searcher = new AutoCompleteBasedOnLucene(directoryFactory, storage, sourceStorage, new DebugLogger());
+            var searcher = new AutoCompleteBasedOnLucene(directoryFactory,  sourceStorage, new DebugLogger(), _converterRepository);
             searcher.Configuration = new AutoCompleteConfiguration();
-            searcher.Converters = new[] {new Converter()};
+            searcher.Converters = new[] {new TextItemConverter()};
             return searcher;
         }
 
         private void IndexItemIntoDirectory(params IItem[] items)
         {
-            var storage = new LuceneStorage(_learningRepository, new ConverterRepository(new Converter()));
             var source = new Source {Items = items};
 
-            var indexer = new SourceStorage(source, _directory, storage);
-            indexer.IndexItems().Wait();
+            var indexer = new SourceStorage(_directory,_learningRepository, _converterRepository);
+            indexer.IndexItems(source, source.GetItems().Result);
         }
     }
 
@@ -325,7 +368,7 @@ namespace Tests
         } 
     }
 
-    class Converter : IConverter<TextItem>
+    class TextItemConverter : IConverter<TextItem>
     {
         public IItem FromDocumentToItem(CoreDocument document)
         {

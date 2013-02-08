@@ -49,7 +49,7 @@ namespace ILoveLucene.WindowsInterop
 
         private void SetupHotKey(IntPtr handle)
         {
-            RegisterHotKey(handle, GetType().GetHashCode(), Modifiers.MOD_WIN, Keys.VK_RETURN);
+            RegisterHotKey(handle, GetType().GetHashCode(), Modifiers.MOD_CONTROL, Keys.VK_RETURN);
         }
 
         public void Dispose()

@@ -1,10 +1,11 @@
 ﻿using Core.API;
+using Lucene.Net.Documents;
 
 namespace Core.Lucene
 {
     public interface IConverterRepository
     {
-        IConverter<T> GetConverterForType<T>();
-        IConverter GetConverterForId(string id);
+        CoreDocument ToDocument(IItemSource source, object item);
+        IItem FromDocumentToItem(CoreDocument coreDoc);
     }
 }

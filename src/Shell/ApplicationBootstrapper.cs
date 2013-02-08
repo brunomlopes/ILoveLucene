@@ -112,7 +112,6 @@ namespace ILoveLucene
 
             builder.RegisterType<ConverterRepository>().As<IConverterRepository>();
 
-            builder.RegisterType<LuceneStorage>().AsSelf().SingleInstance();
             builder.RegisterType<SourceStorageFactory>().AsSelf().SingleInstance();
 
             builder.RegisterType<FileSystemLearningRepository>().As<ILearningRepository>().WithParameter("input", learningStorageLocation);

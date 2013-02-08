@@ -17,9 +17,9 @@ namespace Core.Scheduler
             _container = container;
         }
 
-        public IJob NewJob(TriggerFiredBundle bundle)
+        public IJob NewJob(TriggerFiredBundle bundle, IScheduler scheduler)
         {
-            var job = _simpleFactory.NewJob(bundle);
+            var job = _simpleFactory.NewJob(bundle, scheduler);
             _container.SatisfyImportsOnce(job);
             return job;
         }
