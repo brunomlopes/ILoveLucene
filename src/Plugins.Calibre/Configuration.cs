@@ -13,11 +13,15 @@ namespace Plugins.Calibre
         public Configuration()
         {
             var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-            if(!Directory.Exists(programFiles))
+            PathToCalibreInstalation = Path.Combine(programFiles, "Calibre2");
+
+            if (!Directory.Exists(PathToCalibreInstalation))
             {
                 programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
             }
             PathToCalibreInstalation = Path.Combine(programFiles, "Calibre2");
+
+
             MaximumSecondsProcessShouldTake = 600;
         }
     }
