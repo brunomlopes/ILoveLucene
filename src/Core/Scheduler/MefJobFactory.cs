@@ -23,5 +23,10 @@ namespace Core.Scheduler
             _container.SatisfyImportsOnce(job);
             return job;
         }
+
+        public void ReturnJob(IJob job)
+        {
+            _simpleFactory.ReturnJob(job);
+        }
     }
 }

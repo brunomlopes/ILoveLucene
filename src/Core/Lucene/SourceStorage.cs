@@ -33,12 +33,9 @@ namespace Core.Lucene
 
         public void IndexItems(IItemSource source, IEnumerable<object> items)
         {
-            IndexWriter indexWriter = null;
-            IndexReader indexReader = null;
-            try
+            using (var indexWriter = GetIndexWriter())
+            using (var indexReader = indexWriter.GetReader())
             {
-                indexWriter = GetIndexWriter();
-                indexReader = indexWriter.GetReader();
                 var newTag = Guid.NewGuid().ToString();
 
                 foreach (var item in items)
@@ -50,22 +47,13 @@ namespace Core.Lucene
 
                 indexWriter.Commit();
             }
-            finally
-            {
-                if (indexReader != null) indexReader.Close();
-                if (indexWriter != null) indexWriter.Close();
-            }
         }
 
         public void AppendItems(IItemSource source, params object[] items)
         {
-            IndexWriter indexWriter = null;
-            IndexReader indexReader = null;
-            try
+            using (var indexWriter = GetIndexWriter())
+            using (var indexReader = indexWriter.GetReader())
             {
-                indexWriter = GetIndexWriter();
-                indexReader = indexWriter.GetReader();
-
                 foreach (var item in items)
                 {
                     UpdateDocumentForObject(indexWriter, indexReader, source, EmptyTag, item);
@@ -73,22 +61,13 @@ namespace Core.Lucene
 
                 indexWriter.Commit();
             }
-            finally
-            {
-                if (indexReader != null) indexReader.Close();
-                if (indexWriter != null) indexWriter.Close();
-            }
         }
 
         public void RemoveItems(IItemSource source, params object[] items)
         {
-            IndexWriter indexWriter = null;
-            IndexReader indexReader = null;
-            try
+            using (var indexWriter = GetIndexWriter())
+            using (var indexReader = indexWriter.GetReader())
             {
-                indexWriter = GetIndexWriter();
-                indexReader = indexWriter.GetReader();
-
                 foreach (var item in items)
                 {
                     DeleteDocumentForObject(indexWriter, indexReader, source, item);
@@ -96,27 +75,14 @@ namespace Core.Lucene
 
                 indexWriter.Commit();
             }
-            finally
-            {
-                if (indexReader != null) indexReader.Close();
-                if (indexWriter != null) indexWriter.Close();
-            }
         }
 
         public void LearnCommandForInput(DocumentId completionId, string input)
         {
-            IndexWriter indexWriter = null;
-            IndexReader indexReader = null;
-            try
+            using (var indexWriter = GetIndexWriter())
+            using (var indexReader = indexWriter.GetReader())
             {
-                indexWriter = GetIndexWriter();
-                indexReader = indexWriter.GetReader();
                 LearnCommandForInput(indexWriter, indexReader, completionId, input);
-            }
-            finally
-            {
-                if (indexReader != null) indexReader.Close();
-                if (indexWriter != null) indexWriter.Close();
             }
         }
 
@@ -124,7 +90,7 @@ namespace Core.Lucene
         {
             var dir = _indexDirectory as FSDirectory;
             if (dir != null)
-                new IndexWriter(dir, new StandardAnalyzer(Version.LUCENE_29), !dir.GetDirectory().Exists,
+                new IndexWriter(dir, new StandardAnalyzer(Version.LUCENE_29), !dir.Directory.Exists,
                                 IndexWriter.MaxFieldLength.UNLIMITED).Close();
         }
 
@@ -167,11 +133,11 @@ namespace Core.Lucene
         {
             var query = new BooleanQuery();
             query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.SourceId, source.Id)),
-                                        BooleanClause.Occur.MUST));
+                                        Occur.MUST));
             query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.Tag, EmptyTag)),
-                           BooleanClause.Occur.MUST_NOT));
+                                        Occur.MUST_NOT));
             query.Add(new BooleanClause(new TermQuery(new Term(SpecialFields.Tag, tag)),
-                                        BooleanClause.Occur.MUST_NOT));
+                                        Occur.MUST_NOT));
             indexWriter.DeleteDocuments(query);
         }
 
@@ -194,8 +160,7 @@ namespace Core.Lucene
 
         private Document PopDocument(IndexWriter writer, IndexReader reader, string sha1)
         {
-            var searcher = new IndexSearcher(reader);
-            try
+            using(var searcher = new IndexSearcher(reader))
             {
                 var query = new TermQuery(new Term(SpecialFields.Sha1, sha1));
                 var documents = searcher.Search(query, 1);
@@ -204,13 +169,9 @@ namespace Core.Lucene
 
                 if (documents.TotalHits == 0) return null;
 
-                var document = searcher.Doc(documents.ScoreDocs.First().doc);
+                var document = searcher.Doc(documents.ScoreDocs.First().Doc);
                 writer.DeleteDocuments(new Term(SpecialFields.Sha1, sha1));
                 return document;
-            }
-            finally
-            {
-                searcher.Close();
             }
         }
     }

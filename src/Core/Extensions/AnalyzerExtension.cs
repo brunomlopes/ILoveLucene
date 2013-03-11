@@ -9,17 +9,17 @@ namespace Core.Extensions
     {
         public static IEnumerable<string> Tokenize(this Analyzer self, string text)
         {
-            var stream = self.TokenStream("ignored field name", new StringReader(text));
-
-            stream.Reset();
-            var termAtt = (TermAttribute) stream.AddAttribute(typeof (TermAttribute));
-
-            while (stream.IncrementToken())
+            using (var stream = self.TokenStream("ignored field name", new StringReader(text)))
             {
-                yield return termAtt.Term();
+                stream.Reset();
+                var termAtt = stream.AddAttribute<TermAttribute>();
+
+                while (stream.IncrementToken())
+                {
+                    yield return termAtt.Term;
+                }
+                stream.End();
             }
-            stream.End();
-            stream.Close();
         }
     }
 }

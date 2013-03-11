@@ -50,47 +50,45 @@ namespace Core.Lucene
                                                                              })
                                                                              .Where(s => s != null)
                                                                              .ToArray();
-            var searcher = new MultiSearcher(searchers);
-            try
+            using (var searcher = new MultiSearcher(searchers))
             {
-                BooleanQuery query = GetQueryForText(text);
+                try
+                {
+                    BooleanQuery query = GetQueryForText(text);
                 
-                var results = searcher.Search(query, 10);
-                var commands = results.ScoreDocs
-                    .Select(d =>
-                                {
-                                    var document = searcher.Doc(d.doc);
-                                    try
+                    var results = searcher.Search(query, 10);
+                    var commands = results.ScoreDocs
+                        .Select(d =>
                                     {
-                                        Explanation explanation = null;
-                                        if (includeExplanation)
+                                        var document = searcher.Doc(d.Doc);
+                                        try
                                         {
-                                            explanation = searcher.Explain(query, d.doc);
-                                        }
-                                        var coreDoc = CoreDocument.Rehydrate(document);
-                                        var command = _converterRepository.FromDocumentToItem(coreDoc);
+                                            Explanation explanation = null;
+                                            if (includeExplanation)
+                                            {
+                                                explanation = searcher.Explain(query, d.Doc);
+                                            }
+                                            var coreDoc = CoreDocument.Rehydrate(document);
+                                            var command = _converterRepository.FromDocumentToItem(coreDoc);
 
-                                        return new AutoCompletionResult.CommandResult(command, coreDoc.GetDocumentId(), explanation);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        _log.Error(e, "Error getting command result for document {0}:{1}",
-                                                   document.GetField(SpecialFields.ConverterId).StringValue(),
-                                                   document.GetField(SpecialFields.Id).StringValue());
-                                        return null;
-                                    }
-                                })
-                    .Where(r => r != null);
-                return AutoCompletionResult.OrderedResult(text, commands);
-            }
-            catch (ParseException e)
-            {
-                _log.Error(e, "Error parsing '{0}'", text);
-                return AutoCompletionResult.NoResult(text);
-            }
-            finally
-            {
-                searcher.Close();
+                                            return new AutoCompletionResult.CommandResult(command, coreDoc.GetDocumentId(), explanation);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            _log.Error(e, "Error getting command result for document {0}:{1}",
+                                                       document.GetField(SpecialFields.ConverterId).StringValue,
+                                                       document.GetField(SpecialFields.Id).StringValue);
+                                            return null;
+                                        }
+                                    })
+                        .Where(r => r != null);
+                    return AutoCompletionResult.OrderedResult(text, commands);
+                }
+                catch (ParseException e)
+                {
+                    _log.Error(e, "Error parsing '{0}'", text);
+                    return AutoCompletionResult.NoResult(text);
+                }
             }
         }
 
@@ -117,21 +115,19 @@ namespace Core.Lucene
                                                         //,boosts
                                                         );
             
-            queryParser.SetFuzzyMinSim((float)Configuration.FuzzySimilarity);
-            queryParser.SetDefaultOperator(QueryParser.Operator.AND);
+            queryParser.FuzzyMinSim = ((float)Configuration.FuzzySimilarity);
+            queryParser.DefaultOperator = (QueryParser.Operator.AND);
 
             var textWithSubString = "*" + text.Trim().Replace(" ", "* *").Trim() + "*";
             var textWithFuzzy = text.Trim().Replace(" ", "~ ").Trim() + "~";
 
-            queryParser.SetAllowLeadingWildcard(true);
+            queryParser.AllowLeadingWildcard = (true);
 
             Query substringQuery = queryParser.Parse(textWithSubString);
             Query fuzzyQuery = queryParser.Parse(textWithFuzzy);
 
+            var query = new BooleanQuery {{fuzzyQuery, Occur.SHOULD}, {substringQuery, Occur.SHOULD}};
 
-            var query = new BooleanQuery();
-            query.Add(fuzzyQuery, BooleanClause.Occur.SHOULD);
-            query.Add(substringQuery, BooleanClause.Occur.SHOULD);
             return query;
         }
     }

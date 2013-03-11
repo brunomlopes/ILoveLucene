@@ -22,7 +22,7 @@ namespace ILoveLucene.Views
                 Action<TreeViewItem, Explanation> renderExplanation = null;
                 renderExplanation = (t, exp) =>
                                         {
-                                            var header = exp.GetValue() + " " + exp.GetDescription() + " ";
+                                            var header = exp.Value + " " + exp.Description + " ";
                                             var childItem = new TreeViewItem {Header = header};
                                             t.Items.Add(childItem);
                                             foreach (var explanation in exp.GetDetails() ?? new Explanation[] {})

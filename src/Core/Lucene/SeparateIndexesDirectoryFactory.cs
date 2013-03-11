@@ -27,12 +27,12 @@ namespace Core.Lucene
                 var info = new DirectoryInfo(Path.Combine(_root.FullName, id+".index"));
 
                 var directory = new SimpleFSDirectory(info);
-                if (!info.Exists || info.EnumerateFiles().Count() <= 0)
+                if (!info.Exists || !info.EnumerateFiles().Any())
                 {
                     new IndexWriter(directory, new StandardAnalyzer(Version.LUCENE_29),
                                     true,
                                     IndexWriter.MaxFieldLength.UNLIMITED)
-                        .Close();
+                        .Dispose();
                 }
                 
                 return directory;

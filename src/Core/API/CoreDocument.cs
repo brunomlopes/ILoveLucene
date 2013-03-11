@@ -95,12 +95,12 @@ namespace Core.API
         {
             return (_document.GetField(fieldName)
                     ?? new Field("name", string.Empty, Field.Store.YES, Field.Index.NO))
-                .StringValue();
+                .StringValue;
         }
 
         public IEnumerable<string> GetStringList(string fieldName)
         {
-            return _document.GetFields(fieldName).Select(field => field.StringValue());
+            return _document.GetFields(fieldName).Select(field => field.StringValue);
         }
 
         public DocumentId GetDocumentId()
@@ -148,7 +148,7 @@ namespace Core.API
             var field = new Field(SpecialFields.Learnings, learning, Field.Store.YES,
                                   Field.Index.ANALYZED,
                                   Field.TermVector.WITH_POSITIONS_OFFSETS);
-            field.SetBoost(2);
+            field.Boost = 2;
             return field;
         }
     }
