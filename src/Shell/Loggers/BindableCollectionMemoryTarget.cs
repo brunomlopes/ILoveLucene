@@ -16,7 +16,7 @@ namespace ILoveLucene.Loggers
         {
             _messages = new BindableCollection<LogEventInfo>();
             _limit = 100;
-            MinimumLogLevel = LogLevel.Debug;
+            MinimumLogLevel = LogLevel.Info;
         }
 
         protected override void Write(LogEventInfo logEvent)

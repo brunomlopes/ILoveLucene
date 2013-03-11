@@ -89,9 +89,20 @@ namespace Core.Lucene
         private void EnsureIndexExists()
         {
             var dir = _indexDirectory as FSDirectory;
-            if (dir != null)
-                new IndexWriter(dir, new StandardAnalyzer(Version.LUCENE_29), !dir.Directory.Exists,
-                                IndexWriter.MaxFieldLength.UNLIMITED).Close();
+            if (dir == null) return;
+
+            // this is a bit of a hack, to ensure that we do not get any dangling write locks from a previous crash
+            var writeLock = dir.MakeLock("write.lock");
+            if (writeLock.IsLocked())
+            {
+                writeLock.Release();
+            }
+
+            using (new IndexWriter(dir, new StandardAnalyzer(Version.LUCENE_29), !dir.Directory.Exists,
+                                   IndexWriter.MaxFieldLength.UNLIMITED))
+            {
+                // index exists, we're good.
+            }
         }
 
         private void UpdateDocumentForObject(IndexWriter writer, IndexReader reader, IItemSource source, string tag, object item)
