@@ -15,6 +15,7 @@ using IronPython.Runtime;
 using IronPythonMef;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
+using Plugins.Commands;
 
 namespace Plugins.IronPython
 {
@@ -28,6 +29,29 @@ namespace Plugins.IronPython
         private Dictionary<string,FileSystemWatcher> _watchers = new Dictionary<string, FileSystemWatcher>();
 
         public EventHandler RefreshedFiles;
+
+        public static IList<Type> InitialScopeTypes = new[]
+            {
+                typeof (IItem), typeof (IConverter<>), typeof (BaseActOnTypedItem<>),
+                typeof (BaseActOnTypedItemAndReturnTypedItem<,>),
+                typeof (IItemSource),
+                typeof (BaseItemSource),
+                typeof (IConverter),
+                typeof (ICommand),
+                typeof (IRequest),
+                typeof (IActOnItem),
+                typeof (IActOnItemWithArguments),
+                typeof (IActOnTypedItemWithArguments<>),
+                typeof (IActOnTypedItemWithAutoCompletedArguments<>),
+                typeof (ICanActOnTypedItem<>),
+                typeof (IActOnTypedItemAndReturnItem<>),
+                typeof (IActOnTypedItemAndReturnTypedItem<,>),
+                typeof (IActOnTypedItemWithArgumentsAndReturnTypedItem<,>),
+                typeof (ArgumentAutoCompletionResult),
+                typeof (BasePythonItemSource),
+                typeof (IronPythonImportDefinition)
+            };
+
 
         [ImportConfiguration]
         public CoreConfiguration CoreConfiguration { get; set; }

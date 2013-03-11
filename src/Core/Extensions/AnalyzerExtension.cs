@@ -12,7 +12,7 @@ namespace Core.Extensions
             using (var stream = self.TokenStream("ignored field name", new StringReader(text)))
             {
                 stream.Reset();
-                var termAtt = stream.AddAttribute<TermAttribute>();
+                var termAtt = stream.AddAttribute<ITermAttribute>();
 
                 while (stream.IncrementToken())
                 {

@@ -34,7 +34,7 @@ class StringItemSource(BasePythonItemSource):
             var _engine = Python.CreateEngine();
             var script = _engine.CreateScriptSourceFromString(pythonCode);
             var typeExtractor = new ExtractTypesFromScript(_engine);
-            var types = typeExtractor.GetTypesFromScript(script).ToList();
+            var types = typeExtractor.GetTypesFromScript(script, IronPythonCommandsMefExport.InitialScopeTypes).ToList();
             Assert.Equal(1, types.Count());
             Assert.Equal("StringItemSource", types.First().Name);
 
@@ -58,7 +58,7 @@ class StringItemSource(BasePythonItemSource):
             var _engine = Python.CreateEngine();
             var script = _engine.CreateScriptSourceFromString(pythonCode);
             var typeExtractor = new ExtractTypesFromScript(_engine);
-            var exports = typeExtractor.GetPartsFromScript(script).ToList();
+            var exports = typeExtractor.GetPartsFromScript(script, IronPythonCommandsMefExport.InitialScopeTypes).ToList();
 
             var container = new CompositionContainer();
             var batch = new CompositionBatch(exports, new ComposablePart[] {});
@@ -84,7 +84,7 @@ class StringItemSource(BasePythonItemSource):
             var _engine = Python.CreateEngine();
             var script = _engine.CreateScriptSourceFromString(pythonCode);
             var typeExtractor = new ExtractTypesFromScript(_engine);
-            var exports = typeExtractor.GetPartsFromScript(script).ToList();
+            var exports = typeExtractor.GetPartsFromScript(script, IronPythonCommandsMefExport.InitialScopeTypes).ToList();
 
             var container = new CompositionContainer();
             var batch = new CompositionBatch(exports, new ComposablePart[] {});
@@ -119,7 +119,7 @@ class StringItemSource(BasePythonItemSource, IActOnItem):
             var _engine = Python.CreateEngine();
             var script = _engine.CreateScriptSourceFromString(pythonCode);
             var typeExtractor = new ExtractTypesFromScript(_engine);
-            var exports = typeExtractor.GetPartsFromScript(script).ToList();
+            var exports = typeExtractor.GetPartsFromScript(script, IronPythonCommandsMefExport.InitialScopeTypes).ToList();
 
             var container = new CompositionContainer();
             var batch = new CompositionBatch(exports, new ComposablePart[] {});
@@ -150,7 +150,7 @@ StringItemSource.import_actions.func_dict['imports'] = IronPythonImportDefinitio
             var script = _engine.CreateScriptSourceFromString(pythonCode);
             
             var typeExtractor = new ExtractTypesFromScript(_engine);
-            var exports = typeExtractor.GetPartsFromScript(script).ToList();
+            var exports = typeExtractor.GetPartsFromScript(script, IronPythonCommandsMefExport.InitialScopeTypes).ToList();
 
             var container = new CompositionContainer(new TypeCatalog(typeof(MockExporter), typeof(MockImportActions)));
             
@@ -183,7 +183,7 @@ class StringItemSource:
             var script = _engine.CreateScriptSourceFromString(pythonCode);
             
             var typeExtractor = new ExtractTypesFromScript(_engine);
-            var exports = typeExtractor.GetPartsFromScript(script).ToList();
+            var exports = typeExtractor.GetPartsFromScript(script, IronPythonCommandsMefExport.InitialScopeTypes).ToList();
 
             var container = new CompositionContainer(new TypeCatalog(typeof(MockExporter), typeof(MockImportActions)));
             
@@ -238,7 +238,7 @@ class StringItemSource:
             var script = _engine.CreateScriptSourceFromString(pythonCode);
             
             var typeExtractor = new ExtractTypesFromScript(_engine);
-            var exports = typeExtractor.GetPartsFromScript(script).ToList();
+            var exports = typeExtractor.GetPartsFromScript(script, IronPythonCommandsMefExport.InitialScopeTypes).ToList();
 
             var container = new CompositionContainer(new TypeCatalog(typeof(MockExporter), typeof(MockImportActions)));
             
@@ -306,7 +306,7 @@ class StringItemSource(BasePythonItemSource):
             var _engine = Python.CreateEngine();
             var script = _engine.CreateScriptSourceFromString(pythonCode);
             var typeExtractor = new ExtractTypesFromScript(_engine);
-            var exports = typeExtractor.GetPartsFromScript(script).ToList();
+            var exports = typeExtractor.GetPartsFromScript(script, IronPythonCommandsMefExport.InitialScopeTypes).ToList();
 
             Assert.Equal(0, exports.Count());
         }
