@@ -22,6 +22,7 @@ using ILoveLucene.Infrastructure;
 using ILoveLucene.Loggers;
 using ILoveLucene.Modules;
 using ILoveLucene.ViewModels;
+using NLog;
 using Plugins.IronPython;
 using Plugins.Tasks;
 using Quartz;
@@ -30,6 +31,7 @@ using Quartz.Simpl;
 using ILog = Core.Abstractions.ILog;
 using LogManager = NLog.LogManager;
 using Task = System.Threading.Tasks.Task;
+using Core.Extensions;
 
 namespace ILoveLucene
 {
@@ -86,7 +88,7 @@ namespace ILoveLucene
             var batch = new CompositionBatch();
             batch.AddExportedValue(MefContainer);
             batch.AddExportedValue<ILoadConfiguration>(loadConfiguration);
-            batch.AddExportedValue<ILog>(new NLogAdapter(NLog.LogManager.GetLogger("mef")));
+            batch.AddExportedValue<ILog>(new NLogAdapterToCoreILog(NLog.LogManager.GetLogger("mef")));
             batch.AddExportedValue(coreConfiguration);
             batch.AddExportedValue(updateManagerAdapter);
             batch.AddExportedValue<IScheduler>(scheduler);
@@ -102,7 +104,7 @@ namespace ILoveLucene
             builder.RegisterInstance<IWindowManager>(new WindowManager());
             builder.RegisterInstance<IEventAggregator>(new EventAggregator());
 
-            builder.RegisterModule(new LoggingModule(t => new NLogAdapter(NLog.LogManager.GetLogger(t.FullName)),
+            builder.RegisterModule(new LoggingModule(t => new NLogAdapterToCoreILog(NLog.LogManager.GetLogger(t.FullName)),
                                                      t => NLog.LogManager.GetLogger(t.FullName)));
             builder.RegisterModule(new SatisfyMefImports(MefContainer));
 
@@ -118,6 +120,7 @@ namespace ILoveLucene
             builder.RegisterType<ScheduleIndexJobs>().As<IStartupTask>();
             builder.RegisterType<ScheduleUpdateCheckJob>().As<IStartupTask>();
             builder.RegisterType<IronPythonCommandsMefExport>().As<IStartupTask>();
+            builder.RegisterType<LogScheduledJobs>().As<IStartupTask>();
 
             builder.RegisterType<Shutdown>().AsSelf();
 
@@ -135,21 +138,27 @@ namespace ILoveLucene
             MefContainer.Compose(hack);
 
             Container.Resolve<IScheduler>().Start();
-            Task.Factory.StartNew(ExecuteStartupTasks);
+            var startupTasksLogger = LogManager.GetLogger("StartupTasks");
+            Task.Factory.StartNew(() => ExecuteStartupTasks(startupTasksLogger))
+                .GuardForException(ex => startupTasksLogger.ErrorException("Error with startup tasks", ex));
         }
 
-        private void ExecuteStartupTasks()
+        private void ExecuteStartupTasks(Logger log)
         {
-            var log = LogManager.GetLogger("StartupTasks");
-            Container
-                .Resolve<IEnumerable<IStartupTask>>()
-                .AsParallel()
-                .ForAll(t =>
-                            {
-                                log.Info("Startup task {0} starting", t.GetType().FullName);
-                                t.Execute();
-                                log.Info("Startup task {0} done", t.GetType().FullName);
-                            });
+            var startupTasks = Container.Resolve<IEnumerable<IStartupTask>>();
+            foreach (var t in startupTasks)
+            {
+                try
+                {
+                    log.Info("Startup task {0} starting", t.GetType().FullName);
+                    t.Execute();
+                    log.Info("Startup task {0} done", t.GetType().FullName);
+                }
+                catch (Exception e)
+                {
+                    log.ErrorException("Error executing task "+t.GetType().Name, e);
+                }
+            }
         }
 
         protected override void OnExit(object sender, EventArgs e)

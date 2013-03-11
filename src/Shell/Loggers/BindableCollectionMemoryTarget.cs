@@ -10,14 +10,19 @@ namespace ILoveLucene.Loggers
         private readonly int _limit;
         private object _messagesLock = new object();
 
+        public LogLevel MinimumLogLevel { get; set; }
+
         public BindableCollectionMemoryTarget()
         {
             _messages = new BindableCollection<LogEventInfo>();
             _limit = 100;
+            MinimumLogLevel = LogLevel.Debug;
         }
 
         protected override void Write(LogEventInfo logEvent)
         {
+            if(MinimumLogLevel > logEvent.Level) return;
+
             lock (_messagesLock)
             {
                 Messages.Add(logEvent);

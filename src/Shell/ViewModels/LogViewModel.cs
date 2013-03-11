@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Caliburn.Micro;
 using ILoveLucene.Loggers;
 using NLog;
-using LogManager = NLog.LogManager;
 
 namespace ILoveLucene.ViewModels
 {
     public class LogViewModel : PropertyChangedBase
     {
         private BindableCollectionMemoryTarget _inMemoryTarget;
+
         public BindableCollectionMemoryTarget InMemoryTarget
         {
             get { return _inMemoryTarget; }
@@ -23,6 +20,31 @@ namespace ILoveLucene.ViewModels
             }
         }
 
+        public LogLevel MinimumLevel
+        {
+            get { return _inMemoryTarget.MinimumLogLevel; }
+            set
+            {
+                if (Equals(value, _inMemoryTarget.MinimumLogLevel)) return;
+                _inMemoryTarget.MinimumLogLevel = value;
+                NotifyOfPropertyChange(() => MinimumLevel);
+            }
+        }
+
+        public IEnumerable<LogLevel> LogLevels {get
+        {
+            return new LogLevel[]
+                {
+                    NLog.LogLevel.Debug,
+                    NLog.LogLevel.Error,
+                    NLog.LogLevel.Fatal,
+                    NLog.LogLevel.Info,
+                    NLog.LogLevel.Off,
+                    NLog.LogLevel.Trace,
+                    NLog.LogLevel.Warn,
+                };
+        }}
+
         public IObservableCollection<LogEventInfo> Logs
         {
             get { return InMemoryTarget.Messages; }
@@ -31,11 +53,6 @@ namespace ILoveLucene.ViewModels
         public LogViewModel(BindableCollectionMemoryTarget inMemoryTarget)
         {
             _inMemoryTarget = inMemoryTarget;
-            //_inMemoryTarget.CollectionChanged += (s, e) =>
-            //                                         {
-            //                                             NotifyOfPropertyChange(() => InMemoryTarget);
-            //                                             NotifyOfPropertyChange(() => Logs);
-            //                                         };
         }
     }
 }

@@ -1,8 +1,10 @@
 using System;
 using System.Globalization;
+using System.Text;
 using System.Windows.Data;
 using System.Windows.Markup;
 using NLog;
+using System.Linq;
 
 namespace ILoveLucene.ValueConverters
 {
@@ -12,7 +14,21 @@ namespace ILoveLucene.ValueConverters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var item = (LogEventInfo)value;
-            return string.Format("{0}|{1}|{2}", item.TimeStamp, item.Level, item.FormattedMessage);
+            var builder = new StringBuilder();
+            builder.AppendFormat("{0}|{1}|{2}", item.TimeStamp, item.Level, item.FormattedMessage);
+            if (item.Exception !=null)
+            {
+                var exceptions = new []{item.Exception};
+                if (item.Exception is AggregateException)
+                {
+                    exceptions = ((AggregateException) item.Exception).InnerExceptions.ToArray();
+                }
+                foreach (var ex in exceptions)
+                {
+                    builder.AppendFormat("\n{0}{1}\n{2}", ex.GetType(), ex.Message, ex.StackTrace);
+                }
+            }
+            return builder.ToString();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

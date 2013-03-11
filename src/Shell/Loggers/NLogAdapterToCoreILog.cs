@@ -1,14 +1,14 @@
 ﻿using System;
-using Core.Abstractions;
 using NLog;
+using ILog = Core.Abstractions.ILog;
 
 namespace ILoveLucene.Loggers
 {
-    public class NLogAdapter : ILog, Caliburn.Micro.ILog
+    public class NLogAdapterToCoreILog : ILog, Caliburn.Micro.ILog
     {
         private readonly Logger _logger;
 
-        public NLogAdapter(Logger logger)
+        public NLogAdapterToCoreILog(Logger logger)
         {
             _logger = logger;
         }
