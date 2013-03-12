@@ -72,6 +72,7 @@ namespace Core.Lucene
 
                 var trigger = TriggerBuilder.Create()
                     .StartAt(DateBuilder.FutureDate(2, IntervalUnit.Second))
+                    .WithSimpleSchedule(b => b.WithIntervalInSeconds(frequency).RepeatForever())
                     .WithIdentity("Each" + frequency + "SecondsFor" + itemSource.Id)
                     .Build();
 
