@@ -8,10 +8,10 @@ namespace ILoveLucene.Infrastructure
 {
     public class CoreLoggingJobHistoryPlugin : ISchedulerPlugin, IJobListener
     {
-        private string _jobFailedMessage = "Job {1}.{0} execution failed at {2:HH:mm:ss MM/dd/yyyy} and reports: {8}";
-        private string _jobSuccessMessage = "Job {1}.{0} execution complete at {2:HH:mm:ss MM/dd/yyyy} and reports: {8}";
-        private string _jobToBeFiredMessage = "Job {1}.{0} fired (by trigger {4}.{3}) at: {2:HH:mm:ss MM/dd/yyyy}";
-        private string _jobWasVetoedMessage = "Job {1}.{0} was vetoed.  It was to be fired (by trigger {4}.{3}) at: {2:HH:mm:ss MM/dd/yyyy}";
+        private string _jobFailedMessage = "Job {1}.{0} execution failed and reports: {8}";
+        private string _jobSuccessMessage = "Job {1}.{0} execution complete and reports: {8}";
+        private string _jobToBeFiredMessage = "Job {1}.{0} fired (by trigger {4}.{3}) ";
+        private string _jobWasVetoedMessage = "Job {1}.{0} was vetoed.  It was to be fired (by trigger {4}.{3})";
         private Core.Abstractions.ILog _log;
         private string _name;
 
