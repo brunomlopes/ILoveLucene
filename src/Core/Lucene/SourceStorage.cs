@@ -91,14 +91,10 @@ namespace Core.Lucene
             var dir = _indexDirectory as FSDirectory;
             if (dir == null) return;
 
-            // this is a bit of a hack, to ensure that we do not get any dangling write locks from a previous crash
-            var writeLock = dir.MakeLock("write.lock");
-            if (writeLock.IsLocked())
-            {
-                writeLock.Release();
-            }
+            if(IndexWriter.IsLocked(_indexDirectory))
+                IndexWriter.Unlock(_indexDirectory);
 
-            using (new IndexWriter(dir, new StandardAnalyzer(Version.LUCENE_29), !dir.Directory.Exists,
+            using (var writer = new IndexWriter(dir, new StandardAnalyzer(Version.LUCENE_29), !dir.Directory.Exists,
                                    IndexWriter.MaxFieldLength.UNLIMITED))
             {
                 // index exists, we're good.

@@ -131,21 +131,27 @@ namespace ILoveLucene
 
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
-            base.OnStartup(sender, e);
-
             var hack = new CompositionBatch();
             hack.AddExportedValue(Container);
             MefContainer.Compose(hack);
 
-            Container.Resolve<IScheduler>().Start();
             var startupTasksLogger = LogManager.GetLogger("StartupTasks");
             Task.Factory.StartNew(() => ExecuteStartupTasks(startupTasksLogger))
-                .GuardForException(ex => startupTasksLogger.ErrorException("Error with startup tasks", ex));
+                .GuardForException(ex => startupTasksLogger.ErrorException("Error with startup tasks", ex))
+                ;
+
+            base.OnStartup(sender, e);
         }
 
         private void ExecuteStartupTasks(Logger log)
         {
             var startupTasks = Container.Resolve<IEnumerable<IStartupTask>>();
+
+            // HACK: only start the scheduler after resolving startup tasks
+            // because one of the startup tasks has an onimportstatified that runs execute (ScheduleIndexJobs)
+            // which we want to run just once
+            Container.Resolve<IScheduler>().Start();
+
             foreach (var t in startupTasks)
             {
                 try

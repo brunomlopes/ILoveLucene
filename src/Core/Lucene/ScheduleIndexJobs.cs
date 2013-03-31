@@ -64,6 +64,7 @@ namespace Core.Lucene
                 var itemSourceName = itemSource.Id;
                 var jobDetail = JobBuilder.Create<IndexerJob>()
                     .WithIdentity("IndexerFor" + itemSourceName, JobGroupExporter.JobGroup)
+                    .RequestRecovery(true)
                     .Build();
 
                 jobDetail.JobDataMap[IndexerJob.SourceStorageKey] = sourceStorage;

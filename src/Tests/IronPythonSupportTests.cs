@@ -251,7 +251,7 @@ class StringItemSource:
             Assert.IsAssignableFrom<IActOnItem>(action);
         }
 
-        [Fact]
+        [Fact(Skip = "IronPythonFile needs a way to inject types")]
         public void TouchedFileCausesRecomposition()
         {
             var ironpythonDir = "IronPythonCommands".AsNewDirectoryInfo();
