@@ -64,7 +64,6 @@ namespace Core.Lucene
                 var itemSourceName = itemSource.Id;
                 var jobDetail = JobBuilder.Create<IndexerJob>()
                     .WithIdentity("IndexerFor" + itemSourceName, JobGroupExporter.JobGroup)
-                    .RequestRecovery(true)
                     .Build();
 
                 jobDetail.JobDataMap[IndexerJob.SourceStorageKey] = sourceStorage;
@@ -73,7 +72,9 @@ namespace Core.Lucene
 
                 var trigger = TriggerBuilder.Create()
                     .StartAt(DateBuilder.FutureDate(2, IntervalUnit.Second))
-                    .WithSimpleSchedule(b => b.WithIntervalInSeconds(frequency).RepeatForever())
+                    .WithSimpleSchedule(b => b.WithIntervalInSeconds(frequency)
+                        .RepeatForever()
+                        .WithMisfireHandlingInstructionNextWithRemainingCount())
                     .WithIdentity("Each" + frequency + "SecondsFor" + itemSource.Id)
                     .Build();
 
