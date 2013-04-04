@@ -130,6 +130,7 @@
     <Compile Include="Putty.cs" />
     <Compile Include="Reindex.cs" />
     <Compile Include="ReloadConfiguration.cs" />
+    <Compile Include="RemoteDesktopClient.cs" />
     <Compile Include="Services\RestartService.cs" />
     <Compile Include="Services\ServiceItemConverter.cs" />
     <Compile Include="Services\ServiceTypedItem.cs" />
