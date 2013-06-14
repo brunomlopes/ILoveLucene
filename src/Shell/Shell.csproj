@@ -277,6 +277,10 @@
       <Project>{B8C7C8AE-FB80-473B-85D5-5D0D7F302E09}</Project>
       <Name>Plugins.Calibre</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Plugins.OneNote\Plugins.OneNote.csproj">
+      <Project>{7a6db110-ac8e-4e93-98bf-1bbb45821779}</Project>
+      <Name>Plugins.OneNote</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Plugins.SqlServer\Plugins.SqlServer.csproj">
       <Project>{A601FAC8-1292-45CE-ABD9-87C8C2CA45DD}</Project>
       <Name>Plugins.SqlServer</Name>

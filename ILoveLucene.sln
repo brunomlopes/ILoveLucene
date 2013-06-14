@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shell", "src\Shell\Shell.csproj", "{F296D053-4820-4CC9-9A4F-BFD0517BE7A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "src\Core\Core.csproj", "{28E91DF6-B35A-4341-AB82-E9CE24B04750}"
@@ -29,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{1928F1
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugins.OneNote", "src\Plugins.OneNote\Plugins.OneNote.csproj", "{7A6DB110-AC8E-4E93-98BF-1BBB45821779}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,6 +74,10 @@ Global
 		{5DB74A33-95C2-4B84-B638-C8C252CF7242}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5DB74A33-95C2-4B84-B638-C8C252CF7242}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5DB74A33-95C2-4B84-B638-C8C252CF7242}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A6DB110-AC8E-4E93-98BF-1BBB45821779}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A6DB110-AC8E-4E93-98BF-1BBB45821779}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A6DB110-AC8E-4E93-98BF-1BBB45821779}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A6DB110-AC8E-4E93-98BF-1BBB45821779}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
