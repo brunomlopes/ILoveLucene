@@ -41,7 +41,7 @@ namespace Plugins.Shortcuts
             {
                 var fileInfos = currentDir
                     .GetFiles("*.*", SearchOption.TopDirectoryOnly)
-                    .Where(f => Conf.Extensions.Contains(f.Extension)).ToList();
+                    .Where(f => Conf.Extensions.Contains(f.Extension, StringComparer.InvariantCultureIgnoreCase)).ToList();
                 Log.Debug("Found {0} files in {1}", fileInfos.Count(), currentDir);
                 _shortcutPaths.UnionWith(fileInfos);
             }
