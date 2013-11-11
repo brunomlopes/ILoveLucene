@@ -24,6 +24,7 @@ using ILoveLucene.Modules;
 using ILoveLucene.ViewModels;
 using NLog;
 using Plugins.IronPython;
+using Plugins.Processes;
 using Plugins.Tasks;
 using Quartz;
 using Quartz.Impl;
@@ -121,6 +122,7 @@ namespace ILoveLucene
             builder.RegisterType<ScheduleUpdateCheckJob>().As<IStartupTask>();
             builder.RegisterType<IronPythonCommandsMefExport>().As<IStartupTask>();
             builder.RegisterType<LogScheduledJobs>().As<IStartupTask>();
+            builder.RegisterType<ProcessMonitor>().As<IStartupTask>();
 
             builder.RegisterType<Shutdown>().AsSelf();
 

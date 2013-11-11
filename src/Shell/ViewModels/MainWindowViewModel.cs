@@ -290,6 +290,8 @@ namespace ILoveLucene.ViewModels
             var token = _cancelationTokenSource.Token;
             Task.Factory.StartNew(() =>
                                       {
+                                          if(string.IsNullOrWhiteSpace(Input)) return;
+
                                           var result = _autoCompleteText.Autocomplete(Input);
 
                                           token.ThrowIfCancellationRequested();

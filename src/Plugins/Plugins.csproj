@@ -96,6 +96,8 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Management.Instrumentation" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="Microsoft.CSharp" />
@@ -123,6 +125,11 @@
     <Compile Include="IronPython\BasePythonItemSource.cs" />
     <Compile Include="IronPython\IronPythonCommandsMefExport.cs" />
     <Compile Include="IronPython\Configuration.cs" />
+    <Compile Include="Processes\ForegroundTracker.cs" />
+    <Compile Include="Processes\ProcessMonitor.cs" />
+    <Compile Include="Processes\Win32_Process.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Processes\CloseProcess.cs" />
     <Compile Include="Processes\KillProcess.cs" />
     <Compile Include="Processes\LowerPriority.cs" />
@@ -130,6 +137,7 @@
     <Compile Include="Processes\ProcessItem.cs" />
     <Compile Include="Processes\ProcessSource.cs" />
     <Compile Include="Processes\SwitchToWindow.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Putty.cs" />
     <Compile Include="Reindex.cs" />

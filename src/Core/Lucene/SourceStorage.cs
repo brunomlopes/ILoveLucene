@@ -75,6 +75,20 @@ namespace Core.Lucene
 
                 indexWriter.Commit();
             }
+        }        
+        
+        public void RemoveItemsById(IItemSource source, params DocumentId[] itemIds)
+        {
+            using (var indexWriter = GetIndexWriter())
+            using (var indexReader = indexWriter.GetReader())
+            {
+                foreach (var item in itemIds)
+                {
+                    PopDocument(indexWriter, indexReader, item.GetId());
+                }
+
+                indexWriter.Commit();
+            }
         }
 
         public void LearnCommandForInput(DocumentId completionId, string input)
