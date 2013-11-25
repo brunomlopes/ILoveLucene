@@ -138,9 +138,14 @@ namespace ILoveLucene
             MefContainer.Compose(hack);
 
             var startupTasksLogger = LogManager.GetLogger("StartupTasks");
-            Task.Factory.StartNew(() => ExecuteStartupTasks(startupTasksLogger))
-                .GuardForException(ex => startupTasksLogger.ErrorException("Error with startup tasks", ex))
-                ;
+            try
+            {
+                ExecuteStartupTasks(startupTasksLogger);
+            }
+            catch (Exception ex)
+            {
+                startupTasksLogger.ErrorException("Error executing startup tasks", ex);
+            }
 
             base.OnStartup(sender, e);
         }
