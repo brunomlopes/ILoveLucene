@@ -138,7 +138,19 @@ namespace Plugins.IronPython
                 return;
             }
             _log.Info("Reloading file {0}", e.FullPath);
-            _files[e.FullPath].Compose();
+            try
+            {
+                _files[e.FullPath].Compose();
+
+            }
+            catch (IronPythonFile.PythonException ex)
+            {
+                _log.Error(ex, "Error executing file {0}:{1}", e.FullPath, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex, "Error executing file {0}:{1}", e.FullPath, ex.Message);
+            }
             RefreshedFiles(this, new EventArgs());
 
         }
