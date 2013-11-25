@@ -116,7 +116,8 @@ __InstanceDeletionEvent WITHIN 5 WHERE TargetInstance ISA 'Win32_Process' ";
 
         public void Execute()
         {
-            Init();
+            // Disable WMI tracking, which costs a constant 3% CPU
+            //Init();
             OnUiThread.Execute(() =>
             {
                 _windowTracker = new ForegroundTracker(i => Task.Factory.StartNew(() => ReIndexProcess(i)));
