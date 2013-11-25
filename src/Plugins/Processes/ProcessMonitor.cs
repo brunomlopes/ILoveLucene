@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Security.AccessControl;
 using System.Threading.Tasks;
 using Core.Abstractions;
 using System.Management;
@@ -86,6 +87,7 @@ __InstanceDeletionEvent WITHIN 5 WHERE TargetInstance ISA 'Win32_Process' ";
             ReIndexProcess((int)processId);
         }
 
+        private static readonly object Reindexlock = new object();
         private void ReIndexProcess(int processId)
         {
             Process process;
@@ -106,8 +108,14 @@ __InstanceDeletionEvent WITHIN 5 WHERE TargetInstance ISA 'Win32_Process' ";
             if (previousTitle == process.MainWindowTitle) return;
             Log.Debug("Updating process {0} ({1})", process, process.Id);
 
-            var storage = _sourceStorageFactory.SourceStorageFor(_source.Id);
-            storage.AppendItems(_source, process);
+            // serialize all access to the source storage.
+            lock (Reindexlock)
+            {
+                // yeah, this isn't so clever, now is is it :S
+                // source storage should be able to serialize itself
+                var storage = _sourceStorageFactory.SourceStorageFor(_source.Id);
+                storage.AppendItems(_source, process);
+            }
         }
 
 
@@ -118,11 +126,12 @@ __InstanceDeletionEvent WITHIN 5 WHERE TargetInstance ISA 'Win32_Process' ";
         {
             // Disable WMI tracking, which costs a constant 3% CPU
             //Init();
-            OnUiThread.Execute(() =>
-            {
-                _windowTracker = new ForegroundTracker(i => Task.Factory.StartNew(() => ReIndexProcess(i)));
-                _windowTracker.Start();
-            });
+            // Disable reactive indexing, which collides with regular reindexing
+            //OnUiThread.Execute(() =>
+            //{
+            //    _windowTracker = new ForegroundTracker(i => Task.Factory.StartNew(() => ReIndexProcess(i)));
+            //    _windowTracker.Start();
+            //});
         }
 
 

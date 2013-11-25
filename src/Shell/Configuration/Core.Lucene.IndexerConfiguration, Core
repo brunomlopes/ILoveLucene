@@ -2,7 +2,7 @@
 	IndexingFrequencyForPlugin : {
 		"Plugins.Shortcuts.ShortcutSource, Plugins":1800 ,
 		"Plugins.Commands.StandaloneCommandsSource, Plugins":1200,
-		"Plugins.Processes.ProcessSource, Plugins":1800,
+		"Plugins.Processes.ProcessSource, Plugins":30,
 		"Plugins.Services.ServicesSource, Plugins":1800,
 		"Plugins.Tasks.TaskRepository, Plugins":1800
 	},
