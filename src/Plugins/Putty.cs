@@ -51,7 +51,7 @@ namespace Plugins
             {
                 arguments = "-load " + arguments;
             }
-            Process.Start("putty", arguments);
+            Process.Start(item.FullName, arguments);
         }
 
         public override string Text
