@@ -38,6 +38,7 @@ namespace Core
 
         public IEnumerable<IActOnItem> ActionsForItem(AutoCompletionResult.CommandResult result)
         {
+            if (result == null) return new IActOnItem[] {};
             var item = result.Item;
             var actions = new List<IActOnItem>();
 
