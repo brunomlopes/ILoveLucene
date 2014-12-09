@@ -151,8 +151,8 @@ __InstanceDeletionEvent WITHIN 5 WHERE TargetInstance ISA 'Win32_Process' ";
         public void Dispose(bool disposing)
         {
             if (!disposing) return;
-            _creationWatcher?.Dispose();
-            _deletionWatcher?.Dispose();
+            if (_creationWatcher != null) _creationWatcher.Dispose();
+            if (_deletionWatcher != null) _deletionWatcher.Dispose();
         }
     }
 }

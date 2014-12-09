@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Core.API
 {
@@ -7,8 +6,14 @@ namespace Core.API
     {
         public abstract IEnumerable<object> GetItems();
 
-        public virtual string Id => GetType().FullName;
+        public virtual string Id
+        {
+            get { return GetType().FullName; }
+        }
 
-        public virtual bool Persistent => true;
+        public virtual bool Persistent
+        {
+            get { return true; }
+        }
     }
 }

@@ -110,17 +110,35 @@ namespace ILoveLucene.ViewModels
             }
         }
 
-        public Visibility ArgumentOptionsVisibility => (Item is IActOnItemWithAutoCompletedArguments) && ArgumentOptions.Count > 0
-            ? Visibility.Visible
-            : Visibility.Hidden;
+        public Visibility ArgumentOptionsVisibility
+        {
+            get
+            {
+                return (Item is IActOnItemWithAutoCompletedArguments) && ArgumentOptions.Count > 0
+                    ? Visibility.Visible
+                    : Visibility.Hidden;
+            }
+        }
 
-        public bool CanUpdate => _updateManager.State == UpdateManager.UpdateProcessState.Prepared &&
-                                 _updateManager.HaveUpdatesAvailable;
+        public bool CanUpdate
+        {
+            get
+            {
+                return _updateManager.State == UpdateManager.UpdateProcessState.Prepared &&
+                       _updateManager.HaveUpdatesAvailable;
+            }
+        }
 
-        public Visibility UpdateVisible => (_updateManager.State == UpdateManager.UpdateProcessState.Prepared &&
-                                            _updateManager.HaveUpdatesAvailable)
-            ? Visibility.Visible
-            : Visibility.Hidden;
+        public Visibility UpdateVisible
+        {
+            get
+            {
+                return (_updateManager.State == UpdateManager.UpdateProcessState.Prepared &&
+                        _updateManager.HaveUpdatesAvailable)
+                    ? Visibility.Visible
+                    : Visibility.Hidden;
+            }
+        }
 
         public string Description
         {
@@ -132,7 +150,10 @@ namespace ILoveLucene.ViewModels
             }
         }
 
-        public IItem Item => Result?.Item;
+        public IItem Item
+        {
+            get { return Result != null ? Result.Item : null; }
+        }
 
         private AutoCompletionResult.CommandResult Result
         {
@@ -140,7 +161,7 @@ namespace ILoveLucene.ViewModels
             set
             {
                 _result = value;
-                Description = Item?.Description ?? string.Empty;
+                Description = (Item != null ? Item.Description : string.Empty) ;
 
                 NotifyOfPropertyChange(() => Result);
                 NotifyOfPropertyChange(() => Item);
@@ -169,7 +190,10 @@ namespace ILoveLucene.ViewModels
             }
         }
 
-        public IActOnItemWithArguments ActionWithArguments => SelectedAction as IActOnItemWithArguments;
+        public IActOnItemWithArguments ActionWithArguments
+        {
+            get { return SelectedAction as IActOnItemWithArguments; }
+        }
 
         public string Arguments
         {
@@ -182,7 +206,9 @@ namespace ILoveLucene.ViewModels
         }
 
         public Visibility ArgumentsVisible
-            => (Result != null && ActionWithArguments != null) ? Visibility.Visible : Visibility.Hidden;
+        {
+            get { return (Result != null && ActionWithArguments != null) ? Visibility.Visible : Visibility.Hidden; }
+        }
 
         public string Input
         {
@@ -195,11 +221,14 @@ namespace ILoveLucene.ViewModels
             }
         }
 
-        public bool CanExecute => !string.IsNullOrWhiteSpace(_input) && SelectedAction != null;
-
-        public void Execute(FrameworkElement source)
+        public bool CanExecute
         {
-            Task.Factory.StartNew(() =>
+            get { return !string.IsNullOrWhiteSpace(_input) && SelectedAction != null; }
+        }
+
+        public async void Execute(FrameworkElement source)
+        {
+            await Task.Run(() =>
             {
                 try
                 {
