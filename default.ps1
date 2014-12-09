@@ -34,7 +34,7 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
     mkdir $outputDir\Bin | Out-Null
     mkdir $outputDir\LocalConfiguration | Out-Null
     Echo "Copy configurations from ..\Configuration to here and change them to fit your preferences" `
-        | Out-File $outputDir\LocalConfiguration\readme.txt
+        | Out-File $outputDir\Local.Configuration\readme.txt
     Move-Item $binaries $outputDir\Bin
     Move-Item $plugins $outputDir\Plugins
     

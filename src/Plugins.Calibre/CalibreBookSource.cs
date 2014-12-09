@@ -39,7 +39,8 @@ namespace Plugins.Calibre
             var pathToCalibreDb = Path.Combine(Config.PathToCalibreInstalation, "calibredb.exe");
             if (!File.Exists(pathToCalibreDb))
             {
-                Log.Debug("File {0} doesn't exist.", pathToCalibreDb);
+                Log.Debug("File {0} doesn't exist. Assuming calibre isn't installed.", pathToCalibreDb);
+                yield break;
             }
 
             var outputPath = Path.GetTempFileName() + ".xml";
