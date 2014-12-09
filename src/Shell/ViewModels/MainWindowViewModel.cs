@@ -338,13 +338,13 @@ namespace ILoveLucene.ViewModels
             }
         }
 
-        public void AutoComplete()
+        public async void AutoComplete()
         {
             _cancelationTokenSource.Cancel();
             _cancelationTokenSource = new CancellationTokenSource();
 
             var token = _cancelationTokenSource.Token;
-            Task.Factory.StartNew(() =>
+            await Task.Run(() =>
             {
                 if (string.IsNullOrWhiteSpace(Input)) return;
 
@@ -373,13 +373,13 @@ namespace ILoveLucene.ViewModels
                 .GuardForException(SetError);
         }
 
-        public void ExplainResult()
+        public async void ExplainResult()
         {
             _cancelationTokenSource.Cancel();
             _cancelationTokenSource = new CancellationTokenSource();
 
             var token = _cancelationTokenSource.Token;
-            Task.Factory.StartNew(() =>
+            await Task.Run(() =>
             {
                 var result = _autoCompleteText.Autocomplete(Input, true);
 
@@ -436,7 +436,7 @@ namespace ILoveLucene.ViewModels
             Description = e.Message;
         }
 
-        public void AutoCompleteArgument()
+        public async void AutoCompleteArgument()
         {
             _argumentCancelationTokenSource.Cancel();
             _argumentCancelationTokenSource = new CancellationTokenSource();
@@ -446,7 +446,7 @@ namespace ILoveLucene.ViewModels
             var autoCompleteArgumentsCommand = SelectedAction as IActOnItemWithAutoCompletedArguments;
             if (autoCompleteArgumentsCommand == null)
                 return;
-            Task.Factory.StartNew(() =>
+            await Task.Run(() =>
             {
                 var result = autoCompleteArgumentsCommand.AutoCompleteArguments(Item, Arguments);
 

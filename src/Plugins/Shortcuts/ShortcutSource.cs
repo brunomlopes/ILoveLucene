@@ -62,17 +62,13 @@ namespace Plugins.Shortcuts
             directoryInfos.ForEach(d => ScanDirectoryForShortcuts(d.FullName));
         }
 
-        public override Task<IEnumerable<object>> GetItems()
+        public override IEnumerable<object> GetItems()
         {
-            return Task.Factory.StartNew(() =>
-                                             {
-                                                 _shortcutPaths = new HashSet<FileInfo>();
-                                                 Conf.Directories
-                                                     .Select(Environment.ExpandEnvironmentVariables).ToList()
-                                                     .ForEach(ScanDirectoryForShortcuts);
-                                                 return _shortcutPaths.Cast<object>();
-                                             })
-                .GuardForException(e => Log.Debug("Exception on task:" + e));
+            _shortcutPaths = new HashSet<FileInfo>();
+            Conf.Directories
+                .Select(Environment.ExpandEnvironmentVariables).ToList()
+                .ForEach(ScanDirectoryForShortcuts);
+            return _shortcutPaths;
         }
     }
 }

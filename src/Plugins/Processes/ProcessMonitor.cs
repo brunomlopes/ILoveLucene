@@ -2,10 +2,8 @@
 using System.Collections.Concurrent;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.Security.AccessControl;
-using System.Threading.Tasks;
-using Core.Abstractions;
 using System.Management;
+using Core.Abstractions;
 using Core.Lucene;
 using WMI.Win32;
 
@@ -17,11 +15,8 @@ namespace Plugins.Processes
         private readonly ProcessSource _source;
 
         private readonly ConcurrentDictionary<uint, Process> _cachedProcesses = new ConcurrentDictionary<uint, Process>();
-        private ManagementEventWatcher _modificationWatcher;
-        private ManagementEventWatcher _creationDeletionWatcher;
         private ManagementEventWatcher _creationWatcher;
         private ManagementEventWatcher _deletionWatcher;
-        private ForegroundTracker _windowTracker;
 
         [Import]
         public ILog Log { get; set; }
@@ -149,9 +144,15 @@ __InstanceDeletionEvent WITHIN 5 WHERE TargetInstance ISA 'Win32_Process' ";
 
         public void Dispose()
         {
-            if(_windowTracker != null) _windowTracker.Dispose();
-            if(_creationWatcher != null) _creationWatcher.Dispose();
-            if(_deletionWatcher != null) _deletionWatcher.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        public void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+            _creationWatcher?.Dispose();
+            _deletionWatcher?.Dispose();
         }
     }
 }

@@ -9,7 +9,6 @@ namespace ILoveLucene.AutoUpdate
 {
     public class ScheduleUpdateCheckJob : IStartupTask, IPartImportsSatisfiedNotification
     {
-        private bool _ready;
         private const string JobGroup = "ILoveLucene.AutoUpdate";
         private const string JobName = "ScheduleUpdateCheckJob";
 

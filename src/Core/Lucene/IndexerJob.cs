@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using Core.API;
-using Quartz;
-using Core.Extensions;
 using System.Linq;
+using Core.API;
+using Core.Extensions;
+using Quartz;
 
 namespace Core.Lucene
 {
@@ -37,7 +36,7 @@ namespace Core.Lucene
             {
                 // get count as sideeffect of traversing the items
                 // to avoid re-iterating throught the items result
-                var items = source.GetItems().Result
+                var items = source.GetItems()
                                   .Select(i =>
                                       {
                                           count++;

@@ -24,10 +24,9 @@ namespace Plugins.Calibre
         [Import]
         public ILog Log { get; set; }
      
-        public override Task<IEnumerable<object>> GetItems()
+        public override IEnumerable<object> GetItems()
         {
-            return Task.Factory
-                .StartNew(() => GetBooks());
+            return GetBooks();
         }
 
         private IEnumerable<object> GetBooks()

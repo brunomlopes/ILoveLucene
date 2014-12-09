@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abstractions\AutoCompletionResult.cs" />
+    <Compile Include="Annotations.cs" />
     <Compile Include="API\ArgumentAutoCompletionResult.cs" />
     <Compile Include="API\BaseActOnTypedItem.cs" />
     <Compile Include="API\BaseActOnTypedItemAndReturnTypedItem.cs" />

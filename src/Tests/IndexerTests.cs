@@ -167,9 +167,9 @@ namespace Tests
             var indexer = new SourceStorage(_directory, _learningRepository, _converterRepository);
 
             source.Items = new[] {new TextItem ("simple")};
-            indexer.IndexItems(source, source.GetItems().Result);
+            indexer.IndexItems(source, source.GetItems());
             source.Items = new TextItem[] {};
-            indexer.IndexItems(source, source.GetItems().Result);
+            indexer.IndexItems(source, source.GetItems());
 
 
             var searcher = GetAutocompleter();
@@ -186,7 +186,7 @@ namespace Tests
             var indexer = new SourceStorage(_directory, _learningRepository, _converterRepository);
 
             source.Items = new TextItem[] {};
-            indexer.IndexItems(source, source.GetItems().Result);
+            indexer.IndexItems(source, source.GetItems());
 
             var searcher = GetAutocompleter();
 
@@ -201,14 +201,14 @@ namespace Tests
             {
                 var source = new Source { Items = new  []{new TextItem("Firefox")} };
                 new SourceStorage(_directory, _learningRepository, _converterRepository)
-                    .IndexItems(source, source.GetItems().Result);
+                    .IndexItems(source, source.GetItems());
             }
             {
                 var source = new StepSource {Items = new[] {new TextItem("Firewall")}};
 
                 var task = Task.Factory.StartNew(() =>
                     {
-                        IEnumerable<object> enumerable = source.GetItems().Result;
+                        IEnumerable<object> enumerable = source.GetItems();
                         new SourceStorage(_directory, _learningRepository, _converterRepository)
                             .IndexItems(source, enumerable);
                     });
@@ -239,7 +239,7 @@ namespace Tests
             }
             {
                 var source = new Source { Items = new[] { new TextItem("Firefox") } };
-                new SourceStorage(_directory, _learningRepository, _converterRepository).IndexItems(source, source.GetItems().Result);
+                new SourceStorage(_directory, _learningRepository, _converterRepository).IndexItems(source, source.GetItems());
             }
             {
                 var searcher = GetAutocompleter();
@@ -297,7 +297,7 @@ namespace Tests
             var source = new Source {Items = items};
 
             var indexer = new SourceStorage(_directory,_learningRepository, _converterRepository);
-            indexer.IndexItems(source, source.GetItems().Result);
+            indexer.IndexItems(source, source.GetItems());
         }
     }
 
@@ -317,9 +317,9 @@ namespace Tests
     {
         public IEnumerable<IItem> Items { get; set; }
 
-        public override Task<IEnumerable<object>> GetItems()
+        public override IEnumerable<object> GetItems()
         {
-            return Task.Factory.StartNew(() => Items.Cast<object>());
+            return Items;
         }
 
         public override string Id
@@ -341,9 +341,9 @@ namespace Tests
             _releasedANewItem = new SemaphoreSlim(0);
         }
 
-        public override Task<IEnumerable<object>> GetItems()
+        public override IEnumerable<object> GetItems()
         {
-            return Task.Factory.StartNew(() => StepIterateItems());
+            return StepIterateItems();
         }
 
         public bool ReleaseNextItemAndWait(TimeSpan waitTimeout)

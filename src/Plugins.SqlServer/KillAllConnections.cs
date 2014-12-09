@@ -15,36 +15,31 @@ namespace Plugins.SqlServer
             using (var connection = new SqlConnection("Data Source=.;Integrated Security=True;"))
             {
                 connection.Open();
-                try
+              
+                var command =
+                    new SqlCommand("select session_id from sys.dm_exec_connections where session_id != @@SPID",
+                                    connection);
+                var sqlDataReader = command.ExecuteReader();
+                while (sqlDataReader.Read())
                 {
-                    var command =
-                        new SqlCommand("select session_id from sys.dm_exec_connections where session_id != @@SPID",
-                                       connection);
-                    var sqlDataReader = command.ExecuteReader();
-                    while (sqlDataReader.Read())
+                    sessionIds.Add((int) sqlDataReader["session_id"]);
+                }
+                sqlDataReader.Close();
+                foreach (var sessionId in sessionIds)
+                {
+                    try
                     {
-                        sessionIds.Add((int) sqlDataReader["session_id"]);
-                    }
-                    sqlDataReader.Close();
-                    foreach (var sessionId in sessionIds)
-                    {
-                        try
+                        using (var kill = new SqlCommand(string.Format("kill {0}", sessionId), connection))
                         {
-                            using (var kill = new SqlCommand(string.Format("kill {0}", sessionId), connection))
-                            {
-                                kill.ExecuteNonQuery();
-                            }
-                        }
-                        catch (Exception exception)
-                        {
-                            Console.WriteLine(exception);
+                            kill.ExecuteNonQuery();
                         }
                     }
+                    catch (Exception exception)
+                    {
+                        Console.WriteLine(exception);
+                    }
                 }
-                finally
-                {
-                    connection.Close();
-                }
+
             }
         }
 

@@ -3,13 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Core;
-using Core.API;
 using Core.Abstractions;
-using Lucene.Net.Documents;
+using Core.API;
 using Newtonsoft.Json;
 
 namespace Plugins.Tasks
@@ -198,13 +194,11 @@ namespace Plugins.Tasks
             return fileName;
         }
 
-        public override Task<IEnumerable<object>> GetItems()
+        public override IEnumerable<object> GetItems()
         {
-            return System.Threading.Tasks.Task.Factory
-                .StartNew(() => Directory.EnumerateFiles(TasksLocation, "*.task")
-                                    .Select(FileToTask)
-                                    .Where(t => t != null)
-                                    .Cast<object>());
+            return Directory.EnumerateFiles(TasksLocation, "*.task")
+                .Select(FileToTask)
+                .Where(t => t != null);
         }
 
 

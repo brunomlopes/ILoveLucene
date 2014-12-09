@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ServiceProcess;
-using System.Threading.Tasks;
 using Core.API;
-using Core.Abstractions;
-using System.Linq;
 using ElevationHelper.Services;
 using ElevationHelper.Services.WindowsServices;
 
@@ -15,9 +12,9 @@ namespace Plugins.Services
     {
         public static readonly ElevatedChannel<IServiceHandler> ElevatedServiceHandler = new ElevatedChannel<IServiceHandler>();
 
-        public override Task<IEnumerable<object>> GetItems()
+        public override IEnumerable<object> GetItems()
         {
-            return Task.Factory.StartNew(() => ServiceController.GetServices().Cast<object>());
+            return ServiceController.GetServices();
         }
 
         public override bool Persistent

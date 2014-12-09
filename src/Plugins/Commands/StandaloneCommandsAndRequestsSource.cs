@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Threading.Tasks;
 using Core.API;
-using Core.Abstractions;
 
 namespace Plugins.Commands
 {
@@ -17,12 +15,12 @@ namespace Plugins.Commands
         [ImportMany(AllowRecomposition = true)] 
         public IEnumerable<IRequest> Requests;
 
-        public override Task<IEnumerable<object>> GetItems()
+        public override IEnumerable<object> GetItems()
         {
             //FIXME:  this can be recomposed mid-iteration. we don't want that for now
             var commands = Commands; 
             var requests = Requests; 
-            return Task.Factory.StartNew(() => commands.Cast<Object>().Concat(requests));
+            return commands.Cast<Object>().Concat(requests);
         }
 
         public override bool Persistent

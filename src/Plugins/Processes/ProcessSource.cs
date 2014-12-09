@@ -12,11 +12,9 @@ namespace Plugins.Processes
     [Export(typeof(IItemSource))]
     public class ProcessSource : BaseItemSource
     {
-        public override Task<IEnumerable<object>> GetItems()
+        public override IEnumerable<object> GetItems()
         {
-            return Task.Factory
-                .StartNew(() => Process.GetProcesses()
-                                    .Cast<object>());
+            return Process.GetProcesses();
         }
 
         public override bool Persistent
