@@ -1,4 +1,4 @@
-$framework = "4.0x86"
+$framework = "4.6x86"
 properties {
     $dropbox_base_url = "http://dl.dropbox.com/u/118385/ilovelucene/"
     $package_path = "D:\documents\Dropbox\Public\ilovelucene"
@@ -32,7 +32,7 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
     $plugins = Get-ChildItem $outputDir\Plugins*
     mkdir $outputDir\Plugins | Out-Null
     mkdir $outputDir\Bin | Out-Null
-    mkdir $outputDir\LocalConfiguration | Out-Null
+    mkdir $outputDir\Local.Configuration | Out-Null
     Echo "Copy configurations from ..\Configuration to here and change them to fit your preferences" `
         | Out-File $outputDir\Local.Configuration\readme.txt
     Move-Item $binaries $outputDir\Bin
