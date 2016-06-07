@@ -31,25 +31,35 @@ namespace ILoveLucene.WindowsInterop
             ComponentDispatcher.ThreadPreprocessMessage += ComponentDispatcher_ThreadPreprocessMessage;
         }
 
+        private long _lastTickHotkeyWasPressed = 0;
+        private readonly long _ticksToConsiderHotKeyTrigger = TimeSpan.FromMilliseconds(500.0).Ticks;
+
         private void ComponentDispatcher_ThreadPreprocessMessage(ref MSG msg, ref bool handled)
         {
-            if (msg.message == WM_HOTKEY)
+            var now = DateTime.UtcNow.Ticks;
+            if (msg.message != WM_HOTKEY) return;
+
+            handled = true;
+            if (now - _lastTickHotkeyWasPressed > _ticksToConsiderHotKeyTrigger)
             {
-                try
-                {
-                    _callback();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-                handled = true;
+                _lastTickHotkeyWasPressed = now;
+                return;
+            }
+
+            _lastTickHotkeyWasPressed = now;
+            try
+            {
+                _callback();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
 
         private void SetupHotKey(IntPtr handle)
         {
-            RegisterHotKey(handle, GetType().GetHashCode(), Modifiers.MOD_CONTROL, Keys.VK_RETURN);
+            RegisterHotKey(handle, GetType().GetHashCode(), Modifiers.MOD_CONTROL, 0x0);
         }
 
         public void Dispose()
