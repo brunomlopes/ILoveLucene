@@ -11,8 +11,7 @@ namespace Plugins.Shortcuts
     {
         public override void ActOn(FileInfo item)
         {
-            var arguments = new ProcessStartInfo(item.FullName);
-            arguments.Verb = "runas";
+            var arguments = new ProcessStartInfo(item.FullName) {Verb = "runas"};
             Process.Start(arguments);
         }
     }
