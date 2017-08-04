@@ -1,6 +1,6 @@
 $framework = "4.6x86"
 properties {
-    $dropbox_base_url = "http://dl.dropbox.com/u/118385/ilovelucene/"
+    $dropbox_base_url = "https://brunomlopeswe.blob.core.windows.net/brunomlopes-ilovelucene/"
     $package_path = "D:\documents\Dropbox\Public\ilovelucene"
     $version_index_to_increase = 3
 }
@@ -64,6 +64,7 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
     & "$gitExec" push --tags
     
     Write-Host "Appcast updated with version $version"
+    Write-Host "Please update $zip and $appcast_path to blobstorage at $dropbox_base_url" -ForegroundColor red
 }
 
 Task Help {
