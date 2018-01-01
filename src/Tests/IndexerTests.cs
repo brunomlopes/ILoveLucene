@@ -55,7 +55,7 @@ namespace Tests
 
             var results = searcher.Autocomplete("simple");
             Assert.True(results.HasAutoCompletion);
-            Assert.Equal(results.AutoCompletedCommand.Item.Text, "simple");
+            Assert.Equal("simple", results.AutoCompletedCommand.Item.Text);
         }
         
         [Fact]
@@ -82,7 +82,7 @@ namespace Tests
 
             var results = searcher.Autocomplete("Firafox");
             Assert.True(results.HasAutoCompletion);
-            Assert.Equal(results.AutoCompletedCommand.Item.Text, "Firefox");
+            Assert.Equal("Firefox", results.AutoCompletedCommand.Item.Text);
         }
         
         [Fact]
@@ -96,7 +96,7 @@ namespace Tests
 
             var results = searcher.Autocomplete("FireFox");
             Assert.True(results.HasAutoCompletion);
-            Assert.Equal(results.AutoCompletedCommand.Item.Text, "Firefox");
+            Assert.Equal("Firefox", results.AutoCompletedCommand.Item.Text);
         }
         
         [Fact]
@@ -131,7 +131,7 @@ namespace Tests
 
             var results = searcher.Autocomplete("emac");
             Assert.True(results.HasAutoCompletion);
-            Assert.Equal(results.AutoCompletedCommand.Item.Text, "EmacsClient.lnk");
+            Assert.Equal("EmacsClient.lnk", results.AutoCompletedCommand.Item.Text);
         }
 
         [Fact]
@@ -144,7 +144,7 @@ namespace Tests
 
             var results = searcher.Autocomplete("yog");
             Assert.True(results.HasAutoCompletion);
-            Assert.Equal(results.AutoCompletedCommand.Item.Text, "SQLyog.lnk");
+            Assert.Equal("SQLyog.lnk", results.AutoCompletedCommand.Item.Text);
         }
 
         [Fact]

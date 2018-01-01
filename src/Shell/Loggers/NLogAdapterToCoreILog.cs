@@ -25,12 +25,13 @@ namespace ILoveLucene.Loggers
 
         public void Error(Exception exception)
         {
-            _logger.ErrorException(exception.Message, exception);
+            _logger.Error(exception, exception.Message);
         }
 
         public void Error(Exception exception, string format, params object[] args)
         {
-            _logger.ErrorException(string.Format(format, args), exception);
+            
+            _logger.Error(exception, string.Format(format, args));
         }
 
         public void Debug(string format, params object[] args)

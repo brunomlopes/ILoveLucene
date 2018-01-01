@@ -16,10 +16,11 @@ using Plugins.IronPython;
 using Xunit;
 using Xunit.Extensions;
 using Tests.Helpers;
+using Xunit.Sdk;
 
 namespace Tests
 {
-    public class IronPythonSupportTests :TestClass
+    public class IronPythonSupportTests 
     {
         [Fact]
         public void ExtractTokensFromString()

@@ -8,7 +8,7 @@ using Xunit.Extensions;
 
 namespace Tests
 {
-    public class MakeSureIDoNotScrewUpHashingTests : TestClass
+    public class MakeSureIDoNotScrewUpHashingTests
     {
         [Fact] 
         public void DidI()

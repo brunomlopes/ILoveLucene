@@ -144,7 +144,7 @@ namespace ILoveLucene
             }
             catch (Exception ex)
             {
-                startupTasksLogger.ErrorException("Error executing startup tasks", ex);
+                startupTasksLogger.Error(ex, "Error executing startup tasks");
             }
 
             base.OnStartup(sender, e);
@@ -169,7 +169,7 @@ namespace ILoveLucene
                 }
                 catch (Exception e)
                 {
-                    log.ErrorException("Error executing task "+t.GetType().Name, e);
+                    log.Error(e, "Error executing task "+t.GetType().Name);
                 }
             }
         }
