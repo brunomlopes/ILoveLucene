@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using Quartz;
 
 namespace ILoveLucene.AutoUpdate
@@ -9,9 +10,10 @@ namespace ILoveLucene.AutoUpdate
         [Import]
         public UpdateManagerAdapter UpdateManagerAdapter { get; set; }
 
-        public void Execute(IJobExecutionContext context)
+        public Task Execute(IJobExecutionContext context)
         {
             UpdateManagerAdapter.CheckForUpdates();
+            return Task.CompletedTask;
         }
     }
 }

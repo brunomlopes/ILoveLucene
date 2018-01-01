@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Core.API;
 using Core.Extensions;
 using Quartz;
@@ -25,7 +26,7 @@ namespace Core.Lucene
 
         }
 
-        public void Execute(IJobExecutionContext context)
+        public Task Execute(IJobExecutionContext context)
         {
             var sourceStorage = (SourceStorage)context.MergedJobDataMap[SourceStorageKey];
             var source = (IItemSource)context.MergedJobDataMap[SourceKey];
@@ -56,6 +57,7 @@ namespace Core.Lucene
                     NumberOfItems = count,
                     Source = source,
                 };
+            return Task.CompletedTask;
         }
     }
 }

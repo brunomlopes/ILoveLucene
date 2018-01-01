@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using Core.API;
 using Core.Abstractions;
 using Quartz;
@@ -21,13 +22,13 @@ namespace ILoveLucene.AutoUpdate
         [Import]
         public IScheduler Scheduler { get; set; }
 
-        public void Execute()
+        public async Task Execute()
         {
             if (!Scheduler.IsStarted) return;
 
-            foreach (var jobName in Scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals(JobGroup)))
+            foreach (var jobName in await Scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals(JobGroup)))
             {
-                Scheduler.DeleteJob(jobName);
+                await Scheduler.DeleteJob(jobName);
             }
 
             var jobDetail = JobBuilder.Create<CheckForUpdatesJob>()
@@ -39,12 +40,12 @@ namespace ILoveLucene.AutoUpdate
                 .WithIdentity("TriggerAutoUpdateEach" + Configuration.PeriodicityInMinutes + "Minutes")
                 .Build();
 
-            Scheduler.ScheduleJob(jobDetail, trigger);
+            await Scheduler.ScheduleJob(jobDetail, trigger);
         }
 
         public void OnImportsSatisfied()
         {
-            Execute();
+            Execute().Wait();
         }
     }
 }

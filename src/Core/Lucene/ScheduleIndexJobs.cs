@@ -7,6 +7,7 @@ using Core.API;
 using Core.Abstractions;
 using Quartz;
 using System.Linq;
+using System.Threading.Tasks;
 using Quartz.Impl.Matchers;
 
 namespace Core.Lucene
@@ -39,14 +40,14 @@ namespace Core.Lucene
             Converters = new IConverter[] { };
         }
 
-        public void Execute()
+        public async Task Execute()
         {
             if (!_scheduler.IsStarted) return;
 
 
-            foreach (var jobKey in _scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals(JobGroupExporter.JobGroup)))
+            foreach (var jobKey in await _scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals(JobGroupExporter.JobGroup)))
             {
-                _scheduler.DeleteJob(jobKey);
+                await _scheduler.DeleteJob(jobKey);
             }
 
             foreach (var sourceAndStorage in _sourceStorageFactory.Sources.Select(s => new {Storage = _sourceStorageFactory.SourceStorageFor(s.Id), Source = s}))
@@ -78,7 +79,7 @@ namespace Core.Lucene
                     .WithIdentity("Each" + frequency + "SecondsFor" + itemSource.Id)
                     .Build();
 
-                _scheduler.ScheduleJob(jobDetail, trigger);
+                await _scheduler.ScheduleJob(jobDetail, trigger);
             }
         }
 

@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using Core.Abstractions;
 using Quartz;
-using Quartz.Plugin.History;
-using System.Linq;
 
 namespace ILoveLucene.Infrastructure
 {
@@ -14,7 +13,7 @@ namespace ILoveLucene.Infrastructure
         [Import]
         public ILog Log { get; set; }
 
-        public void Execute()
+        public Task Execute()
         {
             if (Scheduler.ListenerManager.GetJobListener("InternalJobHistory") != null)
                 Scheduler.ListenerManager.RemoveJobListener("InternalJobHistory");
@@ -24,13 +23,13 @@ namespace ILoveLucene.Infrastructure
                     Log = Log,
                     Name = "InternalJobHistory",
                 });
+
+            return Task.CompletedTask;
         }
 
         public void OnImportsSatisfied()
         {
             Execute();
         }
-
-
     }
 }

@@ -83,7 +83,7 @@ namespace ILoveLucene
 
             var updateManagerAdapter = new UpdateManagerAdapter();
             
-            var scheduler = new StdSchedulerFactory().GetScheduler();
+            var scheduler = new StdSchedulerFactory().GetScheduler().Result;
             scheduler.JobFactory = new MefJobFactory(new SimpleJobFactory(), MefContainer);
 
             var batch = new CompositionBatch();

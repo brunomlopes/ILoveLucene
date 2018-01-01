@@ -68,7 +68,7 @@ namespace Plugins
 
         public override void Act()
         {
-            foreach (var jobName in Scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals(ScheduleIndexJobs.JobGroupExporter.JobGroup)))
+            foreach (var jobName in Scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals(ScheduleIndexJobs.JobGroupExporter.JobGroup)).Result)
             {
                 Scheduler.TriggerJob(jobName);
             }

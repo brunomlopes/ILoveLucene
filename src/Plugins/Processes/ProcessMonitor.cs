@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Management;
+using System.Threading.Tasks;
 using Core.Abstractions;
 using Core.Lucene;
 using WMI.Win32;
@@ -117,8 +118,9 @@ __InstanceDeletionEvent WITHIN 5 WHERE TargetInstance ISA 'Win32_Process' ";
         [Import]
         public IOnUiThread OnUiThread { get; set; }
 
-        public void Execute()
+        public Task Execute()
         {
+            return Task.CompletedTask;
             // Disable WMI tracking, which costs a constant 3% CPU
             //Init();
             // Disable reactive indexing, which collides with regular reindexing

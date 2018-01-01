@@ -3,6 +3,8 @@ using Quartz.Impl.Matchers;
 using Quartz.Spi;
 using System;
 using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ILoveLucene.Infrastructure
 {
@@ -16,31 +18,30 @@ namespace ILoveLucene.Infrastructure
         private string _name;
 
 
-        public virtual void Initialize(string pluginName, IScheduler sched)
+        public virtual Task Initialize(string pluginName, IScheduler sched, CancellationToken token)
         {
             this._name = pluginName;
             sched.ListenerManager.AddJobListener(this, new IMatcher<JobKey>[] { EverythingMatcher<JobKey>.AllJobs() });
+            return Task.CompletedTask;
         }
 
-        public virtual void JobExecutionVetoed(IJobExecutionContext context)
+        public virtual Task JobExecutionVetoed(IJobExecutionContext context, CancellationToken token)
         {
-            {
-                var trigger = context.Trigger;
-                var args = new object[] { context.JobDetail.Key.Name, context.JobDetail.Key.Group, SystemTime.UtcNow(), trigger.Key.Name, trigger.Key.Group, trigger.GetPreviousFireTimeUtc(), trigger.GetNextFireTimeUtc(), context.RefireCount };
-                Log.Info(string.Format(CultureInfo.InvariantCulture, this.JobWasVetoedMessage, args));
-            }
+            var trigger = context.Trigger;
+            var args = new object[] { context.JobDetail.Key.Name, context.JobDetail.Key.Group, SystemTime.UtcNow(), trigger.Key.Name, trigger.Key.Group, trigger.GetPreviousFireTimeUtc(), trigger.GetNextFireTimeUtc(), context.RefireCount };
+            Log.Info(string.Format(CultureInfo.InvariantCulture, this.JobWasVetoedMessage, args));
+            return Task.CompletedTask;
         }
 
-        public virtual void JobToBeExecuted(IJobExecutionContext context)
+        public virtual Task JobToBeExecuted(IJobExecutionContext context, CancellationToken token)
         {
-            {
                 var trigger = context.Trigger;
                 var args = new object[] { context.JobDetail.Key.Name, context.JobDetail.Key.Group, SystemTime.UtcNow(), trigger.Key.Name, trigger.Key.Group, trigger.GetPreviousFireTimeUtc(), trigger.GetNextFireTimeUtc(), context.RefireCount };
                 Log.Info(string.Format(CultureInfo.InvariantCulture, this.JobToBeFiredMessage, args));
-            }
+                return Task.CompletedTask;
         }
 
-        public virtual void JobWasExecuted(IJobExecutionContext context, JobExecutionException jobException)
+        public virtual Task JobWasExecuted(IJobExecutionContext context, JobExecutionException jobException, CancellationToken token)
         {
             object[] args;
             var trigger = context.Trigger;
@@ -53,14 +54,17 @@ namespace ILoveLucene.Infrastructure
             string result = Convert.ToString(context.Result, CultureInfo.InvariantCulture);
             args = new object[] { context.JobDetail.Key.Name, context.JobDetail.Key.Group, SystemTime.UtcNow(), trigger.Key.Name, trigger.Key.Group, trigger.GetPreviousFireTimeUtc(), trigger.GetNextFireTimeUtc(), context.RefireCount, result };
             Log.Info(string.Format(CultureInfo.InvariantCulture, this.JobSuccessMessage, args));
+            return Task.CompletedTask;
         }
 
-        public virtual void Shutdown()
+        public virtual Task Shutdown(CancellationToken token)
         {
+            return Task.CompletedTask;
         }
 
-        public virtual void Start()
+        public virtual Task Start(CancellationToken token)
         {
+            return Task.CompletedTask;
         }
 
         public virtual string JobFailedMessage

@@ -11,6 +11,7 @@ using Core.API;
 using Core.Abstractions;
 using IronPython.Hosting;
 using System.Linq;
+using System.Threading.Tasks;
 using IronPython.Runtime;
 using IronPythonMef;
 using Microsoft.Scripting;
@@ -68,7 +69,7 @@ namespace Plugins.IronPython
 
         public bool Executed { get; private set; }
 
-        public void Execute()
+        public Task Execute()
         {
             try
             {
@@ -106,6 +107,7 @@ namespace Plugins.IronPython
                 Executed = true;
             }
 
+            return Task.CompletedTask;
         }
 
         void _watcher_Renamed(object sender, RenamedEventArgs e)

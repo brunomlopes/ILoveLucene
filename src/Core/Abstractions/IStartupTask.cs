@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
+
 namespace Core.Abstractions
 {
     public interface IStartupTask
     {
-        void Execute();
+        Task Execute();
     }
 }
