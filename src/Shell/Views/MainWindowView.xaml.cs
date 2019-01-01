@@ -11,6 +11,7 @@ namespace ILoveLucene.Views
     {
         private readonly KeyboardHandler _globalHotKeyHandler;
         private readonly FocusHandler _focusHandler;
+        private readonly EnvironmentVarListener _envVarListener;
         private NotifyIcon _notifyIcon;
 
         public MainWindowView()
@@ -18,10 +19,13 @@ namespace ILoveLucene.Views
             InitializeComponent();
             _globalHotKeyHandler = new KeyboardHandler(this, Toggle);
             _focusHandler = new FocusHandler(this);
+            _envVarListener = new EnvironmentVarListener(this);
             Input.Focus();
 
             SetupNotifyIcon();
         }
+
+
 
         private void SetupNotifyIcon()
         {
@@ -42,6 +46,8 @@ namespace ILoveLucene.Views
                 _globalHotKeyHandler.Dispose();
             if(_notifyIcon != null)
                 _notifyIcon.Dispose();
+            if (_envVarListener != null)
+                _envVarListener.Dispose();
         }
 
         public void Toggle()
@@ -96,6 +102,11 @@ namespace ILoveLucene.Views
             Show();
             _focusHandler.SetForegroundWindow();
             Input.Focus();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            _envVarListener.OnLoaded();
         }
     }
 }

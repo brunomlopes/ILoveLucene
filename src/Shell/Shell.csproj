@@ -219,6 +219,7 @@
     <Compile Include="Views\LogView.xaml.cs">
       <DependentUpon>LogView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WindowsInterop\EnvironmentVarListener.cs" />
     <Compile Include="WindowsInterop\FocusHandler.cs" />
     <Compile Include="WindowsInterop\KeyboardHandler.cs" />
     <Compile Include="Views\MainWindowView.xaml.cs">
