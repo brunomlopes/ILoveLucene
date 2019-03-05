@@ -1,12 +1,14 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Extensions;
 using Lucene.Net.Documents;
+using Lucene.Net.Index;
 
 namespace Core.API
 {
-    public class CoreDocument
+    public class CoreDocument : IEnumerable<IIndexableField>
     {
         private readonly Document _document;
         private string Id {get { return GetString(SpecialFields.Id); }}
@@ -95,12 +97,12 @@ namespace Core.API
         {
             return (_document.GetField(fieldName)
                     ?? new Field("name", string.Empty, Field.Store.YES, Field.Index.NO))
-                .StringValue;
+                .GetStringValue();
         }
 
         public IEnumerable<string> GetStringList(string fieldName)
         {
-            return _document.GetFields(fieldName).Select(field => field.StringValue);
+            return _document.GetFields(fieldName).Select(field => field.GetStringValue());
         }
 
         public DocumentId GetDocumentId()
@@ -150,6 +152,16 @@ namespace Core.API
                                   Field.TermVector.WITH_POSITIONS_OFFSETS);
             field.Boost = 2;
             return field;
+        }
+
+        public IEnumerator<IIndexableField> GetEnumerator()
+        {
+            return _document.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

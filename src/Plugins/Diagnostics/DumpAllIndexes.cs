@@ -10,6 +10,9 @@ using Lucene.Net.Store;
 using Plugins.Commands;
 using System.Linq;
 using Autofac;
+using Lucene.Net.Analysis.Core;
+using Lucene.Net.Analysis.Standard;
+using Lucene.Net.Util;
 
 namespace Plugins.Diagnostics
 {
@@ -34,11 +37,11 @@ namespace Plugins.Diagnostics
             }
 
             var mergedDirectory = new SimpleFSDirectory(directoryInfo);
-            var mergedIndex = new IndexWriter(mergedDirectory, new SimpleAnalyzer(), true,
-                                              IndexWriter.MaxFieldLength.UNLIMITED);
+            var conf = new IndexWriterConfig(LuceneVersion.LUCENE_48, new SimpleAnalyzer(LuceneVersion.LUCENE_48));
+            var mergedIndex = new IndexWriter(mergedDirectory, conf);
 
             var directoryFactory = AutofacContainer.Resolve<IDirectoryFactory>();
-            mergedIndex.AddIndexes(directoryFactory.GetAllDirectories().Select(d => IndexReader.Open(d, true)).ToArray());
+            mergedIndex.AddIndexes(directoryFactory.GetAllDirectories().Select(d => (IndexReader)DirectoryReader.Open(d)).ToArray());
             mergedIndex.Commit();
         }
     }

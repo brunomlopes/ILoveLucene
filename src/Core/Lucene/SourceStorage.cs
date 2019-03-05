@@ -8,7 +8,7 @@ using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
-using Version = Lucene.Net.Util.Version;
+using Lucene.Net.Util;
 
 namespace Core.Lucene
 {
@@ -34,7 +34,7 @@ namespace Core.Lucene
         public void IndexItems(IItemSource source, IEnumerable<object> items)
         {
             using (var indexWriter = GetIndexWriter())
-            using (var indexReader = indexWriter.GetReader())
+            using (var indexReader = indexWriter.GetReader(true))
             {
                 var newTag = Guid.NewGuid().ToString();
 
@@ -52,7 +52,7 @@ namespace Core.Lucene
         public void AppendItems(IItemSource source, params object[] items)
         {
             using (var indexWriter = GetIndexWriter())
-            using (var indexReader = indexWriter.GetReader())
+            using (var indexReader = indexWriter.GetReader(true))
             {
                 foreach (var item in items)
                 {
@@ -66,7 +66,7 @@ namespace Core.Lucene
         public void RemoveItems(IItemSource source, params object[] items)
         {
             using (var indexWriter = GetIndexWriter())
-            using (var indexReader = indexWriter.GetReader())
+            using (var indexReader = indexWriter.GetReader(true))
             {
                 foreach (var item in items)
                 {
@@ -80,7 +80,7 @@ namespace Core.Lucene
         public void RemoveItemsById(IItemSource source, params DocumentId[] itemIds)
         {
             using (var indexWriter = GetIndexWriter())
-            using (var indexReader = indexWriter.GetReader())
+            using (var indexReader = indexWriter.GetReader(true))
             {
                 foreach (var item in itemIds)
                 {
@@ -94,7 +94,7 @@ namespace Core.Lucene
         public void LearnCommandForInput(DocumentId completionId, string input)
         {
             using (var indexWriter = GetIndexWriter())
-            using (var indexReader = indexWriter.GetReader())
+            using (var indexReader = indexWriter.GetReader(true))
             {
                 LearnCommandForInput(indexWriter, indexReader, completionId, input);
             }
@@ -107,9 +107,9 @@ namespace Core.Lucene
 
             if(IndexWriter.IsLocked(_indexDirectory))
                 IndexWriter.Unlock(_indexDirectory);
-
-            using (var writer = new IndexWriter(dir, new StandardAnalyzer(Version.LUCENE_29), !dir.Directory.Exists,
-                                   IndexWriter.MaxFieldLength.UNLIMITED))
+            var config = new IndexWriterConfig(LuceneVersion.LUCENE_48, new StandardAnalyzer(LuceneVersion.LUCENE_48));
+            
+            using (var writer = new IndexWriter(dir, config))
             {
                 // index exists, we're good.
             }
@@ -146,8 +146,9 @@ namespace Core.Lucene
 
         private IndexWriter GetIndexWriter()
         {
-            return new IndexWriter(_indexDirectory, new StandardAnalyzer(Version.LUCENE_29),
-                                   IndexWriter.MaxFieldLength.UNLIMITED);
+            var config = new IndexWriterConfig(LuceneVersion.LUCENE_48, new StandardAnalyzer(LuceneVersion.LUCENE_48));
+
+            return new IndexWriter(_indexDirectory, config);
         }
 
         private void DeleteDocumentsForSourceWithoutTag(IndexWriter indexWriter, IItemSource source, string tag)
@@ -181,7 +182,7 @@ namespace Core.Lucene
 
         private Document PopDocument(IndexWriter writer, IndexReader reader, string sha1)
         {
-            using(var searcher = new IndexSearcher(reader))
+            var searcher = new IndexSearcher(reader);
             {
                 var query = new TermQuery(new Term(SpecialFields.Sha1, sha1));
                 var documents = searcher.Search(query, 1);

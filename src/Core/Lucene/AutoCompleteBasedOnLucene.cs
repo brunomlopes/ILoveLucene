@@ -5,9 +5,10 @@ using System.Linq;
 using Core.API;
 using Core.Abstractions;
 using Lucene.Net.Analysis.Standard;
-using Lucene.Net.QueryParsers;
+using Lucene.Net.Index;
+using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
-using Version = Lucene.Net.Util.Version;
+using Lucene.Net.Util;
 
 namespace Core.Lucene
 {
@@ -40,7 +41,8 @@ namespace Core.Lucene
                                                                              {
                                                                                  try
                                                                                  {
-                                                                                     return new IndexSearcher(d, true);
+                                                                                     
+                                                                                     return (IndexReader)DirectoryReader.Open(d);
                                                                                  }
                                                                                  catch (Exception e)
                                                                                  {
@@ -50,8 +52,9 @@ namespace Core.Lucene
                                                                              })
                                                                              .Where(s => s != null)
                                                                              .ToArray();
-            using (var searcher = new MultiSearcher(searchers))
+            using(var multiReader = new MultiReader(searchers, true))
             {
+                var searcher = new IndexSearcher(multiReader);
                 try
                 {
                     BooleanQuery query = GetQueryForText(text);
@@ -76,8 +79,8 @@ namespace Core.Lucene
                                         catch (Exception e)
                                         {
                                             _log.Error(e, "Error getting command result for document {0}:{1}",
-                                                       document.GetField(SpecialFields.ConverterId).StringValue,
-                                                       document.GetField(SpecialFields.Id).StringValue);
+                                                       document.GetField(SpecialFields.ConverterId).GetStringValue(),
+                                                       document.GetField(SpecialFields.Id).GetStringValue());
                                             return null;
                                         }
                                     })
@@ -109,14 +112,14 @@ namespace Core.Lucene
                                  {SpecialFields.Learnings, 10},
                                  {SpecialFields.Type, 4}
                              };
-            var queryParser = new MultiFieldQueryParser(Version.LUCENE_29,
+            var queryParser = new MultiFieldQueryParser(LuceneVersion.LUCENE_48,
                                                         new[] { SpecialFields.Name, SpecialFields.Learnings, SpecialFields.Type },
-                                                        new StandardAnalyzer(Version.LUCENE_29)
+                                                        new StandardAnalyzer(LuceneVersion.LUCENE_48)
                                                         //,boosts
                                                         );
             
             queryParser.FuzzyMinSim = ((float)Configuration.FuzzySimilarity);
-            queryParser.DefaultOperator = (QueryParser.Operator.AND);
+            queryParser.DefaultOperator = (QueryParserBase.AND_OPERATOR);
 
             var textWithSubString = "*" + text.Trim().Replace(" ", "* *").Trim() + "*";
             var textWithFuzzy = text.Trim().Replace(" ", "~ ").Trim() + "~";

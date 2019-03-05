@@ -29,9 +29,8 @@ namespace Core.Lucene
                 var directory = new SimpleFSDirectory(info);
                 if (!info.Exists || !info.EnumerateFiles().Any())
                 {
-                    new IndexWriter(directory, new StandardAnalyzer(Version.LUCENE_29),
-                                    true,
-                                    IndexWriter.MaxFieldLength.UNLIMITED)
+                    var config = new IndexWriterConfig(LuceneVersion.LUCENE_48, new StandardAnalyzer(LuceneVersion.LUCENE_48));
+                    new IndexWriter(directory, config)
                         .Dispose();
                 }
                 

@@ -36,7 +36,7 @@ class StringItemSource(BasePythonItemSource):
             var script = _engine.CreateScriptSourceFromString(pythonCode);
             var typeExtractor = new ExtractTypesFromScript(_engine);
             var types = typeExtractor.GetTypesFromScript(script, IronPythonCommandsMefExport.InitialScopeTypes).ToList();
-            Assert.Equal(1, types.Count());
+            Assert.Single(types);
             Assert.Equal("StringItemSource", types.First().Name);
 
             var instance = types.First().Activator();
@@ -68,7 +68,7 @@ class StringItemSource(BasePythonItemSource):
             var instance = new MockImporter();
             container.SatisfyImportsOnce(instance);
 
-            Assert.Equal(1, instance.ItemSources.Count());
+            Assert.Single(instance.ItemSources);
         }
         
         [Fact]

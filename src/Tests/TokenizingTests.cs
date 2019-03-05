@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Extensions;
+using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Util;
 using Xunit;
@@ -12,7 +13,7 @@ namespace Tests
         [Fact]
         public void ExtractTokensFromString()
         {
-            var analyzer = new StandardAnalyzer(Version.LUCENE_29);
+            var analyzer = new StandardAnalyzer(LuceneVersion.LUCENE_48);
 
             var tokens = analyzer.Tokenize("notepad2 note2 note2 no2 n2 n2 n2 n2 n2 n2 note2 notepad2");
 
