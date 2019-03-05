@@ -1,5 +1,5 @@
 ﻿{
-	AppcastFeedUrl : "http://dl.dropbox.com/u/118385/ilovelucene/appcast.xml",
+	AppcastFeedUrl : "https://brunomlopeswe.blob.core.windows.net/brunomlopes-ilovelucene/appcast.xml",
     CheckForUpdates : true,
     PeriodicityInMinutes : 30
 }
