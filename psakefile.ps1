@@ -1,4 +1,5 @@
-$framework = "4.6x86"
+$framework = "4.5.1"
+
 properties {
     $dropbox_base_url = "https://brunomlopeswe.blob.core.windows.net/brunomlopes-ilovelucene/"
     $package_path = "D:\documents\Dropbox\Public\ilovelucene"
@@ -26,8 +27,8 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
     }
     $packageDir = $package_path
     
-    Exec { msbuild /t:clean /p:Configuration=Release /p:OutDir=$outputDir\ }
-    Exec { msbuild /t:build /p:Configuration=Release /p:OutDir=$outputDir\ }
+    Exec { msbuild /verbosity:Minimal /p:VisualStudioVersion=14.0 /t:clean /p:Configuration=Release /p:OutDir=$outputDir\ }
+    Exec { msbuild /verbosity:Minimal /p:VisualStudioVersion=14.0 /t:build /p:Configuration=Release /p:OutDir=$outputDir\ }
     $binaries = Get-ChildItem $outputDir -exclude ILoveLucene*,Plugins*,Configuration
     $plugins = Get-ChildItem $outputDir\Plugins*
     mkdir $outputDir\Plugins | Out-Null
@@ -44,9 +45,9 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
     $package_path = "$packageDir\$package_name"
     
     Push-Location $outputDir
-    $zip = Write-Zip .\* $package_path -level 9
+    Compress-Archive .\* $package_path -Force
     Pop-Location
-    Write-Host "File is up at $zip"
+    Write-Host "File is up at $package_path"
 
     $appcast_path = "$packageDir\appcast.xml"    
     Generate-Appcast-Item `
@@ -64,7 +65,7 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
     & "$gitExec" push --tags
     
     Write-Host "Appcast updated with version $version"
-    Write-Host "Please update $zip and $appcast_path to blobstorage at $dropbox_base_url" -ForegroundColor red
+    Write-Host "Please update $package_path and $appcast_path to blobstorage at $dropbox_base_url" -ForegroundColor red
 }
 
 Task Help {
@@ -83,7 +84,7 @@ param(
     [string]$appcast_path
 )
     $pub_date = Get-Date -format r
-    $template = [xml]"<?xml version=""1.0"" encoding=""utf-8""?>
+    $template = "<?xml version=""1.0"" encoding=""utf-8""?>
 <rss version=""2.0"" xmlns:appcast=""http://www.adobe.com/xml-namespaces/appcast/1.0"">
   <channel>
     <title>ILoveLucene</title>
@@ -100,7 +101,7 @@ param(
   </channel>
 </rss>
 "
-    $template | Format-Xml | Out-File -encoding utf8 $appcast_path
+    $template | Out-File -encoding utf8 $appcast_path
 }
 
 function Generate-Version-Info
@@ -155,6 +156,10 @@ namespace Core
 
 function Get-Git-Exec 
 {
+    [void](. git --version)
+    if($?){
+      return "git.exe"
+    }
     $programFiles = ""
     if (Test-Path "env:programfiles(x86)"){
       $programFiles = (Get-Item "env:programfiles(x86)").Value
