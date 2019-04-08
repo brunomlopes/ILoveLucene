@@ -34,9 +34,15 @@ namespace ILoveLucene.WindowsInterop
         private static void RefreshVariables()
         {
             var allVariables = Environment.GetEnvironmentVariables(EnvironmentVariableTarget.User);
-            foreach(DictionaryEntry var in allVariables)
+            var allMachineVariables = Environment.GetEnvironmentVariables(EnvironmentVariableTarget.Machine);
+            foreach (DictionaryEntry var in allVariables)
             {
-                Environment.SetEnvironmentVariable(var.Key.ToString(), var.Value.ToString(), EnvironmentVariableTarget.Process);
+                var value = var.Value.ToString();
+                if (var.Key.ToString().Equals("Path", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    value = allMachineVariables["Path"].ToString() + ";" + value;
+                }
+                Environment.SetEnvironmentVariable(var.Key.ToString(), value, EnvironmentVariableTarget.Process);
             }
         }
 
