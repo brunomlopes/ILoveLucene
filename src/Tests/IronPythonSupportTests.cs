@@ -94,7 +94,7 @@ class StringItemSource(BasePythonItemSource):
             var instance = new MockImporter();
             container.SatisfyImportsOnce(instance);
 
-            Assert.Equal(1, instance.ItemSources.Count());
+            Assert.Single(instance.ItemSources);
         } 
         
         [Fact]
@@ -129,8 +129,8 @@ class StringItemSource(BasePythonItemSource, IActOnItem):
             var instance = new MockImporter();
             container.SatisfyImportsOnce(instance);
 
-            Assert.Equal(1, instance.ItemSources.Count());
-            Assert.Equal(1, instance.Actions.Count());
+            Assert.Single(instance.ItemSources);
+            Assert.Single(instance.Actions);
         }
         
         [Fact]
@@ -160,10 +160,10 @@ StringItemSource.import_actions.func_dict['imports'] = IronPythonImportDefinitio
             container.Compose(batch);
 
             var value = container.GetExportedValue<MockImportActions>();
-            Assert.Equal(1, value.ActOnItems.Count());
+            Assert.Single(value.ActOnItems);
             IEnumerable actions = exports.First().Instance.actions;
-            Assert.Equal(1, actions.OfType<IActOnItem>().Count());
-            Assert.Equal(1, actions.OfType<MockExporter>().Count());
+            Assert.Single(actions.OfType<IActOnItem>());
+            Assert.Single(actions.OfType<MockExporter>());
         }
         
         [Fact]
@@ -193,10 +193,10 @@ class StringItemSource:
             container.Compose(batch);
 
             var value = container.GetExportedValue<MockImportActions>();
-            Assert.Equal(1, value.ActOnItems.Count());
+            Assert.Single(value.ActOnItems);
             IEnumerable actions = exports.First().Instance.actions;
-            Assert.Equal(1, actions.OfType<IActOnItem>().Count());
-            Assert.Equal(1, actions.OfType<MockExporter>().Count());
+            Assert.Single(actions.OfType<IActOnItem>());
+            Assert.Single(actions.OfType<MockExporter>());
         }
         
         [Fact]
@@ -271,7 +271,7 @@ class StringItemSource(BasePythonItemSource):
             commands.Execute();
 
             var importer = container.GetExportedValue<MockImporter>();
-            Assert.Equal(1, importer.ItemSources.Count());
+            Assert.Single(importer.ItemSources);
 
             var newCode = @"
 @export(IItemSource)
@@ -309,7 +309,7 @@ class StringItemSource(BasePythonItemSource):
             var typeExtractor = new ExtractTypesFromScript(_engine);
             var exports = typeExtractor.GetPartsFromScript(script, IronPythonCommandsMefExport.InitialScopeTypes).ToList();
 
-            Assert.Equal(0, exports.Count());
+            Assert.Empty(exports);
         }
 
         

@@ -12,6 +12,7 @@ using ILoveLucene.Loggers;
 using Lucene.Net.Store;
 using Xunit;
 using Directory = Lucene.Net.Store.Directory;
+using Shouldly;
 
 namespace Tests
 {
@@ -56,6 +57,29 @@ namespace Tests
             var results = searcher.Autocomplete("simple");
             Assert.True(results.HasAutoCompletion);
             Assert.Equal("simple", results.AutoCompletedCommand.Item.Text);
+        }
+        [Fact]
+        public void WhenAnItemIsUpdated_ThereIsStillJustOneItemFound()
+        {
+            var item = new TextItem("simple");
+            IndexItemIntoDirectory(item);
+
+            var searcher = GetAutocompleter();
+
+            var results = searcher.Autocomplete("simple");
+            results.OtherOptions.Count().ShouldBe(0);
+            results.HasAutoCompletion.ShouldBeTrue();
+            results.AutoCompletedCommand.Item.Text.ShouldBe("simple");
+
+            IndexItemIntoDirectory(item);
+
+            searcher = GetAutocompleter();
+
+            results = searcher.Autocomplete("simple");
+            results.OtherOptions.Count().ShouldBe(0);
+            results.HasAutoCompletion.ShouldBeTrue();
+            results.AutoCompletedCommand.Item.Text.ShouldBe("simple");
+
         }
         
         [Fact]
@@ -117,7 +141,7 @@ namespace Tests
             results = searcher.Autocomplete("Fire");
 
             Assert.True(results.HasAutoCompletion);
-            Assert.Equal(1, results.OtherOptions.Count());
+            Assert.Single(results.OtherOptions);
             Assert.Equal("Firewall", results.AutoCompletedCommand.Item.Text);
         }
 

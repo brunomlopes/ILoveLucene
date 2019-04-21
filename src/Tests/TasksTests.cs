@@ -61,7 +61,7 @@ namespace Tests
             var loadedTask = taskRepository.FromFileName(task.FileName);
             loadedTask.Stop();
 
-            Assert.Equal(1, loadedTask.Durations.Count);
+            Assert.Single(loadedTask.Durations);
         }
       
     }

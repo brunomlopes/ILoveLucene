@@ -16,7 +16,7 @@ namespace Plugins.Calibre
             source.Config = new Configuration();
 
             var items = source.GetItems().ToList();
-            Assert.NotEqual(0, items.Count);
+            Assert.NotEmpty(items);
         }
         
     }
