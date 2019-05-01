@@ -225,12 +225,19 @@
     <Compile Include="MakeSureIDoNotScrewUpHashingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TasksTests.cs" />
+    <Compile Include="Calibre\MockLog.cs" />
+    <Compile Include="Calibre\TestBookConverter.cs" />
+    <Compile Include="Calibre\TestItemSource.cs" />
     <Compile Include="TokenizingTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{28E91DF6-B35A-4341-AB82-E9CE24B04750}</Project>
       <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Plugins.Calibre\Plugins.Calibre.csproj">
+      <Project>{b8c7c8ae-fb80-473b-85d5-5d0d7f302e09}</Project>
+      <Name>Plugins.Calibre</Name>
     </ProjectReference>
     <ProjectReference Include="..\Plugins.WindowsEnvironment\Plugins.WindowsEnvironment.csproj">
       <Project>{5DB74A33-95C2-4B84-B638-C8C252CF7242}</Project>
