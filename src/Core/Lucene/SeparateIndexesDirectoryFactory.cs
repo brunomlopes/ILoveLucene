@@ -26,10 +26,11 @@ namespace Core.Lucene
             {
                 var info = new DirectoryInfo(Path.Combine(_root.FullName, id+".index"));
 
-                var directory = new SimpleFSDirectory(info);
+                var directory = new MMapDirectory(info);
                 if (!info.Exists || !info.EnumerateFiles().Any())
                 {
                     var config = new IndexWriterConfig(LuceneVersion.LUCENE_48, new StandardAnalyzer(LuceneVersion.LUCENE_48));
+                    config.OpenMode = OpenMode.CREATE_OR_APPEND;
                     new IndexWriter(directory, config)
                         .Dispose();
                 }
@@ -50,7 +51,7 @@ namespace Core.Lucene
         {
             _root.Refresh();
             return _root.EnumerateDirectories("*.index")
-                .Select(d => new SimpleFSDirectory(d))
+                .Select(d => new MMapDirectory(d))
                 .Cast<Directory>()
                 .Concat(_inMemoryDirectories.Values);
         }

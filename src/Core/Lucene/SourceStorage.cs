@@ -102,17 +102,16 @@ namespace Core.Lucene
 
         private void EnsureIndexExists()
         {
-            var dir = _indexDirectory as FSDirectory;
-            if (dir == null) return;
+            if (!(_indexDirectory is FSDirectory dir)) return;
 
-            if(IndexWriter.IsLocked(_indexDirectory))
+            if (IndexWriter.IsLocked(_indexDirectory))
                 IndexWriter.Unlock(_indexDirectory);
-            var config = new IndexWriterConfig(LuceneVersion.LUCENE_48, new StandardAnalyzer(LuceneVersion.LUCENE_48));
-            
-            using (var writer = new IndexWriter(dir, config))
+            var config = new IndexWriterConfig(LuceneVersion.LUCENE_48, new StandardAnalyzer(LuceneVersion.LUCENE_48))
             {
-                // index exists, we're good.
-            }
+                OpenMode = OpenMode.CREATE_OR_APPEND
+            };
+            new IndexWriter(dir, config)
+                .Dispose();
         }
 
         private void UpdateDocumentForObject(IndexWriter writer, IndexReader reader, IItemSource source, string tag, object item)
@@ -134,7 +133,7 @@ namespace Core.Lucene
             writer.AddDocument(document);
         }
 
-        public void DeleteDocumentForObject(IndexWriter writer, IndexReader indexReader, IItemSource source, object item)
+        private void DeleteDocumentForObject(IndexWriter writer, IndexReader indexReader, IItemSource source, object item)
         {
             var document = _converterRepository.ToDocument(source, item);
 
@@ -147,7 +146,6 @@ namespace Core.Lucene
         private IndexWriter GetIndexWriter()
         {
             var config = new IndexWriterConfig(LuceneVersion.LUCENE_48, new StandardAnalyzer(LuceneVersion.LUCENE_48));
-
             return new IndexWriter(_indexDirectory, config);
         }
 
@@ -183,18 +181,17 @@ namespace Core.Lucene
         private Document PopDocument(IndexWriter writer, IndexReader reader, string sha1)
         {
             var searcher = new IndexSearcher(reader);
-            {
-                var query = new TermQuery(new Term(SpecialFields.Sha1, sha1));
-                var documents = searcher.Search(query, 1);
+            var query = new TermQuery(new Term(SpecialFields.Sha1, sha1));
+            var documents = searcher.Search(query, 1);
+            
+            Debug.Assert(documents.TotalHits <= 1, string.Format("Sha1 '{0}' matched more than one document", sha1));
 
-                Debug.Assert(documents.TotalHits <= 1, string.Format("Sha1 '{0}' matched more than one document", sha1));
+            if (documents.TotalHits == 0) return null;
 
-                if (documents.TotalHits == 0) return null;
+            var document = documents.ScoreDocs.Select(sd => searcher.Doc(sd.Doc)).First();
+            writer.DeleteDocuments(new Term(SpecialFields.Sha1, sha1));
 
-                var document = searcher.Doc(documents.ScoreDocs.First().Doc);
-                writer.DeleteDocuments(new Term(SpecialFields.Sha1, sha1));
-                return document;
-            }
+            return document;
         }
     }
 }

@@ -41,8 +41,16 @@ namespace Plugins.Diagnostics
             var mergedIndex = new IndexWriter(mergedDirectory, conf);
 
             var directoryFactory = AutofacContainer.Resolve<IDirectoryFactory>();
-            mergedIndex.AddIndexes(directoryFactory.GetAllDirectories().Select(d => (IndexReader)DirectoryReader.Open(d)).ToArray());
+            var allDirectories = directoryFactory.GetAllDirectories();
+            foreach(var directory in allDirectories)
+            {
+                using(var reader = DirectoryReader.Open(directory))
+                {
+                    mergedIndex.AddIndexes(reader);
+                }
+            }
             mergedIndex.Commit();
+
         }
     }
 }

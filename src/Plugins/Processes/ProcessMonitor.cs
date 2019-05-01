@@ -64,9 +64,8 @@ __InstanceDeletionEvent WITHIN 5 WHERE TargetInstance ISA 'Win32_Process' ";
         private void ProcessDeleted(Win32_Process proc)
         {
             Log.Debug("Process {0} ({1}) deleted", proc.Name, proc.ProcessId);
-            Process process;
             var storage = _sourceStorageFactory.SourceStorageFor(_source.Id);
-            if (_cachedProcesses.TryRemove(proc.ProcessId, out process))
+            if (_cachedProcesses.TryRemove(proc.ProcessId, out Process process))
             {
                 storage.RemoveItems(_source, process);
             }

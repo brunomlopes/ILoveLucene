@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Core.Extensions;
 using Lucene.Net.Documents;
@@ -34,6 +35,7 @@ namespace Core.API
 
         public static CoreDocument Rehydrate(Document document)
         {
+            Contract.Requires(document != null);
             return new CoreDocument(document);
         }
 
@@ -85,18 +87,18 @@ namespace Core.API
 
         public CoreDocument Store(string fieldName, params string[] content)
         {
-            return SetField(fieldName, content, Field.Index.NOT_ANALYZED_NO_NORMS, Field.TermVector.NO); ;
+            return SetStringField(fieldName, content);
         }
         
         public CoreDocument Index(string fieldName, params string[] content)
         {
-            return SetField(fieldName, content, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
+            return SetTextField(fieldName, content);
         }
 
         public string GetString(string fieldName)
         {
             return (_document.GetField(fieldName)
-                    ?? new Field("name", string.Empty, Field.Store.YES, Field.Index.NO))
+                    ?? new StringField("name", string.Empty, Field.Store.YES))
                 .GetStringValue();
         }
 
@@ -130,8 +132,8 @@ namespace Core.API
                 throw new InvalidOperationException("Document missing required field " + field);
             }
         }
-
-        private CoreDocument SetField(string fieldName, IEnumerable<string> content, Field.Index analyzed, Field.TermVector withTermVector)
+        
+        private CoreDocument SetStringField(string fieldName, IEnumerable<string> content)
         {
             // getfield retuns on first, and removefields removes all field by the name
             // removefield would only remove the first with the name
@@ -139,18 +141,29 @@ namespace Core.API
                 _document.RemoveFields(fieldName);
             foreach (var c in content)
             {
-                _document.Add(new Field(fieldName, c, Field.Store.YES, analyzed,
-                                        withTermVector));
+                _document.AddStringField(fieldName, c, Field.Store.YES);
+            }
+            return this;
+        }
+        private CoreDocument SetTextField(string fieldName, IEnumerable<string> content)
+        {
+            // getfield retuns on first, and removefields removes all field by the name
+            // removefield would only remove the first with the name
+            if (_document.GetField(fieldName) != null)
+                _document.RemoveFields(fieldName);
+            foreach (var c in content)
+            {
+                _document.AddTextField(fieldName, c, Field.Store.YES);
             }
             return this;
         }
 
         private static Field FieldForLearning(string learning)
         {
-            var field = new Field(SpecialFields.Learnings, learning, Field.Store.YES,
-                                  Field.Index.ANALYZED,
-                                  Field.TermVector.WITH_POSITIONS_OFFSETS);
-            field.Boost = 2;
+            var field = new TextField(SpecialFields.Learnings, learning, Field.Store.YES)
+            {
+                Boost = 2
+            };
             return field;
         }
 

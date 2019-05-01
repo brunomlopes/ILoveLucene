@@ -50,11 +50,8 @@ namespace Core.Lucene
                 await _scheduler.DeleteJob(jobKey);
             }
 
-            foreach (var sourceAndStorage in _sourceStorageFactory.Sources.Select(s => new {Storage = _sourceStorageFactory.SourceStorageFor(s.Id), Source = s}))
+            foreach (var (sourceStorage, itemSource) in _sourceStorageFactory.Sources.Select(s => (_sourceStorageFactory.SourceStorageFor(s.Id), s)))
             {
-                IItemSource itemSource = sourceAndStorage.Source;
-                SourceStorage sourceStorage = sourceAndStorage.Storage;
-
                 var frequency = Configuration.GetFrequencyForItemSource(itemSource);
 
                 if (itemSource.Persistent && frequency < Configuration.MinimumFrequencyForPersistentSources)
@@ -85,7 +82,7 @@ namespace Core.Lucene
 
         public void OnImportsSatisfied()
         {
-            Execute();
+            Execute().Wait();
         }
     }
 }

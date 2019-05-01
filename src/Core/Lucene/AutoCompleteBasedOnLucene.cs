@@ -118,7 +118,7 @@ namespace Core.Lucene
                                                         //,boosts
                                                         );
             
-            queryParser.FuzzyMinSim = ((float)Configuration.FuzzySimilarity);
+            queryParser.FuzzyMinSim = (float)Configuration.FuzzySimilarity;
             queryParser.DefaultOperator = (QueryParserBase.AND_OPERATOR);
 
             var textWithSubString = "*" + text.Trim().Replace(" ", "* *").Trim() + "*";
