@@ -5,6 +5,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Core.Extensions;
 using Lucene.Net.Documents;
+using Lucene.Net.Documents.Extensions;
 using Lucene.Net.Index;
 
 namespace Core.API

@@ -35,11 +35,11 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
     mkdir $outputDir\Bin | Out-Null
     mkdir $outputDir\Local.Configuration | Out-Null
     Echo "Copy configurations from ..\Configuration to here and change them to fit your preferences" `
-        | Out-File $outputDir\Local.Configuration\readme.txt
+    | Out-File $outputDir\Local.Configuration\readme.txt
     Move-Item $binaries $outputDir\Bin
     Move-Item $plugins $outputDir\Plugins
     
-    Remove-Item $outputDir\Bin\*.pdb -exclude Core.pdb,ElevationHelper.Services.pdb
+    Remove-Item $outputDir\Bin\*.pdb -exclude Core.pdb, ElevationHelper.Services.pdb
     
     $package_name = "ILoveLucene-$version-$gitHash.zip"
     $package_path = "$packageDir\$package_name"
@@ -74,15 +74,14 @@ Task Help {
 
 Task default -depends Help
 
-function Generate-Appcast-Item
-{
-param(
-    [string]$version,
-    [string]$package_url,
-    [string]$package_filename,
-    [string]$package_size,
-    [string]$appcast_path
-)
+function Generate-Appcast-Item {
+    param(
+        [string]$version,
+        [string]$package_url,
+        [string]$package_filename,
+        [string]$package_size,
+        [string]$appcast_path
+    )
     $pub_date = Get-Date -format r
     $template = "<?xml version=""1.0"" encoding=""utf-8""?>
 <rss version=""2.0"" xmlns:appcast=""http://www.adobe.com/xml-namespaces/appcast/1.0"">
@@ -104,17 +103,16 @@ param(
     $template | Out-File -encoding utf8 $appcast_path
 }
 
-function Generate-Version-Info
-{
-param(
-    [string]$clsCompliant = "true",
-    [string]$company, 
-    [string]$product, 
-    [string]$copyright, 
-    [string]$version,
-    [string]$assembly_file = $(throw "assembly_file is a required parameter."),
-    [string]$class_file = $(throw "class_file is a required parameter.")
-)
+function Generate-Version-Info {
+    param(
+        [string]$clsCompliant = "true",
+        [string]$company, 
+        [string]$product, 
+        [string]$copyright, 
+        [string]$version,
+        [string]$assembly_file = $(throw "assembly_file is a required parameter."),
+        [string]$class_file = $(throw "class_file is a required parameter.")
+    )
     $commit = Get-Git-Commit
     $timestamp = get-date -UFormat %Y%m%d_%H%M
     $datetime = get-date -UFormat "new DateTime(%Y,%m,%d,%H,%M,%S)"
@@ -154,42 +152,40 @@ namespace Core
     $classInfo | out-file -encoding utf8 $class_file
 }
 
-function Get-Git-Exec 
-{
+function Get-Git-Exec {
     [void](. git --version)
-    if($?){
-      return "git.exe"
+    if ($?) {
+        return "git.exe"
     }
     $programFiles = ""
-    if (Test-Path "env:programfiles(x86)"){
-      $programFiles = (Get-Item "env:programfiles(x86)").Value
-    }else{
-      $programFiles = (Get-Item "env:programfiles").Value
+    if (Test-Path "env:programfiles(x86)") {
+        $programFiles = (Get-Item "env:programfiles(x86)").Value
+    }
+    else {
+        $programFiles = (Get-Item "env:programfiles").Value
     }
     return "$programFiles\Git\bin\git.exe"
 }
 
-function Get-Git-Commit
-{
+function Get-Git-Commit {
     $gitExec = Get-Git-Exec
     $gitLog = & "$gitExec" log --oneline -1
     return $gitLog.Split(' ')[0]
 }
 
-function Get-Next-Version
-{
+function Get-Next-Version {
     $gitExec = Get-Git-Exec
-    $description= (& "$gitExec" describe --tags).split("-")
+    $description = (& "$gitExec" describe --tags).split("-")
     $last_version_tag = $description[0]
     if (-not $last_version_tag.startswith("version")) {
         throw "Git description '$description' not valid for version" 
     }
     
-    $last_versions = $last_version_tag.split("_")[1].split(".") | foreach { [int]$_} 
+    $last_versions = $last_version_tag.split("_")[1].split(".") | foreach { [int]$_ } 
     if ($description.Length -eq 3) {
         $last_versions[$version_index_to_increase] += 1
-        $i = $version_index_to_increase+1
-        while($i -lt 4){
+        $i = $version_index_to_increase + 1
+        while ($i -lt 4) {
             $last_versions[$i] = 0
             $i += 1
         }
