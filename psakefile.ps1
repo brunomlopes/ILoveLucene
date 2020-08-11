@@ -1,4 +1,4 @@
-$framework = "4.5.1"
+Framework "4.8"
 
 properties {
     $dropbox_base_url = "https://brunomlopeswe.blob.core.windows.net/brunomlopes-ilovelucene/"
@@ -22,19 +22,19 @@ Task Build-Package -depends Update-Solution-Assembly-Info -description "Builds a
     $gitHash = Get-Git-Commit
     $outputRoot = (Get-Item .).FullName
     $outputDir = "$outputRoot\output"
-    if (Test-Path $outputDir){
+    if (Test-Path $outputDir) {
         Remove-Item $outputDir -recurse -force
     }
     $packageDir = $package_path
     
-    Exec { msbuild /verbosity:Minimal /p:VisualStudioVersion=14.0 /t:clean /p:Configuration=Release /p:OutDir=$outputDir\ }
-    Exec { msbuild /verbosity:Minimal /p:VisualStudioVersion=14.0 /t:build /p:Configuration=Release /p:OutDir=$outputDir\ }
-    $binaries = Get-ChildItem $outputDir -exclude ILoveLucene*,Plugins*,Configuration
+    Exec { msbuild.exe /verbosity:Minimal /p:VisualStudioVersion=14.0 /t:clean /p:Configuration=Release /p:OutDir=$outputDir\ }
+    Exec { msbuild.exe /verbosity:Minimal /p:VisualStudioVersion=14.0 /t:build /p:Configuration=Release /p:OutDir=$outputDir\ }
+    $binaries = Get-ChildItem $outputDir -exclude ILoveLucene*, Plugins*, Configuration
     $plugins = Get-ChildItem $outputDir\Plugins*
     mkdir $outputDir\Plugins | Out-Null
     mkdir $outputDir\Bin | Out-Null
     mkdir $outputDir\Local.Configuration | Out-Null
-    Echo "Copy configurations from ..\Configuration to here and change them to fit your preferences" `
+    Write-Output "Copy configurations from ..\Configuration to here and change them to fit your preferences" `
     | Out-File $outputDir\Local.Configuration\readme.txt
     Move-Item $binaries $outputDir\Bin
     Move-Item $plugins $outputDir\Plugins
@@ -181,15 +181,9 @@ function Get-Next-Version {
         throw "Git description '$description' not valid for version" 
     }
     
-    $last_versions = $last_version_tag.split("_")[1].split(".") | foreach { [int]$_ } 
-    if ($description.Length -eq 3) {
-        $last_versions[$version_index_to_increase] += 1
-        $i = $version_index_to_increase + 1
-        while ($i -lt 4) {
-            $last_versions[$i] = 0
-            $i += 1
-        }
-    }
+    $last_versions = $last_version_tag.split("_")[1].split(".") | ForEach-Object { [int]$_ } 
+    $last_versions[$version_index_to_increase] += 1
+
     
     return [string]::join(".", $last_versions)
 }

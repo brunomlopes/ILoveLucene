@@ -20,4 +20,3 @@ Use scriptblock for taskNameFormat
 -------------------------------------------------------------------
 $config.taskNameFormat= { param($taskName) "Executing $taskName at $(get-date)" }
 #>
-$config.framework = "4.6.1"
