@@ -107,10 +107,10 @@
       <HintPath>..\..\packages\IronPythonMef.1.0.0.0\lib\net40\IronPythonMef.dll</HintPath>
     </Reference>
     <Reference Include="J2N, Version=2.0.0.0, Culture=neutral, PublicKeyToken=f39447d697a969af, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\J2N.2.0.0-beta-0008\lib\net45\J2N.dll</HintPath>
+      <HintPath>..\..\packages\J2N.2.0.0-beta-0012\lib\net45\J2N.dll</HintPath>
     </Reference>
     <Reference Include="Lucene.Net, Version=4.0.0.0, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Lucene.Net.4.8.0-beta00011\lib\net45\Lucene.Net.dll</HintPath>
+      <HintPath>..\..\packages\Lucene.Net.4.8.0-beta00014\lib\net45\Lucene.Net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ComponentModel.Composition.Initialization.Desktop">
       <HintPath>..\..\lib\composition.initialization.desktop\Microsoft.ComponentModel.Composition.Initialization.Desktop.dll</HintPath>
@@ -470,13 +470,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="LICENSE.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="j2n-icon-100x100.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\..\packages\Lucene.Net.4.8.0-beta00011\analyzers\dotnet\cs\Lucene.Net.CodeAnalysis.dll" />
+    <Analyzer Include="..\..\packages\Lucene.Net.4.8.0-beta00014\analyzers\dotnet\cs\Lucene.Net.CodeAnalysis.CSharp.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
